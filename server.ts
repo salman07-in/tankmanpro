@@ -1390,8 +1390,8 @@ async function startServer() {
     const vendor = res.locals.vendor as Vendor;
     const todayDateStr = new Date().toISOString().slice(0, 10);
 
-    // Strictly filter to ONLY bookings assigned to this vendor
-    const rawAssignedBookings = filterVendorScopedBookings(liveBookings, vendor.uid);
+    // Strictly filter to ONLY bookings assigned to this vendor AND within their supported PIN codes
+    const rawAssignedBookings = filterVendorScopedBookings(liveBookings, vendor.uid, vendor.supportedAreaPins);
     const sanitizedBookings = rawAssignedBookings
       .map((b) => sanitizeBookingForVendorView(b, vendor.uid))
       .filter((b): b is NonNullable<typeof b> => b !== null);

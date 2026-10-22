@@ -2530,10 +2530,16 @@ function findEligibleVendorsForBooking(booking, vendors) {
 }
 
 // src/lib/vendorEngine.ts
-function filterVendorScopedBookings(bookings, vendorUid) {
+function filterVendorScopedBookings(bookings, vendorUid, supportedAreaPins) {
   const cleanUid = (vendorUid || "").trim();
   if (!cleanUid) return [];
-  return bookings.filter((b) => b.assignedVendorUid === cleanUid);
+  return bookings.filter((b) => {
+    if (b.assignedVendorUid !== cleanUid) return false;
+    if (Array.isArray(supportedAreaPins) && supportedAreaPins.length > 0) {
+      return supportedAreaPins.includes(b.pinCode);
+    }
+    return true;
+  });
 }
 function maskCustomerPhone(phone) {
   const clean = (phone || "").trim();
@@ -2632,7 +2638,7 @@ function validateVendorJobTransition(params) {
 }
 function computeVendorDashboardMetrics(params) {
   const { bookings, vendor, todayDateStr } = params;
-  const scoped = filterVendorScopedBookings(bookings, vendor.uid);
+  const scoped = filterVendorScopedBookings(bookings, vendor.uid, vendor.supportedAreaPins);
   const commissionPercent = typeof vendor.commissionPercent === "number" && vendor.commissionPercent >= 0 ? vendor.commissionPercent : 18;
   let awaitingAcceptanceCount = 0;
   let todaysJobsCount = 0;
@@ -4429,7 +4435,7 @@ async function startServer() {
   app.get("/api/vendor/state", (_req, res) => {
     const vendor = res.locals.vendor;
     const todayDateStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
-    const rawAssignedBookings = filterVendorScopedBookings(liveBookings, vendor.uid);
+    const rawAssignedBookings = filterVendorScopedBookings(liveBookings, vendor.uid, vendor.supportedAreaPins);
     const sanitizedBookings = rawAssignedBookings.map((b) => sanitizeBookingForVendorView(b, vendor.uid)).filter((b) => b !== null);
     const assignedBookingIds = new Set(rawAssignedBookings.map((b) => b.id));
     const scopedEvents = liveBookingEvents.filter((e) => assignedBookingIds.has(e.bookingId));

@@ -138,8 +138,8 @@ export const AdminShell: React.FC<AdminShellProps> = ({
     }
   });
 
-  const [loginEmail, setLoginEmail] = useState('admin@tankmanpro.com');
-  const [loginPassword, setLoginPassword] = useState('TankmanAdmin@2026');
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -1063,7 +1063,7 @@ export const AdminShell: React.FC<AdminShellProps> = ({
               </div>
             )}
 
-            <form onSubmit={handleEmailLogin} className="space-y-4">
+            <form onSubmit={handleEmailLogin} className="space-y-4" autoComplete="off">
               <div>
                 <label
                   htmlFor="admin-login-email"
@@ -1073,10 +1073,12 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                 </label>
                 <input
                   id="admin-login-email"
+                  name="admin_direct_user_id"
                   type="email"
+                  autoComplete="off"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
-                  placeholder="admin@tankmanpro.com"
+                  placeholder="Enter admin email (e.g. admin@tankmanpro.com)"
                   className="w-full px-3.5 py-2.5 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-teal-500"
                 />
               </div>
@@ -1090,10 +1092,12 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                 </label>
                 <input
                   id="admin-login-password"
+                  name="admin_direct_secret_key"
                   type="password"
+                  autoComplete="new-password"
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
-                  placeholder="••••••••••••"
+                  placeholder="Enter admin password"
                   className="w-full px-3.5 py-2.5 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-teal-500"
                 />
               </div>
@@ -1122,22 +1126,8 @@ export const AdminShell: React.FC<AdminShellProps> = ({
               className="w-full py-2.5 px-4 bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold rounded-xl border border-slate-700 transition-colors cursor-pointer flex items-center justify-center gap-2"
             >
               <ShieldCheck className="w-4 h-4 text-teal-400" />
-              Sign In with Google (skhan786spn@gmail.com)
+              Sign In with Google (Super Admin)
             </button>
-
-            <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
-              <span>Verified Admin Credentials Pre-Filled</span>
-              <button
-                type="button"
-                onClick={() => {
-                  setLoginEmail('admin@tankmanpro.com');
-                  setLoginPassword('TankmanAdmin@2026');
-                }}
-                className="text-teal-400 hover:underline font-semibold cursor-pointer"
-              >
-                Reset Credentials
-              </button>
-            </div>
           </div>
         </main>
       </div>

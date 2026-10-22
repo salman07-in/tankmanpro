@@ -126,8 +126,8 @@ export const VendorShell: React.FC<VendorShellProps> = ({
 
   // Login Form State
   const [partnerAccounts, setPartnerAccounts] = useState<PartnerAccountPreview[]>([]);
-  const [emailOrCode, setEmailOrCode] = useState('rohilkhand.demo@tankmanpro.example');
-  const [vendorPassword, setVendorPassword] = useState('TankmanPartner@2026');
+  const [emailOrCode, setEmailOrCode] = useState('');
+  const [vendorPassword, setVendorPassword] = useState('');
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
   const [authBanner, setAuthBanner] = useState<{
     type: 'error' | 'success' | 'info';
@@ -195,22 +195,9 @@ export const VendorShell: React.FC<VendorShellProps> = ({
     setOpToast({ type, text });
   }, []);
 
-  // Load Partner Account Directory for Login Quick-Selection
+  // Partner Account directory not displayed on login
   useEffect(() => {
-    let active = true;
-    fetch('/api/vendor/accounts-preview')
-      .then((r) => r.json())
-      .then((data) => {
-        if (active && Array.isArray(data?.accounts)) {
-          setPartnerAccounts(data.accounts);
-        }
-      })
-      .catch(() => {
-        // Ignore preview fetch errors
-      });
-    return () => {
-      active = false;
-    };
+    setPartnerAccounts([]);
   }, []);
 
   // Fetch Scoped Vendor State from Authoritative Server
@@ -645,6 +632,13 @@ export const VendorShell: React.FC<VendorShellProps> = ({
 
   const filteredBookings = useMemo(() => {
     return bookings.filter((b) => {
+      // Strictly show only orders for this vendor's authorized PIN code(s)
+      if (vendorProfile?.supportedAreaPins && vendorProfile.supportedAreaPins.length > 0) {
+        if (!vendorProfile.supportedAreaPins.includes(b.pinCode)) {
+          return false;
+        }
+      }
+
       if (jobFilter === 'AWAITING_ACCEPTANCE' && b.status !== 'assigned_to_vendor') {
         return false;
       }
@@ -799,62 +793,7 @@ export const VendorShell: React.FC<VendorShellProps> = ({
               </div>
             )}
 
-            {/* Quick Partner Account Selector for Multi-City Testing */}
-            {partnerAccounts.length > 0 && (
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-slate-800">
-                    Select Active Partner Account
-                  </span>
-                  <span className="text-xs text-slate-500">
-                    Password: <code className="font-mono text-slate-700">TankmanPartner@2026</code>
-                  </span>
-                </div>
-                <div className="grid grid-cols-1 gap-1.5">
-                  {partnerAccounts.map((acc) => {
-                    const isSelected =
-                      emailOrCode.toLowerCase() === acc.email.toLowerCase() ||
-                      emailOrCode.toLowerCase() === acc.vendorCode.toLowerCase();
-                    return (
-                      <button
-                        key={acc.uid}
-                        type="button"
-                        onClick={() => {
-                          setEmailOrCode(acc.email);
-                          setVendorPassword('TankmanPartner@2026');
-                          setAuthBanner(null);
-                        }}
-                        className={`text-left px-3 py-2 rounded-lg border text-xs transition-colors cursor-pointer flex items-center justify-between gap-2 ${
-                          isSelected
-                            ? 'bg-teal-50 border-teal-600 text-slate-950 font-semibold'
-                            : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
-                        }`}
-                      >
-                        <div className="min-w-0">
-                          <div className="truncate font-semibold text-slate-900">
-                            {acc.displayName}
-                          </div>
-                          <div className="text-slate-500 truncate mt-0.5">
-                            <span className="font-mono">{acc.vendorCode}</span>
-                            <span aria-hidden="true"> · </span>
-                            <span>{acc.email}</span>
-                            <span aria-hidden="true"> · </span>
-                            <span className="font-mono">
-                              PINs: {acc.supportedAreaPins.join(', ')}
-                            </span>
-                          </div>
-                        </div>
-                        <span className="text-xs font-mono text-teal-700 shrink-0">
-                          {acc.status}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            <form onSubmit={handleVendorLogin} className="space-y-4">
+            <form onSubmit={handleVendorLogin} className="space-y-4" autoComplete="off">
               <div>
                 <label
                   htmlFor="vendor-identifier"
@@ -864,10 +803,12 @@ export const VendorShell: React.FC<VendorShellProps> = ({
                 </label>
                 <input
                   id="vendor-identifier"
+                  name="partner_login_code"
                   type="text"
+                  autoComplete="off"
                   value={emailOrCode}
                   onChange={(e) => setEmailOrCode(e.target.value)}
-                  placeholder="e.g. rohilkhand.demo@tankmanpro.example or TMP-VND-1003"
+                  placeholder="Enter Partner Email or Vendor ID"
                   className="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700"
                 />
               </div>
@@ -889,10 +830,12 @@ export const VendorShell: React.FC<VendorShellProps> = ({
                 </div>
                 <input
                   id="vendor-password"
+                  name="partner_login_secret"
                   type="password"
+                  autoComplete="new-password"
                   value={vendorPassword}
                   onChange={(e) => setVendorPassword(e.target.value)}
-                  placeholder="••••••••••••"
+                  placeholder="Enter your password"
                   className="w-full px-3.5 py-2.5 text-sm bg-white border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-700"
                 />
               </div>

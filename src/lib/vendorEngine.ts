@@ -38,11 +38,18 @@ export interface VendorTransitionValidation {
  */
 export function filterVendorScopedBookings(
   bookings: Booking[],
-  vendorUid: string
+  vendorUid: string,
+  supportedAreaPins?: string[]
 ): Booking[] {
   const cleanUid = (vendorUid || '').trim();
   if (!cleanUid) return [];
-  return bookings.filter((b) => b.assignedVendorUid === cleanUid);
+  return bookings.filter((b) => {
+    if (b.assignedVendorUid !== cleanUid) return false;
+    if (Array.isArray(supportedAreaPins) && supportedAreaPins.length > 0) {
+      return supportedAreaPins.includes(b.pinCode);
+    }
+    return true;
+  });
 }
 
 /**
@@ -188,7 +195,7 @@ export function computeVendorDashboardMetrics(params: {
   todayDateStr: string;
 }): VendorDashboardMetrics {
   const { bookings, vendor, todayDateStr } = params;
-  const scoped = filterVendorScopedBookings(bookings, vendor.uid);
+  const scoped = filterVendorScopedBookings(bookings, vendor.uid, vendor.supportedAreaPins);
   const commissionPercent =
     typeof vendor.commissionPercent === 'number' && vendor.commissionPercent >= 0
       ? vendor.commissionPercent
