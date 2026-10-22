@@ -1,0 +1,6 @@
+{
+  "name": "TankmanPro",
+  "description": "Indian home-services booking platform with city and PIN-code coverage validation, dynamic city and vendor-offer pricing, and isolated Customer, Admin, and Vendor portals.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

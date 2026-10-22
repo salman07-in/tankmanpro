@@ -1,0 +1,228 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Platform user account (customer, vendor, or admin)",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "role": { "type": "string", "enum": ["customer", "vendor", "admin"] },
+        "displayName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "active": { "type": "boolean" },
+        "createdAtIso": { "type": "string" },
+        "updatedAtIso": { "type": "string" }
+      },
+      "required": ["uid", "role", "displayName", "email", "active"]
+    },
+    "City": {
+      "title": "City",
+      "description": "Serviceable city record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "state": { "type": "string" },
+        "active": { "type": "boolean" },
+        "supportPhone": { "type": "string" },
+        "updatedAtIso": { "type": "string" }
+      },
+      "required": ["id", "name", "slug", "state", "active"]
+    },
+    "ServiceArea": {
+      "title": "ServiceArea",
+      "description": "6-digit Indian PIN code serviceability and zone mapping",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "pinCode": { "type": "string" },
+        "cityId": { "type": "string" },
+        "cityName": { "type": "string" },
+        "state": { "type": "string" },
+        "zoneLabel": { "type": "string" },
+        "active": { "type": "boolean" },
+        "supportedServiceIds": { "type": "array", "items": { "type": "string" } },
+        "assignedVendorUids": { "type": "array", "items": { "type": "string" } },
+        "conflictFlag": { "type": "boolean" },
+        "conflictNotes": { "type": "string" },
+        "updatedAtIso": { "type": "string" }
+      },
+      "required": ["id", "pinCode", "cityId", "zoneLabel", "active"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Service category in marketplace catalog",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "slug": { "type": "string" },
+        "shortDescription": { "type": "string" },
+        "iconKey": { "type": "string" },
+        "displayOrder": { "type": "number" },
+        "active": { "type": "boolean" }
+      },
+      "required": ["id", "name", "slug", "active"]
+    },
+    "Service": {
+      "title": "Service",
+      "description": "Bookable home service with variants, addons, and city availability",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "categoryId": { "type": "string" },
+        "slug": { "type": "string" },
+        "title": { "type": "string" },
+        "shortSummary": { "type": "string" },
+        "fullDescription": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "durationMinutes": { "type": "number" },
+        "warrantyDays": { "type": "number" },
+        "status": { "type": "string", "enum": ["draft", "published", "archived"] },
+        "defaultPricingMode": { "type": "string", "enum": ["city_fixed", "vendor_offer"] },
+        "supportedCityIds": { "type": "array", "items": { "type": "string" } },
+        "updatedAtIso": { "type": "string" }
+      },
+      "required": ["id", "categoryId", "slug", "title", "status", "defaultPricingMode"]
+    },
+    "PriceOverride": {
+      "title": "PriceOverride",
+      "description": "City or vendor specific integer-paise price override for a service variant",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "serviceId": { "type": "string" },
+        "variantId": { "type": "string" },
+        "cityId": { "type": "string" },
+        "vendorUid": { "type": "string" },
+        "amountPaise": { "type": "number" },
+        "approvalStatus": { "type": "string", "enum": ["approved", "pending", "rejected"] },
+        "active": { "type": "boolean" },
+        "updatedAtIso": { "type": "string" }
+      },
+      "required": ["id", "serviceId", "variantId", "cityId", "amountPaise", "active"]
+    },
+    "Vendor": {
+      "title": "Vendor",
+      "description": "Service partner / technician account and operational coverage",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "vendorCode": { "type": "string" },
+        "displayName": { "type": "string" },
+        "businessName": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending_verification", "active", "suspended", "rejected"] },
+        "isAvailable": { "type": "boolean" },
+        "supportedCityIds": { "type": "array", "items": { "type": "string" } },
+        "supportedAreaPins": { "type": "array", "items": { "type": "string" } },
+        "supportedServiceIds": { "type": "array", "items": { "type": "string" } },
+        "maxActiveJobs": { "type": "number" },
+        "activeAssignedJobs": { "type": "number" },
+        "updatedAtIso": { "type": "string" }
+      },
+      "required": ["uid", "vendorCode", "displayName", "status"]
+    },
+    "Booking": {
+      "title": "Booking",
+      "description": "Customer service booking with authoritative paise quote snapshot and vendor dispatch state",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "bookingNumber": { "type": "string" },
+        "customerUid": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerPhone": { "type": "string" },
+        "cityId": { "type": "string" },
+        "pinCode": { "type": "string" },
+        "serviceId": { "type": "string" },
+        "variantId": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": [
+            "requested",
+            "confirmed",
+            "assigned_to_vendor",
+            "vendor_accepted",
+            "vendor_rejected",
+            "in_progress",
+            "completed",
+            "cancelled",
+            "refunded"
+          ]
+        },
+        "assignedVendorUid": { "type": "string" },
+        "createdAtIso": { "type": "string" },
+        "updatedAtIso": { "type": "string" }
+      },
+      "required": ["id", "bookingNumber", "customerName", "cityId", "pinCode", "serviceId", "status"]
+    },
+    "BookingEvent": {
+      "title": "BookingEvent",
+      "description": "Immutable audit trail entry for booking status and assignment changes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "bookingId": { "type": "string" },
+        "actorUid": { "type": "string" },
+        "actorRole": { "type": "string", "enum": ["customer", "vendor", "admin", "system"] },
+        "actorName": { "type": "string" },
+        "fromStatus": { "type": "string" },
+        "toStatus": { "type": "string" },
+        "note": { "type": "string" },
+        "createdAtIso": { "type": "string" }
+      },
+      "required": ["id", "bookingId", "actorRole", "toStatus", "createdAtIso"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Real-time operational notification for admin, vendor, or customer",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "recipientRole": { "type": "string", "enum": ["admin", "vendor", "customer"] },
+        "recipientUid": { "type": "string" },
+        "bookingId": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string" },
+        "read": { "type": "boolean" },
+        "createdAtIso": { "type": "string" }
+      },
+      "required": ["id", "recipientRole", "title", "message", "read", "createdAtIso"]
+    },
+    "CmsSettings": {
+      "title": "CmsSettings",
+      "description": "Admin-managed website hero, trust strip, FAQs, contact info, and dispatch mode",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "heroTitle": { "type": "string" },
+        "heroSubtitle": { "type": "string" },
+        "announcementText": { "type": "string" },
+        "supportPhone": { "type": "string" },
+        "supportEmail": { "type": "string" },
+        "whatsappNumber": { "type": "string" },
+        "dispatchMode": { "type": "string", "enum": ["manual", "auto_lowest_load"] },
+        "updatedAtIso": { "type": "string" }
+      },
+      "required": ["id", "heroTitle", "supportPhone", "dispatchMode"]
+    }
+  },
+  "firestore": {
+    "/users/{uid}": { "schema": "User", "description": "User profiles and RBAC roles" },
+    "/cities/{cityId}": { "schema": "City", "description": "Serviceable cities" },
+    "/service_areas/{pinCode}": { "schema": "ServiceArea", "description": "PIN code coverage records" },
+    "/categories/{categoryId}": { "schema": "Category", "description": "Service categories" },
+    "/services/{serviceId}": { "schema": "Service", "description": "Service catalog" },
+    "/price_overrides/{overrideId}": { "schema": "PriceOverride", "description": "City and vendor price overrides" },
+    "/vendors/{uid}": { "schema": "Vendor", "description": "Vendor profiles and PIN/service assignments" },
+    "/bookings/{bookingId}": { "schema": "Booking", "description": "Customer bookings" },
+    "/booking_events/{eventId}": { "schema": "BookingEvent", "description": "Booking lifecycle audit events" },
+    "/notifications/{notificationId}": { "schema": "Notification", "description": "Portal notifications" },
+    "/cms_settings/{docId}": { "schema": "CmsSettings", "description": "Website CMS settings" }
+  }
+}

@@ -1,0 +1,118 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        (request.auth.token.email == "skhan786spn@gmail.com" && request.auth.token.email_verified == true) ||
+        (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin')
+      );
+    }
+
+    function isVendor() {
+      return isAuthenticated() && (
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'vendor'
+      );
+    }
+
+    // 1. Users collection
+    match /users/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create: if isAuthenticated() && isOwner(uid) &&
+        (request.resource.data.role in ['customer', 'vendor'] || isAdmin());
+      allow update: if isAdmin() || (isOwner(uid) && request.resource.data.role == resource.data.role);
+      allow delete: if isAdmin();
+    }
+
+    // 2. Public Catalog & Location Collections (Read by Customer Storefront, Managed by Admin)
+    match /cities/{cityId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /service_areas/{pinCode} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /services/{serviceId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /price_overrides/{overrideId} {
+      allow read: if true;
+      allow create, update: if isAdmin() || (isVendor() && request.resource.data.vendorUid == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    match /coupons/{couponId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /cms_settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 3. Vendors Collection
+    match /vendors/{uid} {
+      allow read: if true;
+      allow create: if isAdmin() || isOwner(uid);
+      allow update: if isAdmin() || (isOwner(uid) && request.resource.data.status == resource.data.status);
+      allow delete: if isAdmin();
+    }
+
+    // 4. Bookings Collection
+    match /bookings/{bookingId} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.customerUid == request.auth.uid) ||
+        (isAuthenticated() && resource.data.assignedVendorUid == request.auth.uid);
+      allow create: if true;
+      allow update: if isAdmin() ||
+        (isAuthenticated() && resource.data.assignedVendorUid == request.auth.uid) ||
+        (isAuthenticated() && resource.data.customerUid == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    // 5. Booking Audit Trail Events
+    match /booking_events/{eventId} {
+      allow read: if isAdmin() || isAuthenticated();
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+
+    // 6. Notifications
+    match /notifications/{notificationId} {
+      allow read: if isAdmin() ||
+        (isAuthenticated() && resource.data.recipientUid == request.auth.uid);
+      allow create: if true;
+      allow update: if isAdmin() ||
+        (isAuthenticated() && resource.data.recipientUid == request.auth.uid);
+      allow delete: if isAdmin();
+    }
+
+    // 7. Area Waitlist Leads (Unsupported PIN codes)
+    match /area_waitlist/{leadId} {
+      allow read: if isAdmin();
+      allow create: if true;
+      allow update, delete: if isAdmin();
+    }
+  }
+}
