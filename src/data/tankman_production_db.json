@@ -1,0 +1,3617 @@
+{
+  "cities": [
+    {
+      "id": "city_delhi",
+      "name": "New Delhi",
+      "state": "Delhi NCR",
+      "slug": "new-delhi",
+      "supportPhone": "+91-98100-TANK1",
+      "active": true,
+      "isDemo": true
+    },
+    {
+      "id": "city_shahjahanpur",
+      "name": "Shahjahanpur",
+      "state": "Uttar Pradesh",
+      "slug": "shahjahanpur",
+      "supportPhone": "+91-94150-TANK2",
+      "active": true,
+      "isDemo": true
+    }
+  ],
+  "serviceAreas": [
+    {
+      "id": "sa_del_110001",
+      "cityId": "city_delhi",
+      "cityName": "New Delhi",
+      "state": "Delhi NCR",
+      "pinCode": "110001",
+      "zoneLabel": "Central Delhi",
+      "neighbourhoods": [
+        "Connaught Place",
+        "Barakhamba",
+        "Janpath"
+      ],
+      "supportedServiceIds": [],
+      "assignedVendorUids": [
+        "vendor_demo_del_1",
+        "vendor_demo_del_2"
+      ],
+      "active": true,
+      "isDemo": true
+    },
+    {
+      "id": "sa_del_110016",
+      "cityId": "city_delhi",
+      "cityName": "New Delhi",
+      "state": "Delhi NCR",
+      "pinCode": "110016",
+      "zoneLabel": "South Delhi",
+      "neighbourhoods": [
+        "Hauz Khas",
+        "Green Park",
+        "IIT Delhi Area"
+      ],
+      "supportedServiceIds": [],
+      "assignedVendorUids": [
+        "vendor_demo_del_1",
+        "vendor_demo_del_2"
+      ],
+      "active": true,
+      "isDemo": true
+    },
+    {
+      "id": "sa_del_110075",
+      "cityId": "city_delhi",
+      "cityName": "New Delhi",
+      "state": "Delhi NCR",
+      "pinCode": "110075",
+      "zoneLabel": "Dwarka Sub-City",
+      "neighbourhoods": [
+        "Dwarka Sector 4",
+        "Dwarka Sector 10",
+        "Dwarka Sector 12"
+      ],
+      "supportedServiceIds": [],
+      "assignedVendorUids": [
+        "vendor_demo_del_1"
+      ],
+      "active": true,
+      "isDemo": true
+    },
+    {
+      "id": "sa_spn_242001",
+      "cityId": "city_shahjahanpur",
+      "cityName": "Shahjahanpur",
+      "state": "Uttar Pradesh",
+      "pinCode": "242001",
+      "zoneLabel": "City Centre & Sadar",
+      "neighbourhoods": [
+        "Sadar Bazar",
+        "Civil Lines",
+        "Town Hall",
+        "Kanth Road"
+      ],
+      "supportedServiceIds": [],
+      "assignedVendorUids": [
+        "vendor_demo_spn_1",
+        "vendor_demo_spn_2"
+      ],
+      "active": true,
+      "isDemo": true
+    },
+    {
+      "id": "sa_spn_242226",
+      "cityId": "city_shahjahanpur",
+      "cityName": "Shahjahanpur",
+      "state": "Uttar Pradesh",
+      "pinCode": "242226",
+      "zoneLabel": "Roza Industrial & Residential",
+      "neighbourhoods": [
+        "Roza Junction",
+        "Railway Colony",
+        "Lodhipur"
+      ],
+      "supportedServiceIds": [],
+      "assignedVendorUids": [
+        "vendor_demo_spn_1",
+        "vendor_demo_spn_2"
+      ],
+      "active": true,
+      "isDemo": true
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat_water_tank",
+      "name": "Water Tank Cleaning",
+      "slug": "water-tank-cleaning",
+      "shortDescription": "Mechanized dewatering, sludge removal, high-pressure jet cleaning & UV sanitization (500L to 5000L).",
+      "iconKey": "water-tank",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg",
+      "sortOrder": 1,
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "cat_vehicle_wash",
+      "name": "Car & Bike Wash",
+      "slug": "car-bike-wash",
+      "shortDescription": "Doorstep car interior vacuum + exterior polish wash and two-wheeler foam wash.",
+      "iconKey": "vehicle-wash",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175929.jpg",
+      "sortOrder": 2,
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "cat_kitchen",
+      "name": "Kitchen, Chimney & Fridge",
+      "slug": "kitchen-cleaning",
+      "shortDescription": "Empty kitchen deep cleaning, chimney degreasing, single/double door fridge, gas stove & sink cleaning.",
+      "iconKey": "kitchen",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/t_chimeny.png",
+      "sortOrder": 3,
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "cat_bathroom",
+      "name": "Bathroom & Tile Cleaning",
+      "slug": "bathroom-cleaning",
+      "shortDescription": "Machine & hand scrubbing, complete A-to-Z bathroom deep cleaning, toilet & washbasin descaling.",
+      "iconKey": "bathroom",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/bathroom-.webp",
+      "sortOrder": 4,
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "cat_fan_appliances",
+      "name": "Fan, Floor & Home Care",
+      "slug": "fan-floor-door-cleaning",
+      "shortDescription": "Ceiling fan & exhaust fan degreasing, door cleaning, and microfiber floor scrubbing.",
+      "iconKey": "fan-appliances",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/asian-man-wearing-a-protective-mask-cleaning-ceiling-fan-at-home.jpg",
+      "sortOrder": 5,
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "cat_sofa_mattress",
+      "name": "Sofa, Mattress & Carpet",
+      "slug": "sofa-mattress-carpet",
+      "shortDescription": "Dry dusting, shampooing, wet vacuum extraction for sofas, single/double mattresses & carpets.",
+      "iconKey": "sofa-mattress",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/How-Do-we-Clean-Your-Sofa.jpg",
+      "sortOrder": 6,
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "cat_ac_service",
+      "name": "AC Service & Repair",
+      "slug": "ac-service-repair",
+      "shortDescription": "Split & window AC foam-jet service, cooling diagnostics, and complete AC installation.",
+      "iconKey": "ac-service",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/repairman-uniform-installing-outside-unit-air-conditioner_93675-91162.jpg",
+      "sortOrder": 7,
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "cat_repairs",
+      "name": "Home Maintenance & Technicians",
+      "slug": "home-maintenance-technicians",
+      "shortDescription": "Certified Plumber, Electrician, Painter, Washing Machine & Refrigerator technicians on call.",
+      "iconKey": "appliance-repair",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/colorful-electricity-elements-concept_1284-37811.jpg",
+      "sortOrder": 8,
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "cat_aesthetics",
+      "name": "Beedare Skin & Aesthetics",
+      "slug": "beedare-aesthetics",
+      "shortDescription": "At-home chemical peels, Dermapen, PRP rejuvenation & laser hair removal by Beedare by TankmanPro.",
+      "iconKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/54a488b2-c84c-4ea4-ad5b-62f4610ece16.jpg",
+      "sortOrder": 9,
+      "status": "published",
+      "isDemo": true
+    }
+  ],
+  "services": [
+    {
+      "id": "srv_mechanized_tank_clean",
+      "slug": "mechanized-water-tank-cleaning",
+      "title": "Mechanized Water Tank Cleaning",
+      "categoryId": "cat_water_tank",
+      "shortDescription": "Manhole & surroundings cleaned off dirt, mud, and algae; water pumped out; high-pressure rotary jet wash & sanitization.",
+      "fullDescription": "The manhole and surroundings are cleaned of dirt, mud, and algae, after which water below the foot-valve level is pumped out using specialized dewatering equipment. Includes internal sludge vacuuming, high-pressure jet wash of walls and ceiling, and anti-bacterial UV treatment.",
+      "illustrationKey": "water-tank",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg",
+      "galleryUrls": [
+        "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg"
+      ],
+      "durationMinutes": 60,
+      "basePricePaise": 59900,
+      "regularPricePaise": 69900,
+      "defaultPricingMode": "city_fixed",
+      "cityModeOverrides": {
+        "city_delhi": "city_fixed",
+        "city_shahjahanpur": "vendor_offer",
+        "city_kanpur": "city_fixed"
+      },
+      "inclusions": [
+        "Stage 1: Manhole & surrounding area mud, dirt, and algae removal",
+        "Stage 2: Mechanized dewatering pump-out below foot-valve level",
+        "Stage 3: Wet-vacuum extraction of bottom sludge and sediment",
+        "Stage 4: High-pressure jet cleaning of internal walls, floor, and ceiling",
+        "Stage 5: Antibacterial sanitization & UV germicidal treatment",
+        "Stage 6: Float valve check and clean water rinse"
+      ],
+      "exclusions": [
+        "Structural cement plastering or civil crack repair",
+        "Water tanker refilling supply"
+      ],
+      "preparationInstructions": [
+        "Switch off the water pump 3–4 hours before the appointment so water level is low.",
+        "Provide terrace/tank access and a standard power socket within 15 metres."
+      ],
+      "warrantySummary": "100% chemical-residue-free mechanized hygiene process",
+      "cancellationPolicySummary": "Free cancellation or reschedule up to 4 hours before slot.",
+      "variants": [
+        {
+          "id": "var_tank_500_1000",
+          "serviceId": "srv_mechanized_tank_clean",
+          "name": "Water Tank Cleaning (500L to 750L)",
+          "scopeSummary": "Standard residential overhead tank (500 ltr to 750 ltr capacity)",
+          "durationMinutes": 45,
+          "basePricePaise": 49900,
+          "regularPricePaise": 69900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg",
+          "active": true
+        },
+        {
+          "id": "var_tank_1000_1500",
+          "serviceId": "srv_mechanized_tank_clean",
+          "name": "Water Tank Cleaning (1000L to 1500L)",
+          "scopeSummary": "Medium overhead or underground tank (1000 ltr to 1500 ltr capacity)",
+          "durationMinutes": 60,
+          "basePricePaise": 89900,
+          "regularPricePaise": 109900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg",
+          "active": true
+        },
+        {
+          "id": "var_tank_1500_2000",
+          "serviceId": "srv_mechanized_tank_clean",
+          "name": "Water Tank Cleaning (2000L to 3000L)",
+          "scopeSummary": "Large overhead or sump tank (2000 ltr to 3000 ltr capacity)",
+          "durationMinutes": 90,
+          "basePricePaise": 149900,
+          "regularPricePaise": 179900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg",
+          "active": true
+        },
+        {
+          "id": "var_tank_4000_5000",
+          "serviceId": "srv_mechanized_tank_clean",
+          "name": "Water Tank Cleaning (4000L to 5000L)",
+          "scopeSummary": "Extra-large commercial / society storage tank (4000 ltr to 5000 ltr)",
+          "durationMinutes": 120,
+          "basePricePaise": 249900,
+          "regularPricePaise": 299900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg",
+          "active": true
+        }
+      ],
+      "addons": [
+        {
+          "id": "addon_float_valve",
+          "serviceId": "srv_mechanized_tank_clean",
+          "name": "Heavy Duty Float Valve Replacement",
+          "description": "Prevent overflow and save water with anti-corrosion brass valve assembly.",
+          "pricePaise": 14900,
+          "required": false,
+          "maxQuantity": 2,
+          "active": true
+        },
+        {
+          "id": "addon_pipeline_flush",
+          "serviceId": "srv_mechanized_tank_clean",
+          "name": "Main Pipeline Air & Sludge Flush",
+          "description": "Flush out sediment from main header downpipe to internal distribution lines.",
+          "pricePaise": 29900,
+          "required": false,
+          "maxQuantity": 1,
+          "active": true
+        }
+      ],
+      "questions": [],
+      "faqs": [
+        {
+          "question": "Do I need to completely drain the tank before the crew arrives?",
+          "answer": "No. Turn off your water pump 3–4 hours before so only residual water is left."
+        }
+      ],
+      "supportedCityIds": [
+        "city_delhi"
+      ],
+      "status": "published",
+      "isDemo": false,
+      "updatedAtIso": "2026-10-23T16:49:29.514Z"
+    },
+    {
+      "id": "srv_car_wash",
+      "slug": "car-wash",
+      "title": "Car wash",
+      "categoryId": "cat_vehicle_wash",
+      "shortDescription": "We provide interior and exterior Cleaning Via vacuum + polish. Car Cleaning services at Tankmanpro cleaning services.",
+      "fullDescription": "A high pressure water jet is used to clean the car exterior as well as the engine compartment. The flexible nozzle makes it easy to target areas with tough stains and the high pressure maintained guarantees that it removes the dirt completely and effortlessly. Includes full interior high-suction vacuuming, dashboard polish, tyre dressing, and crystal glass cleaning.",
+      "illustrationKey": "vehicle-wash",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175929.jpg",
+      "galleryUrls": [
+        "https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175929.jpg"
+      ],
+      "durationMinutes": 60,
+      "basePricePaise": 29900,
+      "regularPricePaise": 39900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "High-pressure water jet exterior foam wash",
+        "Engine compartment surface dust and grime jet clean",
+        "Interior high-suction vacuuming (seats, floor mats, boot)",
+        "Dashboard, console and interior trim UV conditioning polish",
+        "Tyre cleaning and high-gloss dressing",
+        "Streak-free glass cleaning inside and out"
+      ],
+      "exclusions": [
+        "Interior roof fabric foam extraction (quoted as add-on)",
+        "Exterior rubbing, compound buffing or ceramic coating"
+      ],
+      "preparationInstructions": [
+        "Park vehicle in an accessible driveway, parking spot or open area.",
+        "Ensure a standard water tap and electrical plug socket are available nearby."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_car_wash_standard",
+          "serviceId": "srv_car_wash",
+          "name": "Doorstep Car Wash (Hatchback / Sedan / SUV)",
+          "scopeSummary": "Full exterior high pressure foam wash, interior vacuuming & polish",
+          "durationMinutes": 60,
+          "basePricePaise": 29900,
+          "regularPricePaise": 39900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175929.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_bike_wash",
+      "slug": "bike-wash",
+      "title": "Bike Wash",
+      "categoryId": "cat_vehicle_wash",
+      "shortDescription": "This service includes Foam Wash of Bike’s Body paint together with the polishing of Tyre/ Plastic/ Vinyl components.",
+      "fullDescription": "Recommended to maintain the basic hygiene and shine of your two-wheeler. Includes high pressure water jet exterior wash, engine dirt blast, snow foam body wash, tyre/plastic/vinyl polishing, and chain clean & lube check.",
+      "illustrationKey": "vehicle-wash",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175942.jpg",
+      "galleryUrls": [
+        "https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175942.jpg"
+      ],
+      "durationMinutes": 30,
+      "basePricePaise": 9900,
+      "regularPricePaise": 14900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "High-pressure water jet pre-wash",
+        "Snow foam body shampoo & scrub",
+        "Engine area degreasing and grime removal",
+        "Tyre and rim cleaning with gloss polish",
+        "Plastic and vinyl dashboard/mirror trim polishing"
+      ],
+      "exclusions": [
+        "Engine oil change or mechanical tune-ups"
+      ],
+      "preparationInstructions": [
+        "Keep bike parked on double stand with power socket nearby."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 2 hours before service.",
+      "variants": [
+        {
+          "id": "var_bike_wash_standard",
+          "serviceId": "srv_bike_wash",
+          "name": "Two-Wheeler Foam Wash & Polish",
+          "scopeSummary": "Complete foam wash, pressure jet, tyre and plastic polish",
+          "durationMinutes": 30,
+          "basePricePaise": 9900,
+          "regularPricePaise": 14900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175942.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_chimney_cleaning",
+      "slug": "chimney-cleaning",
+      "title": "Chimney Cleaning",
+      "categoryId": "cat_kitchen",
+      "shortDescription": "Disassembling filters, chemical spray & scrubbing out stains, chimney exterior cleaning, wet wipe, reassembling.",
+      "fullDescription": "1. Disassembling: Unlock and remove baffle/mesh filters from the chimney.\n2. Filter Cleaning: Specialized grease-cutting chemical spray and heavy scrub.\n3. Exterior Cleaning: Stain removal and polishing of stainless steel / glass outer body.\n4. Wet Wipe: Microfiber moisture wipe down.\n5. Reassembling: Fit back parts with safety check.",
+      "illustrationKey": "kitchen",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/t_chimeny.png",
+      "galleryUrls": [
+        "https://tankmanpro.com/wp-content/uploads/2023/11/t_chimeny.png",
+        "https://tankmanpro.com/wp-content/uploads/2023/11/electric-kitchen-chimney-cleaning-service-500x500-1.jpg"
+      ],
+      "durationMinutes": 60,
+      "basePricePaise": 39900,
+      "regularPricePaise": 49900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Filter disassembly and deep degreasing soak",
+        "Oil collector tray hot-chemical wash",
+        "Exterior hood scrubbing and smudge-free polish",
+        "Exhaust suction check and reassembly"
+      ],
+      "exclusions": [
+        "Motor rewinding or duct pipe installation"
+      ],
+      "preparationInstructions": [
+        "Turn off chimney switch at least 30 mins before appointment."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_chimney_clean_standard",
+          "serviceId": "srv_chimney_cleaning",
+          "name": "Standard Kitchen Chimney Deep Clean",
+          "scopeSummary": "Filter degreasing, oil collector wash, outer body polish & reassembly",
+          "durationMinutes": 60,
+          "basePricePaise": 39900,
+          "regularPricePaise": 49900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/t_chimeny.png",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_ceiling_fan_cleaning",
+      "slug": "ceiling-fan-cleaning",
+      "title": "Celling Fan Cleaning",
+      "categoryId": "cat_fan_appliances",
+      "shortDescription": "Dry Dusting of fan blades, chemical spray and scrubbing to remove stains on surfaces, wet wipe using microfiber towel.",
+      "fullDescription": "Removing stubborn grease and oily dust accumulated on ceiling fans. Dry dusting on both sides of blades, specialized non-abrasive stain remover spray, blade scrubbing, and clean microfiber wet wipe for spotless finish.",
+      "illustrationKey": "fan-appliances",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/asian-man-wearing-a-protective-mask-cleaning-ceiling-fan-at-home.jpg",
+      "durationMinutes": 20,
+      "basePricePaise": 4900,
+      "regularPricePaise": 7900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Dry dusting of blades and motor canopy",
+        "Chemical spray to lift sticky yellow grease",
+        "Soft scrubbing on both blade faces",
+        "Microfiber towel wipe and drying"
+      ],
+      "exclusions": [
+        "Motor internal winding repair or replacement"
+      ],
+      "preparationInstructions": [
+        "Ensure fan switch is off and floor beneath is accessible."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 2 hours before service.",
+      "variants": [
+        {
+          "id": "var_ceiling_fan_clean",
+          "serviceId": "srv_ceiling_fan_cleaning",
+          "name": "Ceiling Fan Deep Cleaning (Per Fan)",
+          "scopeSummary": "Blade dry dusting, degreasing scrub & microfiber wet wipe",
+          "durationMinutes": 20,
+          "basePricePaise": 4900,
+          "regularPricePaise": 7900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/asian-man-wearing-a-protective-mask-cleaning-ceiling-fan-at-home.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_exhaust_fan_cleaning",
+      "slug": "exhaust-fan-cleaning",
+      "title": "Exhaust fan cleaning",
+      "categoryId": "cat_fan_appliances",
+      "shortDescription": "Dry Dusting, chemical spray and scrubbing to remove sticky grease on surfaces, wet wipe using microfiber towel.",
+      "fullDescription": "Kitchen and bathroom exhaust fans accumulate hardened grease, oil, and lint. We apply targeted industrial degreasing spray, scrub the mesh guard and blades, wipe away dissolved grime, and restore smooth airflow.",
+      "illustrationKey": "fan-appliances",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/IMG_20231119_154808.jpg",
+      "durationMinutes": 30,
+      "basePricePaise": 9900,
+      "regularPricePaise": 14900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Exhaust grill and louvre degreasing",
+        "Blade scrub with heavy-duty oil cutter",
+        "Motor exterior wipe and lint vacuuming",
+        "Microfiber drying and airflow test"
+      ],
+      "exclusions": [
+        "Electrical motor rewiring"
+      ],
+      "preparationInstructions": [
+        "Turn off power to exhaust point."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 2 hours before service.",
+      "variants": [
+        {
+          "id": "var_exhaust_fan_clean",
+          "serviceId": "srv_exhaust_fan_cleaning",
+          "name": "Exhaust Fan Deep Degreasing (Per Fan)",
+          "scopeSummary": "Mesh, blade, and louvre heavy oil & grease removal",
+          "durationMinutes": 30,
+          "basePricePaise": 9900,
+          "regularPricePaise": 14900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/IMG_20231119_154808.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_single_door_fridge",
+      "slug": "single-door-fridge-cleaning",
+      "title": "Single Door Fridge Cleaning",
+      "categoryId": "cat_kitchen",
+      "shortDescription": "Dry Dusting from exterior and interior, removing dirt/oil/food stains, wiping out moisture with microfiber towel.",
+      "fullDescription": "Complete single-door refrigerator sanitation. Includes removing removable trays and baskets for hot-water scrubbing, cleaning door gaskets to prevent mold, interior deodorization, and exterior body wipe.",
+      "illustrationKey": "kitchen",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/360_F_511507346_o2oI9h94brU0ziVqJf2TrH54EPN1mNd5.webp",
+      "durationMinutes": 45,
+      "basePricePaise": 34900,
+      "regularPricePaise": 44900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Removal and washing of shelves, crisper box, and door racks",
+        "Antimicrobial sanitization of interior walls and freezer box",
+        "Door rubber gasket mold and dirt removal",
+        "Exterior door surface and handle wipe"
+      ],
+      "exclusions": [
+        "Compressor repair or refrigerant gas refill"
+      ],
+      "preparationInstructions": [
+        "Please remove perishable food items prior to technician arrival."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_fridge_single_door",
+          "serviceId": "srv_single_door_fridge",
+          "name": "Single Door Refrigerator Deep Clean",
+          "scopeSummary": "Shelves, crisper, door gaskets, and interior deodorization",
+          "durationMinutes": 45,
+          "basePricePaise": 34900,
+          "regularPricePaise": 44900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/360_F_511507346_o2oI9h94brU0ziVqJf2TrH54EPN1mNd5.webp",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_double_door_fridge",
+      "slug": "double-door-fridge-cleaning",
+      "title": "Double Door Fridge Cleaning",
+      "categoryId": "cat_kitchen",
+      "shortDescription": "Dry Dusting exterior and interior, removing food stains, freezer frost cleanup, shelf descaling, microfiber wipe.",
+      "fullDescription": "Comprehensive deep cleaning for double-door / frost-free refrigerators. Thorough washing of glass shelves, vegetable crispers, freezer trays, door seals, odor neutralization, and exterior stainless steel / glass polishing.",
+      "illustrationKey": "kitchen",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/360_F_419363786_20QxVTKHTQo7BHuu2vINOtun8p9r1pPu.webp",
+      "durationMinutes": 60,
+      "basePricePaise": 49900,
+      "regularPricePaise": 59900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Full interior cleaning of both freezer and refrigerator compartments",
+        "Washing and drying of all tempered glass shelves and door bins",
+        "Food spill and sticky sauce stain removal",
+        "Antimicrobial deodorization treatment",
+        "Exterior body polishing and handle sanitization"
+      ],
+      "exclusions": [
+        "Compressor or cooling coil repairs"
+      ],
+      "preparationInstructions": [
+        "Empty major food containers before start."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_fridge_double_door",
+          "serviceId": "srv_double_door_fridge",
+          "name": "Double Door Refrigerator Deep Clean",
+          "scopeSummary": "Dual compartment deep clean, shelf washing & deodorization",
+          "durationMinutes": 60,
+          "basePricePaise": 49900,
+          "regularPricePaise": 59900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/360_F_419363786_20QxVTKHTQo7BHuu2vINOtun8p9r1pPu.webp",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_gas_stove_cleaning",
+      "slug": "gas-stove-cleaning",
+      "title": "Gas Stove Cleaning",
+      "categoryId": "cat_kitchen",
+      "shortDescription": "Removing stains, spots and dust using cleaner, wiping the surface using a microfiber towel.",
+      "fullDescription": "Intensive gas stove and cooktop degreasing. Removal of burnt milk/curry residues, carbon buildup from brass burners, spill trays, control knobs, and glass/stainless steel surface buffing.",
+      "illustrationKey": "kitchen",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/cleaning-gas-stove-at-kitchen.jpg",
+      "durationMinutes": 30,
+      "basePricePaise": 9900,
+      "regularPricePaise": 14900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Burner pan support and spill tray degreasing",
+        "Burner head carbon deposit scrubbing",
+        "Glass top / stainless steel surface stain removal",
+        "Knob and surrounding grease wipe down"
+      ],
+      "exclusions": [
+        "Gas pipeline or regulator replacement"
+      ],
+      "preparationInstructions": [
+        "Ensure gas cylinder / pipeline valve is turned off."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 2 hours before service.",
+      "variants": [
+        {
+          "id": "var_gas_stove_clean",
+          "serviceId": "srv_gas_stove_cleaning",
+          "name": "Gas Stove / Cooktop Deep Degreasing",
+          "scopeSummary": "Burnt food stain removal, burner scrub & surface polish",
+          "durationMinutes": 30,
+          "basePricePaise": 9900,
+          "regularPricePaise": 14900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/cleaning-gas-stove-at-kitchen.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_kitchen_sink_cleaning",
+      "slug": "kitchen-sink-cleaning",
+      "title": "Kitchen Sink Cleaning",
+      "categoryId": "cat_kitchen",
+      "shortDescription": "Removing stains, spots and dust using cleaner, wiping the surface using a microfiber towel.",
+      "fullDescription": "Specialized descaling and sanitization of stainless steel, quartz, or granite kitchen sinks. Eliminates hard water scale, food residue grease, tap limescale, and deodorizes drain outlet.",
+      "illustrationKey": "kitchen",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/pexels-photo-9462309.jpeg",
+      "durationMinutes": 30,
+      "basePricePaise": 9900,
+      "regularPricePaise": 14900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Sink basin hard-water and scale removal",
+        "Water faucet descaling and buffing",
+        "Drain collar and drain strainer degreasing",
+        "Microfiber dry wipe and shine restore"
+      ],
+      "exclusions": [
+        "Under-sink underground sewer unclogging (requires plumber)"
+      ],
+      "preparationInstructions": [
+        "Keep sink free of unwashed utensils."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 2 hours before service.",
+      "variants": [
+        {
+          "id": "var_kitchen_sink_clean",
+          "serviceId": "srv_kitchen_sink_cleaning",
+          "name": "Kitchen Sink & Tap Descaling",
+          "scopeSummary": "Limescale, oil stains removal, faucet polish & drain sanitization",
+          "durationMinutes": 30,
+          "basePricePaise": 9900,
+          "regularPricePaise": 14900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/11/pexels-photo-9462309.jpeg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_kitchen_chimney_clean",
+      "slug": "empty-kitchen-chimney-deep-cleaning",
+      "title": "Empty Kitchen + Chimney Deep Cleaning - Delhi",
+      "categoryId": "cat_kitchen",
+      "shortDescription": "Professional empty kitchen deep cleaning with chimney degreasing & filter wash. Removes oil, stains & grease for a hygienic, fresh kitchen.",
+      "fullDescription": "Bring back the shine to your kitchen with our professional cleaning package.\n\nService Includes:\n• Floor & wall tile scrubbing\n• Sink, tap & slab stain removal\n• External cupboard & rack cleaning\n• Window & exhaust fan dusting\n• Switchboards & handles sanitization\n• Chimney deep cleaning (filter wash, oil & grease removal, outer body shine)\n\nService Time: 2–2.5 Hours\nDone By: Trained professionals using eco-friendly products.",
+      "illustrationKey": "kitchen",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-04_49_15-PM.png",
+      "galleryUrls": [
+        "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-04_49_15-PM.png",
+        "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-04_54_38-PM.png"
+      ],
+      "durationMinutes": 150,
+      "basePricePaise": 129900,
+      "regularPricePaise": 159900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Floor & wall tile scrubbing",
+        "Sink, tap & slab stain removal",
+        "External cupboard & rack cleaning",
+        "Window & exhaust fan dusting",
+        "Switchboards & handles sanitization",
+        "Chimney deep cleaning (filter wash, oil/grease removal, outer shine)"
+      ],
+      "exclusions": [
+        "Inside closed cupboards or internal fridge/microwave components"
+      ],
+      "preparationInstructions": [
+        "Ideal for shifting homes, festival cleaning & empty flats."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_empty_kitchen_chimney",
+          "serviceId": "srv_kitchen_chimney_clean",
+          "name": "Empty Kitchen + Chimney Deep Cleaning",
+          "scopeSummary": "Floor/wall scrub, slab descaling, cabinet outer & chimney deep clean",
+          "durationMinutes": 150,
+          "basePricePaise": 129900,
+          "regularPricePaise": 159900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-04_49_15-PM.png",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_empty_kitchen_appliances",
+      "slug": "empty-kitchen-chimney-appliances-cleaning",
+      "title": "Empty Kitchen + Chimney + Appliances Cleaning - Delhi",
+      "categoryId": "cat_kitchen",
+      "shortDescription": "Complete empty kitchen deep cleaning with chimney degreasing & external cleaning of appliances like fridge, microwave & gas stove.",
+      "fullDescription": "Empty Kitchen + Chimney + Appliances Deep Cleaning – ₹1699/-\n\nA premium package for total kitchen hygiene with chimney & appliances care.\n\nService Includes:\n• Floor & Wall Cleaning (hand scrubbing & mopping)\n• Sink & Tap Descaling (oil, stains & lime removal)\n• Slab / Countertop Cleaning (masala & grease stains)\n• Cupboards & Racks External Cleaning\n• Windows & Exhaust Fan Dusting\n• Switchboards & Handles Sanitization\n• Chimney Deep Cleaning (filter degreasing, outer body scrub, carbon deposit)\n• Appliances External Cleaning (refrigerator outer, microwave outer, mixer/grinder wipe, gas stove degreasing)\n\nService Time: 2.5–3 Hours.",
+      "illustrationKey": "kitchen",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-05_10_35-PM.png",
+      "galleryUrls": [
+        "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-05_10_35-PM.png",
+        "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-04_45_36-PM.png"
+      ],
+      "durationMinutes": 180,
+      "basePricePaise": 169900,
+      "regularPricePaise": 199900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Floor & wall scrubbing and mopping",
+        "Sink & tap descaling (oil, stains & lime)",
+        "Slab / Countertop grease degreasing",
+        "Cupboards and racks external wiping",
+        "Windows and exhaust fan dusting",
+        "Chimney deep cleaning & filter wash",
+        "External cleaning of fridge, microwave, mixer and gas stove"
+      ],
+      "exclusions": [
+        "Internal fridge defrost or oven inside degreasing"
+      ],
+      "preparationInstructions": [
+        "Keep kitchen counters clear of utensils."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_empty_kitchen_appliances_clean",
+          "serviceId": "srv_empty_kitchen_appliances",
+          "name": "Empty Kitchen + Chimney + Appliances Cleaning",
+          "scopeSummary": "Floor/wall scrub, slab, chimney deep clean + fridge/microwave/stove outer",
+          "durationMinutes": 180,
+          "basePricePaise": 169900,
+          "regularPricePaise": 199900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-05_10_35-PM.png",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_toilet_cleaning",
+      "slug": "toilet-cleaning",
+      "title": "Toilet Cleaning",
+      "categoryId": "cat_bathroom",
+      "shortDescription": "Indian/Western Toilet stain removal from tiles and toilet pot, wiping out all the water with a wiper.",
+      "fullDescription": "Targeted deep sanitation for Indian or Western toilet bowls. Includes removing stubborn mineral rings, urine stains, rim descaling, flush tank exterior wipe, and bathroom floor squeegee drying.",
+      "illustrationKey": "bathroom",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/12.jpg",
+      "durationMinutes": 30,
+      "basePricePaise": 9900,
+      "regularPricePaise": 14900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Toilet bowl acid-free heavy stain removal",
+        "Rim and jet spray disinfection",
+        "Seat cover and hinge cleaning",
+        "Floor area wiping with rubber squeegee"
+      ],
+      "exclusions": [
+        "Full bathroom wall tile scrubbing (see Bathroom Cleaning)"
+      ],
+      "preparationInstructions": [
+        "Provide running water and toilet brush access."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 2 hours before service.",
+      "variants": [
+        {
+          "id": "var_toilet_clean_standard",
+          "serviceId": "srv_toilet_cleaning",
+          "name": "Toilet Deep Cleaning (Indian / Western)",
+          "scopeSummary": "Pot stain descaling, rim disinfection & squeegee drying",
+          "durationMinutes": 30,
+          "basePricePaise": 9900,
+          "regularPricePaise": 14900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/12.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_bathroom_sqft",
+      "slug": "bathroom-cleaning-square-fit",
+      "title": "Bathroom cleaning square fit",
+      "categoryId": "cat_bathroom",
+      "shortDescription": "Wet Wiping geyser, exhaust, window sills, glass partitions and mirrors. Stain removal from tiles, basin, toilet and water closet.",
+      "fullDescription": "Custom square-foot bathroom deep cleaning package. Wet wiping dust from outermost part with microfiber towel (geyser, exhaust, window sills, glass partitions, mirrors). Stain removal from wall/floor tiles, basin, toilet, and water closet.",
+      "illustrationKey": "bathroom",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/bathroom-.webp",
+      "durationMinutes": 60,
+      "basePricePaise": 29900,
+      "regularPricePaise": 39900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Mirror, glass partition & chrome fittings descaling",
+        "Tile wall grout scrubbing and lime mark removal",
+        "Washbasin, counter and toilet seat deep clean",
+        "Geyser, exhaust fan outer surface wet wipe",
+        "Floor water wiper squeegee dry"
+      ],
+      "exclusions": [
+        "Tile re-grouting or plumbing pipe replacement"
+      ],
+      "preparationInstructions": [
+        "Remove personal bath toiletries from shelves prior to cleaning."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_bathroom_sqft_standard",
+          "serviceId": "srv_bathroom_sqft",
+          "name": "Bathroom Cleaning (₹15/sq.ft · Standard Size)",
+          "scopeSummary": "Tile descaling, chrome polish, basin, toilet, mirrors & exhaust wipe",
+          "durationMinutes": 60,
+          "basePricePaise": 29900,
+          "regularPricePaise": 39900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/bathroom-.webp",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_floor_cleaning_sqft",
+      "slug": "floor-cleaning-sq-ft",
+      "title": "Floor cleaning Sq.ft",
+      "categoryId": "cat_fan_appliances",
+      "shortDescription": "Cleaning using cloth and mop: Cleaning grouts, corners and all over the surface with a wet microfiber towel and mop.",
+      "fullDescription": "Floor deep cleaning measured per square foot. Ideal for living rooms, hallways, bedrooms, or full houses. High-grade floor cleaner removes dirt from grouts, hard-to-reach corners, and buffs tiled, marble, or vitrified surfaces.",
+      "illustrationKey": "fan-appliances",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/ff.jpg",
+      "durationMinutes": 60,
+      "basePricePaise": 29900,
+      "regularPricePaise": 39900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Grout line dirt extraction and hand scrubbing",
+        "Corner dirt and baseboard border cleaning",
+        "Specialized pH-balanced floor cleaning solution",
+        "Double microfiber mop pass for spotless finish"
+      ],
+      "exclusions": [
+        "Diamond marble polishing or epoxy re-grouting"
+      ],
+      "preparationInstructions": [
+        "Clear floor of small rugs and loose items."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_floor_cleaning_sqft",
+          "serviceId": "srv_floor_cleaning_sqft",
+          "name": "Floor Deep Scrubbing & Mop (₹15/sq.ft)",
+          "scopeSummary": "Grout cleaning, corner scrub, and motorized microfiber mopping",
+          "durationMinutes": 60,
+          "basePricePaise": 29900,
+          "regularPricePaise": 39900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/ff.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_bathroom_cleaning",
+      "slug": "bathroom-deep-and-machine-scrub-cleaning",
+      "title": "Bathroom Deep & Machine Scrub Cleaning",
+      "categoryId": "cat_bathroom",
+      "shortDescription": "Rotary machine tile scrubbing, acid-free tap & shower descaling, toilet bowl sanitization, and grout line whitening.",
+      "fullDescription": "Intensive mechanized bathroom deep cleaning. Includes single-disc rotary machine scrubbing of floor tiles, hand scrubbing of wall tiles, acid-free descaling of taps and showers, and hygienic wipe of mirrors.",
+      "illustrationKey": "bathroom",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/bathroom-.webp",
+      "galleryUrls": [
+        "https://tankmanpro.com/wp-content/uploads/2023/12/bathroom-.webp"
+      ],
+      "durationMinutes": 90,
+      "basePricePaise": 49900,
+      "regularPricePaise": 64900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Floor tiles mechanized single-disc machine scrubbing",
+        "Wall tiles descaling and yellow stain scrub",
+        "Chrome CP tap, shower, and health faucet acid-free descaling",
+        "Toilet bowl, seat, and washbasin sanitization"
+      ],
+      "exclusions": [
+        "Civil repairs or broken tile replacement"
+      ],
+      "preparationInstructions": [
+        "Ensure running water and geyser plug are functional."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before slot.",
+      "variants": [
+        {
+          "id": "var_bath_machine_scrub",
+          "serviceId": "srv_bathroom_cleaning",
+          "name": "Standard Bathroom Deep Scrub (Up to 40 sq ft)",
+          "scopeSummary": "Single disc machine floor scrub, wall descaling & sanitary sanitization",
+          "durationMinutes": 90,
+          "basePricePaise": 49900,
+          "regularPricePaise": 64900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/bathroom-.webp",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_sofa_mattress_clean",
+      "slug": "sofa-cushion-cleaning",
+      "title": "Sofa & Cushien cleaning 249/per seat",
+      "categoryId": "cat_sofa_mattress",
+      "shortDescription": "Dry Dusting, dusting and vacuuming sofa and cushions to remove dirt deposited on surface of sofa, cushion and cushion covers.",
+      "fullDescription": "Specialized 3-step upholstery care for fabric and leatherette sofas: high-suction vacuum extraction of deeply trapped dust and food crumbs, organic shampoo foam scrub to lift grease, and moisture extraction for fresh clean seats.",
+      "illustrationKey": "sofa-mattress",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/How-Do-we-Clean-Your-Sofa.jpg",
+      "galleryUrls": [
+        "https://tankmanpro.com/wp-content/uploads/2023/12/How-Do-we-Clean-Your-Sofa.jpg"
+      ],
+      "durationMinutes": 60,
+      "basePricePaise": 24900,
+      "regularPricePaise": 29900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "High-power dry vacuuming for dust mites & hair",
+        "Foam shampoo scrub to eliminate stains and sweat odor",
+        "Wet vacuum extraction of suspended dirt",
+        "Fabric conditioning for soft, fragrant finish"
+      ],
+      "exclusions": [
+        "Re-upholstery or fabric tear mending"
+      ],
+      "preparationInstructions": [
+        "Ensure sofa is dry and ceiling fan is kept on after cleaning."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_sofa_seat_standard",
+          "serviceId": "srv_sofa_mattress_clean",
+          "name": "Sofa Cleaning (Per Seat · Minimum 2 Seats)",
+          "scopeSummary": "Dry vacuuming, shampoo foam scrubbing, and extraction",
+          "durationMinutes": 60,
+          "basePricePaise": 24900,
+          "regularPricePaise": 29900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/How-Do-we-Clean-Your-Sofa.jpg",
+          "active": true
+        },
+        {
+          "id": "var_sofa_5seat",
+          "serviceId": "srv_sofa_mattress_clean",
+          "name": "5-Seater Sofa Deep Shampoo & Extraction",
+          "scopeSummary": "3+1+1 or 5-seater fabric/leather sofa deep shampoo and vacuum extraction",
+          "durationMinutes": 90,
+          "basePricePaise": 119900,
+          "regularPricePaise": 149900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/How-Do-we-Clean-Your-Sofa.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_carpet_cleaning",
+      "slug": "carpet-cleaning-sq-ft",
+      "title": "Carpet cleaning  sq.ft",
+      "categoryId": "cat_sofa_mattress",
+      "shortDescription": "Carpet cleaning: Deep cleaning and shampooing of carpet with wet vacuum extraction.",
+      "fullDescription": "Restores the fresh pile, vibrant color, and hygienic softness of living room rugs and wall-to-wall carpets. Deep rotary brush agitation, antimicrobial shampoo, and moisture extraction.",
+      "illustrationKey": "sofa-mattress",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/Helpling-carpet_cleaning.webp",
+      "durationMinutes": 60,
+      "basePricePaise": 39900,
+      "regularPricePaise": 49900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "High-power pile vacuuming",
+        "Spot stain pre-treatment for coffee/tea marks",
+        "Rotary shampoo scrub with fabric-safe detergent",
+        "Wet vacuum suction to remove dirty foam and water"
+      ],
+      "exclusions": [
+        "Severe acid burn or dye bleeding recovery"
+      ],
+      "preparationInstructions": [
+        "Keep area free of footwear during and after service."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_carpet_sqft_clean",
+          "serviceId": "srv_carpet_cleaning",
+          "name": "Carpet Deep Cleaning & Shampooing",
+          "scopeSummary": "Deep cleaning and shampooing (₹10/sq.ft · Standard Rug)",
+          "durationMinutes": 60,
+          "basePricePaise": 39900,
+          "regularPricePaise": 49900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2023/12/Helpling-carpet_cleaning.webp",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_ac_foam_jet",
+      "slug": "ac-services",
+      "title": "AC Services",
+      "categoryId": "cat_ac_service",
+      "shortDescription": "Swift and professional AC repair services: expert technicians ready to diagnose and fix your cooling system issues, ensuring comfort and efficiency.",
+      "fullDescription": "Fast and reliable AC repair solutions tailored to your needs, ensuring optimal comfort in any season. Our skilled technicians diagnose and fix issues efficiently, restoring your cooling system’s performance. Count on us for prompt service and lasting results.",
+      "illustrationKey": "ac-service",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/repairman-uniform-installing-outside-unit-air-conditioner_93675-91162.jpg",
+      "galleryUrls": [
+        "https://tankmanpro.com/wp-content/uploads/2024/03/repairman-uniform-installing-outside-unit-air-conditioner_93675-91162.jpg"
+      ],
+      "durationMinutes": 60,
+      "basePricePaise": 59900,
+      "regularPricePaise": 79900,
+      "defaultPricingMode": "vendor_offer",
+      "cityModeOverrides": {
+        "city_delhi": "vendor_offer",
+        "city_shahjahanpur": "city_fixed",
+        "city_kanpur": "city_fixed"
+      },
+      "inclusions": [
+        "Indoor cooling coil & filter deep foam wash with spill-guard jacket",
+        "Outdoor condenser unit high-pressure jet wash",
+        "Drain pipe flushing to prevent indoor water dripping",
+        "Coolant pressure, compressor amperage & thermostat check"
+      ],
+      "exclusions": [
+        "Spare parts and refrigerant gas refill (quoted post-inspection)"
+      ],
+      "preparationInstructions": [
+        "Provide ladder access to indoor unit and open balcony for outdoor unit."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_ac_single",
+          "serviceId": "srv_ac_foam_jet",
+          "name": "Split / Window AC Foam-Jet Service (1 Unit)",
+          "scopeSummary": "Indoor coil foam jet, outdoor condenser jet wash, cooling test",
+          "durationMinutes": 60,
+          "basePricePaise": 59900,
+          "regularPricePaise": 79900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/repairman-uniform-installing-outside-unit-air-conditioner_93675-91162.jpg",
+          "active": true
+        },
+        {
+          "id": "var_ac_twin",
+          "serviceId": "srv_ac_foam_jet",
+          "name": "Twin AC Service Combo (2 Units)",
+          "scopeSummary": "Complete foam-jet servicing for 2 air conditioners",
+          "durationMinutes": 100,
+          "basePricePaise": 109900,
+          "regularPricePaise": 139900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/repairman-uniform-installing-outside-unit-air-conditioner_93675-91162.jpg",
+          "active": true
+        },
+        {
+          "id": "var_ac_install",
+          "serviceId": "srv_ac_foam_jet",
+          "name": "AC Installation (Split / Window)",
+          "scopeSummary": "Mounting indoor & outdoor unit, vacuuming & leak testing",
+          "durationMinutes": 90,
+          "basePricePaise": 149900,
+          "regularPricePaise": 179900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/repairman-uniform-installing-outside-unit-air-conditioner_93675-91162.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_refrigerator_repair",
+      "slug": "refrigerator-services",
+      "title": "Refrigerator Services",
+      "categoryId": "cat_repairs",
+      "shortDescription": "Expert refrigerator repair services: fast, reliable fixes to keep your food fresh and your kitchen running smoothly.",
+      "fullDescription": "Need your refrigerator fixed? Our experienced technicians offer prompt and dependable repair services to get your fridge up and running in no time. We diagnose and resolve cooling issues, compressor problems, defrost failures, gas leaks, and thermostat faults efficiently.",
+      "illustrationKey": "appliance-repair",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/Refrigerator-Repair-Appliance-Company.jpg",
+      "durationMinutes": 45,
+      "basePricePaise": 29900,
+      "regularPricePaise": 39900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Comprehensive cooling diagnostics & error code read",
+        "Compressor relay, capacitor, and thermostat inspection",
+        "Gas pressure check and defrost timer test",
+        "Minor wiring and connection repair"
+      ],
+      "exclusions": [
+        "Cost of compressor, PCB or gas recharge (quoted post-diagnosis)"
+      ],
+      "preparationInstructions": [
+        "Ensure refrigerator is plugged into electric socket."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 2 hours before service.",
+      "variants": [
+        {
+          "id": "var_fridge_repair_diag",
+          "serviceId": "srv_refrigerator_repair",
+          "name": "Refrigerator Diagnostic & Inspection Visit",
+          "scopeSummary": "Inspection, fault finding, and minor repair adjustment",
+          "durationMinutes": 45,
+          "basePricePaise": 29900,
+          "regularPricePaise": 39900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/Refrigerator-Repair-Appliance-Company.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_washing_machine_repair",
+      "slug": "washing-machine-services",
+      "title": "Washing Machine Services",
+      "categoryId": "cat_repairs",
+      "shortDescription": "Efficient washing machine repair services: skilled technicians swiftly diagnose and resolve issues to restore functionality.",
+      "fullDescription": "Need your washing machine fixed? Our expert technicians offer fast and dependable repair services for front-load, top-load, and semi-automatic machines. We resolve drum rotation issues, vibration noise, drainage blockage, water inlet valve faults, and PCB errors.",
+      "illustrationKey": "appliance-repair",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/360_F_423351639_qcIVh5khAZrpTdIHakM5n8G6wtgFIA7y.jpg",
+      "durationMinutes": 45,
+      "basePricePaise": 29900,
+      "regularPricePaise": 39900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Complete mechanical and electrical system diagnostics",
+        "Drain pump, inlet valve, and belt tension check",
+        "Motor carbon brush and drum balance inspection",
+        "Basic filter cleaning and lint trap clean"
+      ],
+      "exclusions": [
+        "Replacement parts like drum bearings, motor or motherboard"
+      ],
+      "preparationInstructions": [
+        "Ensure machine is connected to water tap and power socket."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 2 hours before service.",
+      "variants": [
+        {
+          "id": "var_wm_repair_diag",
+          "serviceId": "srv_washing_machine_repair",
+          "name": "Washing Machine Inspection & Diagnostic Visit",
+          "scopeSummary": "Full diagnosis of front-load, top-load or semi-auto machines",
+          "durationMinutes": 45,
+          "basePricePaise": 29900,
+          "regularPricePaise": 39900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/360_F_423351639_qcIVh5khAZrpTdIHakM5n8G6wtgFIA7y.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_plumber_services",
+      "slug": "plumber-services",
+      "title": "Plumber Services",
+      "categoryId": "cat_repairs",
+      "shortDescription": "Maintain and repair all plumbing installations: fixtures, leakages, piping, toilets, water heaters, and drain clearance.",
+      "fullDescription": "Plumbers install and repair water, gas, and other piping systems in homes and businesses. They install plumbing fixtures such as faucets, sinks, bathtubs, and toilets. They clear blocked drains, fix pipe bursts, replace angle valves, and overhaul bathroom fittings.",
+      "illustrationKey": "plumbing",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/colorful-plumbing-round-composition_1284-40766.jpg",
+      "durationMinutes": 45,
+      "basePricePaise": 14900,
+      "regularPricePaise": 24900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Expert diagnostic check of piping lines & fixtures",
+        "Minor leak repair, washer replacement or tap tightening",
+        "Water pressure and overhead tank connection assessment"
+      ],
+      "exclusions": [
+        "Cost of replacement taps, pipes or specialized sanitaryware"
+      ],
+      "preparationInstructions": [
+        "Locate main water supply valve before technician arrival."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 2 hours before service.",
+      "variants": [
+        {
+          "id": "var_plumber_inspection",
+          "serviceId": "srv_plumber_services",
+          "name": "Plumber Diagnostic & Repair Visit",
+          "scopeSummary": "Tap repair, leak check, toilet flush or pipe fixing",
+          "durationMinutes": 45,
+          "basePricePaise": 14900,
+          "regularPricePaise": 24900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/colorful-plumbing-round-composition_1284-40766.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_electrician_services",
+      "slug": "electrician-services",
+      "title": "Electrician Services",
+      "categoryId": "cat_repairs",
+      "shortDescription": "Installing, maintaining, and repairing electrical control, wiring, circuit breakers, switchboards, and lighting systems.",
+      "fullDescription": "Certified electrical diagnostics: reading blueprints, inspecting circuit breakers, replacing faulty switchboards, repairing short circuits, inverter battery line setup, light fixtures, and fan installations.",
+      "illustrationKey": "appliance-repair",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/colorful-electricity-elements-concept_1284-37811.jpg",
+      "durationMinutes": 45,
+      "basePricePaise": 14900,
+      "regularPricePaise": 24900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Electrical load and voltage fault testing",
+        "Minor switch, socket, or wire terminal replacement",
+        "Earthing and MCB trip diagnosis"
+      ],
+      "exclusions": [
+        "Cost of cables, MCB switches, chandelier or heavy materials"
+      ],
+      "preparationInstructions": [
+        "Provide access to main MCB distribution board."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 2 hours before service.",
+      "variants": [
+        {
+          "id": "var_electrician_inspection",
+          "serviceId": "srv_electrician_services",
+          "name": "Electrician Inspection & Repair Visit",
+          "scopeSummary": "Switchboard, wiring, MCB, or light fixture diagnosis & repair",
+          "durationMinutes": 45,
+          "basePricePaise": 14900,
+          "regularPricePaise": 24900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/colorful-electricity-elements-concept_1284-37811.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_painter_services",
+      "slug": "painter-services",
+      "title": "Painter Services",
+      "categoryId": "cat_repairs",
+      "shortDescription": "Professional painting services for interior and exterior walls: surface prep, scraping, crack filling, primer & finish.",
+      "fullDescription": "Mixing and matching paint, stain and finishes to specifications. Applying paint using rollers/sprayers, repairing wall cracks with putty, scraping flaking paint, water seepage primer treatment, and flawless coats.",
+      "illustrationKey": "appliance-repair",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/istockphoto-1198989663-612x612-1.jpg",
+      "durationMinutes": 60,
+      "basePricePaise": 49900,
+      "regularPricePaise": 69900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Site laser measurement & wall moisture inspection",
+        "Paint shade catalog and texture finish consultation",
+        "Surface area square footage estimation and quote"
+      ],
+      "exclusions": [
+        "Cost of paint cans, primer buckets, and masking tape"
+      ],
+      "preparationInstructions": [
+        "Clear wall areas for accurate tape measurements."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_painter_consultation",
+          "serviceId": "srv_painter_services",
+          "name": "Painter Wall Measurement & Site Inspection",
+          "scopeSummary": "Detailed measurement, seepage check, color consult & quote",
+          "durationMinutes": 60,
+          "basePricePaise": 49900,
+          "regularPricePaise": 69900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2024/03/istockphoto-1198989663-612x612-1.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_yellow_peel",
+      "slug": "yellow-peel-anti-aging-skin-renewal",
+      "title": "Yellow Peel – Anti-aging & skin renewal",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Welcome to Beedare by Tankmanpro. Experience Advanced Skin Resurfacing and Brightening – all from the comfort of your home.",
+      "fullDescription": "Certified & Skilled Skincare Experts at your doorstep. Safe, Dermatologist-Approved Formulas to improve skin texture, stimulate collagen, reduce fine lines, and reveal brighter, healthier-looking skin with minimal downtime.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/54a488b2-c84c-4ea4-ad5b-62f4610ece16.jpg",
+      "durationMinutes": 60,
+      "basePricePaise": 399900,
+      "regularPricePaise": 499900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Skin assessment and pre-peel cleansing",
+        "Application of dermatological Yellow Peel formula",
+        "Post-peel soothing mask and SPF application",
+        "Customized home-care recovery guidelines"
+      ],
+      "exclusions": [
+        "Internal oral medications"
+      ],
+      "preparationInstructions": [
+        "Just a comfortable space, towel, and clean running water."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 6 hours before appointment.",
+      "variants": [
+        {
+          "id": "var_yellow_peel",
+          "serviceId": "srv_beedare_yellow_peel",
+          "name": "Yellow Peel Anti-Aging & Renewal Session",
+          "scopeSummary": "Advanced skin resurfacing, collagen renewal & glow",
+          "durationMinutes": 60,
+          "basePricePaise": 399900,
+          "regularPricePaise": 499900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/54a488b2-c84c-4ea4-ad5b-62f4610ece16.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_tca_peel",
+      "slug": "tca-peel-pigmentation-scar-reduction",
+      "title": "TCA Peel – Pigmentation & scar reduction",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Advanced Skin Resurfacing: Target stubborn pigmentation, acne scars, and uneven skin tone with clinical TCA peel at home.",
+      "fullDescription": "Trichloroacetic Acid (TCA) peel treatment administered by certified skincare practitioners. Targets deep pigmentation, old acne blemishes, and sun damage for refreshed, smooth skin.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/enjoying-beauty-treatment.jpg",
+      "durationMinutes": 60,
+      "basePricePaise": 299900,
+      "regularPricePaise": 399900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Medical skin prep and degreasing",
+        "Precision TCA acid peel application",
+        "Neutralization & calming post-peel serum",
+        "Post-procedure sun protection protocol"
+      ],
+      "exclusions": [
+        "Prescription steroid creams"
+      ],
+      "preparationInstructions": [
+        "Avoid waxing, bleaching, or retinoids for 48 hours prior."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 6 hours before appointment.",
+      "variants": [
+        {
+          "id": "var_tca_peel",
+          "serviceId": "srv_beedare_tca_peel",
+          "name": "TCA Pigmentation & Scar Reduction Session",
+          "scopeSummary": "Targeted deep pigmentation, scar softening & resurfacing",
+          "durationMinutes": 60,
+          "basePricePaise": 299900,
+          "regularPricePaise": 399900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/enjoying-beauty-treatment.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_vitc_peel",
+      "slug": "vitamin-c-peel-brightening-antioxidant-boost",
+      "title": "Vitamin C Peel – Brightening & antioxidant boost",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Instantly revive dull skin: high-potency antioxidant Vitamin C peel provides radiant glow, minimizes tan and boosts hydration.",
+      "fullDescription": "Gentle yet powerful brightening treatment. Concentrated Vitamin C combined with botanical fruit acids infuses antioxidants, removes surface dead cells, and brightens sun-damaged skin.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/anti-aging.jpg",
+      "durationMinutes": 45,
+      "basePricePaise": 199900,
+      "regularPricePaise": 249900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Antioxidant deep facial cleanse",
+        "Vitamin C active booster peel application",
+        "Hydrating cooling mask and barrier cream"
+      ],
+      "exclusions": [
+        "Laser skin treatments"
+      ],
+      "preparationInstructions": [
+        "Gentle face wash before arrival."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_vitc_peel",
+          "serviceId": "srv_beedare_vitc_peel",
+          "name": "Vitamin C Brightening & Glow Session",
+          "scopeSummary": "Instant glow, tan removal, and antioxidant hydration",
+          "durationMinutes": 45,
+          "basePricePaise": 199900,
+          "regularPricePaise": 249900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/anti-aging.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_glycolic_peel",
+      "slug": "glycolic-peel-skin-resurfacing-even-tone",
+      "title": "• Glycolic Peel – Skin resurfacing & even tone",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Clinical alpha-hydroxy acid (AHA) peel dissolves cellular glue to reveal fresher, smoother, and more even-toned skin.",
+      "fullDescription": "Experience medical-grade AHA skin resurfacing at home. Gently unclogs congested pores, softens fine lines, and promotes cellular turnover for smooth porcelain skin texture.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/Chemical-Peel.jpg",
+      "durationMinutes": 45,
+      "basePricePaise": 199900,
+      "regularPricePaise": 249900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Gentle pre-peel cleanser and toner",
+        "Controlled Glycolic AHA peel layer",
+        "Skin neutralizer and cold compress",
+        "Hydra-nourishing soothing balm"
+      ],
+      "exclusions": [
+        "Microdermabrasion combination"
+      ],
+      "preparationInstructions": [
+        "Do not scrub or exfoliate skin on day of treatment."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_glycolic_peel",
+          "serviceId": "srv_beedare_glycolic_peel",
+          "name": "Glycolic Peel Skin Resurfacing Session",
+          "scopeSummary": "AHA cell renewal, smooth texture & even skin tone",
+          "durationMinutes": 45,
+          "basePricePaise": 199900,
+          "regularPricePaise": 249900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/Chemical-Peel.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_prp",
+      "slug": "prp-platelet-rich-plasma-therapy",
+      "title": "• PRP (Platelet-Rich Plasma Therapy) – Hair & skin rejuvenation",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Autologous growth factor therapy to stimulate hair follicle regrowth, thicken hair roots, and rejuvenate facial collagen.",
+      "fullDescription": "Administered by certified medical professionals adhering to hospital-grade sterile standards. Uses your body’s concentrated growth factors to revitalize dormant scalp hair follicles and reverse facial aging.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/prp-hair-treatment.jpg",
+      "durationMinutes": 60,
+      "basePricePaise": 399900,
+      "regularPricePaise": 499900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Sterile blood draw and high-speed centrifugal separation",
+        "Topical numbing cream for painless application",
+        "Targeted micro-injection or meso-gun delivery",
+        "Post-procedure antiseptic spray and care kit"
+      ],
+      "exclusions": [
+        "Hair transplant surgery"
+      ],
+      "preparationInstructions": [
+        "Wash hair thoroughly in morning; stay well-hydrated."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 8 hours before appointment.",
+      "variants": [
+        {
+          "id": "var_prp_therapy",
+          "serviceId": "srv_beedare_prp",
+          "name": "PRP Hair & Scalp Rejuvenation Session",
+          "scopeSummary": "Autologous platelet plasma micro-therapy for hair density",
+          "durationMinutes": 60,
+          "basePricePaise": 399900,
+          "regularPricePaise": 499900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/prp-hair-treatment.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_botox",
+      "slug": "botox-smoothens-wrinkles-fine-lines",
+      "title": "• Botox – Smoothens wrinkles & fine lines (per unit)",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Experience Advanced Aesthetic Solutions: smooth forehead lines, crow’s feet, and frown lines with certified botulinum toxin at home.",
+      "fullDescription": "Precise micro-dosing to relax hyperactive facial muscles and eliminate dynamic wrinkles. Safe, FDA-approved authentic botulinum protein delivered by certified injectors.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/botox-2020-01-13-5e1c430703002.jpg",
+      "durationMinutes": 30,
+      "basePricePaise": 150000,
+      "regularPricePaise": 180000,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Facial muscle movement mapping and consultation",
+        "Topical anesthetic numbing cream",
+        "Precise micro-droplet injection delivery",
+        "2-week follow-up touch-up check"
+      ],
+      "exclusions": [
+        "Surgical facelift"
+      ],
+      "preparationInstructions": [
+        "Avoid alcohol and blood thinners 24 hours prior."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 6 hours before appointment.",
+      "variants": [
+        {
+          "id": "var_botox_unit",
+          "serviceId": "srv_beedare_botox",
+          "name": "Botox Anti-Wrinkle Treatment (Starting 5 Units)",
+          "scopeSummary": "Forehead lines, crow’s feet or frown line smoothing (₹300/unit)",
+          "durationMinutes": 30,
+          "basePricePaise": 150000,
+          "regularPricePaise": 180000,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/botox-2020-01-13-5e1c430703002.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_filler",
+      "slug": "filler-1-ml-volume-restoration-contouring",
+      "title": "Filler (1 ml) – Volume restoration & contouring –",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Hyaluronic acid dermal filler (1 ml): Restore hollow cheeks, enhance lips, soften nasolabial folds, and sculpt jawline contour.",
+      "fullDescription": "Premium cross-linked hyaluronic acid filler to replenish youthful volume. Instant, natural results delivered by experienced aesthetic doctors in a comfortable home setting.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/what-are-skin-boosters.jpg",
+      "durationMinutes": 45,
+      "basePricePaise": 1599900,
+      "regularPricePaise": 1899900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Sterile sealed 1 ml hyaluronic acid syringe (Allergan / Juvederm / Restylane)",
+        "Detailed facial contour symmetry analysis",
+        "Painless cannula or fine-needle injection with lidocaine",
+        "Sculpting massage and post-filler cool pack"
+      ],
+      "exclusions": [
+        "Permanent silicone fillers"
+      ],
+      "preparationInstructions": [
+        "Avoid aspirin and green tea for 24 hours prior."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 8 hours before service.",
+      "variants": [
+        {
+          "id": "var_filler_1ml",
+          "serviceId": "srv_beedare_filler",
+          "name": "Dermal Filler (1 ml Hyaluronic Acid)",
+          "scopeSummary": "Lip enhancement, cheek lift, or smile lines volume restoration",
+          "durationMinutes": 45,
+          "basePricePaise": 1599900,
+          "regularPricePaise": 1899900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/what-are-skin-boosters.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_skin_booster",
+      "slug": "skin-booster-hydration-radiance-boost",
+      "title": "Skin Booster – Hydration & radiance boost",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Deep dermal hydration micro-injections with pure hyaluronic acid. Boosts elasticity, glow, and plumps dehydrated skin.",
+      "fullDescription": "Profhilo / Restylane SkinBoosters deliver ultra-pure hyaluronic acid across bio-aesthetic points. Stimulates 4 types of collagen and elastin, restoring natural firm radiance without altering facial structure.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/what-are-skin-boosters.jpg",
+      "durationMinutes": 45,
+      "basePricePaise": 1499900,
+      "regularPricePaise": 1799900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Topical numbing and skin disinfection",
+        "Multi-point hyaluronic micro-bolus placement",
+        "Hydrating sheet mask and soothing cream"
+      ],
+      "exclusions": [
+        "Surgical threading"
+      ],
+      "preparationInstructions": [
+        "Arrive with clean makeup-free skin."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 6 hours before service.",
+      "variants": [
+        {
+          "id": "var_skin_booster",
+          "serviceId": "srv_beedare_skin_booster",
+          "name": "Skin Booster Deep Hydration & Collagen Session",
+          "scopeSummary": "Pure hyaluronic acid bio-remodeling for intense glow and elasticity",
+          "durationMinutes": 45,
+          "basePricePaise": 1499900,
+          "regularPricePaise": 1799900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/what-are-skin-boosters.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_microneedle",
+      "slug": "micro-needle-therapy-scar-reduction-skin-renewal",
+      "title": "Micro-Needle Therapy – Scar reduction & skin renewal",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Medical micro-needling stimulates natural elastin and collagen synthesis to diminish acne scars, reduce pore size, and firm skin.",
+      "fullDescription": "Precision motorized micro-needling creates controlled micro-channels in the dermis, triggering natural wound-healing cascade, serum absorption boost, and skin tightening.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/360_F_471092808_sUCrkTM1CwSfXuFvMWTUKrGsTzfbfTCw.jpg",
+      "durationMinutes": 60,
+      "basePricePaise": 499900,
+      "regularPricePaise": 599900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Medical numbing cream for comfortable session",
+        "Sterile single-use multi-needle cartridge",
+        "Hyaluronic & peptide infusion during needling",
+        "Cryo-cooling calming mask and SPF 50+"
+      ],
+      "exclusions": [
+        "Active cystic acne infected lesions"
+      ],
+      "preparationInstructions": [
+        "Avoid direct sun exposure 24 hours prior."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 6 hours before service.",
+      "variants": [
+        {
+          "id": "var_microneedle",
+          "serviceId": "srv_beedare_microneedle",
+          "name": "Micro-Needle Collagen Induction Therapy",
+          "scopeSummary": "Acne scar reduction, pore shrinking & skin texture renewal",
+          "durationMinutes": 60,
+          "basePricePaise": 499900,
+          "regularPricePaise": 599900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/360_F_471092808_sUCrkTM1CwSfXuFvMWTUKrGsTzfbfTCw.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_dermapen",
+      "slug": "dermapen-treatment-collagen-boost-smooth-texture",
+      "title": "Dermapen Treatment – Collagen boost & smooth texture",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Dermapen 4 digital fractional micro-needling for superior scar repair, fine line softening, and epidermal glow.",
+      "fullDescription": "The gold standard in mechanical collagen induction therapy. Dermapen 4 creates up to 1,920 micro-punctures per second, stimulating rapid fibroblasts, smoothing surgical/acne scars and firming lax skin.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/beautiful-young-woman-at-beauty-clinic.jpg",
+      "durationMinutes": 60,
+      "basePricePaise": 499900,
+      "regularPricePaise": 599900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Full face antiseptic prep & high-strength numbing",
+        "Dermapen 4 automated micro-therapy with targeted depth",
+        "Growth factor complex infusion",
+        "Post-procedure biocellulose cooling mask"
+      ],
+      "exclusions": [
+        "Keloid scar prone skin"
+      ],
+      "preparationInstructions": [
+        "Avoid exfoliating acid serums 48 hours prior."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 6 hours before service.",
+      "variants": [
+        {
+          "id": "var_dermapen_clean",
+          "serviceId": "srv_beedare_dermapen",
+          "name": "Dermapen 4 Fractional Collagen Induction",
+          "scopeSummary": "High-speed automated micro-needling for scars & smoothness",
+          "durationMinutes": 60,
+          "basePricePaise": 499900,
+          "regularPricePaise": 599900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/beautiful-young-woman-at-beauty-clinic.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_full_body_laser",
+      "slug": "full-body-laser-complete-hair-removal",
+      "title": "Full Body Laser – Complete hair removal",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Enjoy smooth, hair-free skin with our advanced diode laser hair removal – painless, safe, and permanent at your doorstep.",
+      "fullDescription": "State-of-the-art triple-wavelength diode laser with ice-chill contact cooling. Targets hair roots without pain or burns across arms, legs, back, chest, stomach, and bikini zone.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/full-body-laser-hair-removal-india.jpg",
+      "durationMinutes": 120,
+      "basePricePaise": 799900,
+      "regularPricePaise": 999900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Skin phototype laser energy calibration",
+        "Full body shave touch-up and cooling gel application",
+        "Triple wavelength pain-free diode laser pass",
+        "Soothing aloe vera skin hydration"
+      ],
+      "exclusions": [
+        "Hair bleaching before treatment"
+      ],
+      "preparationInstructions": [
+        "Shave treatment areas 24 hours before appointment. Do not wax or thread."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 8 hours before appointment.",
+      "variants": [
+        {
+          "id": "var_full_body_laser",
+          "serviceId": "srv_beedare_full_body_laser",
+          "name": "Full Body Painless Laser Hair Removal Session",
+          "scopeSummary": "Complete full body permanent hair reduction with cooling tip",
+          "durationMinutes": 120,
+          "basePricePaise": 799900,
+          "regularPricePaise": 999900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/full-body-laser-hair-removal-india.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_full_face_laser",
+      "slug": "full-face-laser-smooth-clear-facial-skin",
+      "title": "Full Face Laser – Smooth & clear facial skin",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Permanent reduction of upper lip, chin, sideburns, and forehead peach fuzz with gentle pain-reduced diode laser.",
+      "fullDescription": "Achieve flawless makeup-ready facial skin without monthly threading or waxing pain. Safe for all skin tones with customized laser fluences.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/skin-care-face-beauty-treatment-ipl-photo-facial-therapy-ant.jpg",
+      "durationMinutes": 30,
+      "basePricePaise": 399900,
+      "regularPricePaise": 499900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Protective eye goggles and cooling gel application",
+        "Upper lip, chin, jawline and cheek laser passes",
+        "Post-laser soothing gel and sun block"
+      ],
+      "exclusions": [
+        "Eyebrow shaping"
+      ],
+      "preparationInstructions": [
+        "Shave or trim facial hair 12 hours prior."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_full_face_laser",
+          "serviceId": "srv_beedare_full_face_laser",
+          "name": "Full Face Laser Hair Reduction Session",
+          "scopeSummary": "Upper lip, chin, sideburns & forehead painless laser",
+          "durationMinutes": 30,
+          "basePricePaise": 399900,
+          "regularPricePaise": 499900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/skin-care-face-beauty-treatment-ipl-photo-facial-therapy-ant.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_bikini_laser",
+      "slug": "bikini-laser-hygiene-smoothness",
+      "title": "Bikini Laser – Hygiene & smoothness",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Hygienic, smooth, and ingrown-free bikini area laser hair removal with maximum privacy and certified female laser technicians.",
+      "fullDescription": "Enjoy long-lasting smoothness and eliminate painful waxing rashes and ingrown hairs. Certified female practitioners maintain complete privacy in your home.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/woman-receiving-laser-epilation-on-bikini-zone-at-beauty-clinic-bikini-zone-laser-hair.jpg",
+      "durationMinutes": 45,
+      "basePricePaise": 399900,
+      "regularPricePaise": 499900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Strict single-use sanitized disposables",
+        "Cooling gel and painless diode laser coverage",
+        "Anti-inflammatory post-care application"
+      ],
+      "exclusions": [
+        "Waxing services"
+      ],
+      "preparationInstructions": [
+        "Shave area 24 hours prior with clean razor."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_bikini_laser",
+          "serviceId": "srv_beedare_bikini_laser",
+          "name": "Bikini Line Precision Laser Session",
+          "scopeSummary": "Hygiene & smoothness with certified female technicians",
+          "durationMinutes": 45,
+          "basePricePaise": 399900,
+          "regularPricePaise": 499900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/woman-receiving-laser-epilation-on-bikini-zone-at-beauty-clinic-bikini-zone-laser-hair.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_full_arm_laser",
+      "slug": "full-arm-laser-hair-free-arms",
+      "title": "Full Arm Laser – Hair-free arms",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Complete hair-free arms including hands, fingers, and underarms with fast scanning diode laser technology.",
+      "fullDescription": "Say goodbye to razor burns and tanning on arms. Uniform diode laser beams target deep dark hair follicles, giving soft, silky-smooth arms.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/body-care-laser-hair-removal-epilation-treatment-smooth-skin.jpg",
+      "durationMinutes": 45,
+      "basePricePaise": 499900,
+      "regularPricePaise": 599900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Both full arms and underarms laser coverage",
+        "Ice cooling protection for zero discomfort",
+        "Post-treatment soothing lotion"
+      ],
+      "exclusions": [
+        "Chemical bleaching"
+      ],
+      "preparationInstructions": [
+        "Shave arms 24 hours before appointment."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_full_arm_laser",
+          "serviceId": "srv_beedare_full_arm_laser",
+          "name": "Full Both Arms + Underarms Laser Session",
+          "scopeSummary": "Complete hair removal for both arms and underarms",
+          "durationMinutes": 45,
+          "basePricePaise": 499900,
+          "regularPricePaise": 599900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/body-care-laser-hair-removal-epilation-treatment-smooth-skin.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    },
+    {
+      "id": "srv_beedare_full_legs_laser",
+      "slug": "full-legs-laser-hair-free-legs",
+      "title": "Full Legs Laser – Hair-free legs-Delhi",
+      "categoryId": "cat_aesthetics",
+      "shortDescription": "Both full legs hair removal: thighs, knees, calves, and feet with painless cooling diode laser.",
+      "fullDescription": "Flaunt silky, hair-free legs all year round. High-repetition diode laser rapidly treats large surface areas, permanently reducing leg hair and strawberry legs.",
+      "illustrationKey": "aesthetics",
+      "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/360_F_325763670_7HDQhp4ZLh530EzsAM0iUfPJpIW2by1Z.jpg",
+      "durationMinutes": 60,
+      "basePricePaise": 499900,
+      "regularPricePaise": 599900,
+      "defaultPricingMode": "city_fixed",
+      "inclusions": [
+        "Full thighs, calves, knees and feet coverage",
+        "Pre-laser cooling glide gel",
+        "Calming post-laser mist and moisturizing cream"
+      ],
+      "exclusions": [
+        "Chemical body tanning"
+      ],
+      "preparationInstructions": [
+        "Shave legs thoroughly 24 hours in advance."
+      ],
+      "cancellationPolicySummary": "Free cancellation up to 4 hours before service.",
+      "variants": [
+        {
+          "id": "var_full_legs_laser",
+          "serviceId": "srv_beedare_full_legs_laser",
+          "name": "Full Both Legs Pain-Free Laser Session",
+          "scopeSummary": "Thighs to feet permanent hair reduction with ice-chill tip",
+          "durationMinutes": 60,
+          "basePricePaise": 499900,
+          "regularPricePaise": 599900,
+          "imageUrl": "https://tankmanpro.com/wp-content/uploads/2025/08/360_F_325763670_7HDQhp4ZLh530EzsAM0iUfPJpIW2by1Z.jpg",
+          "active": true
+        }
+      ],
+      "addons": [],
+      "questions": [],
+      "faqs": [],
+      "supportedCityIds": [
+        "city_delhi",
+        "city_shahjahanpur"
+      ],
+      "status": "published",
+      "isDemo": true
+    }
+  ],
+  "vendors": [
+    {
+      "uid": "vnd_1792757447825",
+      "vendorCode": "TMP-VND-1005",
+      "displayName": "Permanent Firebase Partner",
+      "businessName": "Permanent Firebase Partner Services",
+      "phone": "9988776655",
+      "email": "firebasepartner@tankmanpro.com",
+      "password": "PartnerSecurePass123",
+      "status": "active",
+      "isAvailable": true,
+      "supportedCityIds": [],
+      "supportedAreaPins": [
+        "208001"
+      ],
+      "supportedServiceIds": [
+        "svc_water_tank_cleaning"
+      ],
+      "workingDays": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
+      "workingHoursLabel": "08:00 AM – 08:00 PM",
+      "maxActiveJobs": 6,
+      "activeAssignedJobs": 0,
+      "assignmentPriority": 1,
+      "experienceYearsLabel": "4+ Years Experience",
+      "commissionPercent": 18,
+      "kycNotes": "Registered by Main Admin.",
+      "createdAtIso": "2026-10-23T12:10:47.825Z",
+      "updatedAtIso": "2026-10-23T12:10:47.825Z",
+      "isDemo": false
+    },
+    {
+      "uid": "vendor_demo_del_1",
+      "displayName": "AquaPure Mechanized Crew (Delhi)",
+      "businessName": "AquaPure Hygiene Solutions Pvt. Ltd.",
+      "phone": "+91-98100-00001",
+      "email": "aquapure.demo@tankmanpro.example",
+      "status": "active",
+      "supportedCityIds": [
+        "city_delhi"
+      ],
+      "supportedAreaPins": [
+        "110001",
+        "110016",
+        "110075"
+      ],
+      "supportedServiceIds": [
+        "srv_mechanized_tank_clean",
+        "srv_car_wash",
+        "srv_bike_wash",
+        "srv_chimney_cleaning",
+        "srv_ceiling_fan_cleaning",
+        "srv_exhaust_fan_cleaning",
+        "srv_single_door_fridge",
+        "srv_double_door_fridge",
+        "srv_gas_stove_cleaning",
+        "srv_kitchen_sink_cleaning",
+        "srv_kitchen_chimney_clean",
+        "srv_empty_kitchen_appliances",
+        "srv_toilet_cleaning",
+        "srv_bathroom_sqft",
+        "srv_floor_cleaning_sqft",
+        "srv_bathroom_cleaning",
+        "srv_sofa_mattress_clean",
+        "srv_carpet_cleaning",
+        "srv_ac_foam_jet",
+        "srv_refrigerator_repair",
+        "srv_washing_machine_repair",
+        "srv_plumber_services",
+        "srv_electrician_services",
+        "srv_painter_services",
+        "srv_beedare_yellow_peel",
+        "srv_beedare_tca_peel",
+        "srv_beedare_vitc_peel",
+        "srv_beedare_glycolic_peel",
+        "srv_beedare_prp",
+        "srv_beedare_botox",
+        "srv_beedare_filler",
+        "srv_beedare_skin_booster",
+        "srv_beedare_microneedle",
+        "srv_beedare_dermapen",
+        "srv_beedare_full_body_laser",
+        "srv_beedare_full_face_laser",
+        "srv_beedare_bikini_laser",
+        "srv_beedare_full_arm_laser",
+        "srv_beedare_full_legs_laser"
+      ],
+      "workingDays": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
+      "workingHoursLabel": "08:00 AM – 08:00 PM",
+      "maxActiveJobs": 6,
+      "activeAssignedJobs": 0,
+      "assignmentPriority": 1,
+      "experienceYearsLabel": "Verified Crew · Delhi NCR",
+      "isDemo": true,
+      "vendorCode": "TMP-VND-1001",
+      "isAvailable": true,
+      "commissionPercent": 18,
+      "password": "TankmanPartner@2026",
+      "kycNotes": "Verified Aadhaar, PAN, Police Clearance & Mechanised Tool Kit Inspection.",
+      "createdAtIso": "2026-09-15T09:00:00.000Z",
+      "updatedAtIso": "2026-10-19T14:30:00.000Z"
+    },
+    {
+      "uid": "vendor_demo_del_2",
+      "displayName": "Capital Climate & Tank Engineers (Delhi)",
+      "businessName": "Capital Home Technical Services",
+      "phone": "+91-98100-00002",
+      "email": "capital.demo@tankmanpro.example",
+      "status": "active",
+      "supportedCityIds": [
+        "city_delhi"
+      ],
+      "supportedAreaPins": [
+        "110001",
+        "110016",
+        "110075"
+      ],
+      "supportedServiceIds": [
+        "srv_mechanized_tank_clean",
+        "srv_car_wash",
+        "srv_bike_wash",
+        "srv_chimney_cleaning",
+        "srv_ceiling_fan_cleaning",
+        "srv_exhaust_fan_cleaning",
+        "srv_single_door_fridge",
+        "srv_double_door_fridge",
+        "srv_gas_stove_cleaning",
+        "srv_kitchen_sink_cleaning",
+        "srv_kitchen_chimney_clean",
+        "srv_empty_kitchen_appliances",
+        "srv_toilet_cleaning",
+        "srv_bathroom_sqft",
+        "srv_floor_cleaning_sqft",
+        "srv_bathroom_cleaning",
+        "srv_sofa_mattress_clean",
+        "srv_carpet_cleaning",
+        "srv_ac_foam_jet",
+        "srv_refrigerator_repair",
+        "srv_washing_machine_repair",
+        "srv_plumber_services",
+        "srv_electrician_services",
+        "srv_painter_services",
+        "srv_beedare_yellow_peel",
+        "srv_beedare_tca_peel",
+        "srv_beedare_vitc_peel",
+        "srv_beedare_glycolic_peel",
+        "srv_beedare_prp",
+        "srv_beedare_botox",
+        "srv_beedare_filler",
+        "srv_beedare_skin_booster",
+        "srv_beedare_microneedle",
+        "srv_beedare_dermapen",
+        "srv_beedare_full_body_laser",
+        "srv_beedare_full_face_laser",
+        "srv_beedare_bikini_laser",
+        "srv_beedare_full_arm_laser",
+        "srv_beedare_full_legs_laser"
+      ],
+      "workingDays": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat"
+      ],
+      "workingHoursLabel": "09:00 AM – 07:00 PM",
+      "maxActiveJobs": 5,
+      "activeAssignedJobs": 0,
+      "assignmentPriority": 2,
+      "experienceYearsLabel": "Verified Crew · Connaught Place & South Delhi",
+      "isDemo": true,
+      "vendorCode": "TMP-VND-1002",
+      "isAvailable": true,
+      "commissionPercent": 18,
+      "password": "TankmanPartner@2026",
+      "kycNotes": "Verified Aadhaar, PAN, Police Clearance & Mechanised Tool Kit Inspection.",
+      "createdAtIso": "2026-09-15T09:00:00.000Z",
+      "updatedAtIso": "2026-10-19T14:30:00.000Z"
+    },
+    {
+      "uid": "vendor_demo_spn_1",
+      "displayName": " (Shahjahanpur)",
+      "businessName": "Rohilkhand Hydro Care Services",
+      "phone": "+91-94150-00001",
+      "email": "rohilkhand.demo@tankmanpro.example",
+      "status": "active",
+      "supportedCityIds": [
+        "city_shahjahanpur"
+      ],
+      "supportedAreaPins": [
+        "242001",
+        "242226",
+        "208001",
+        "208002"
+      ],
+      "supportedServiceIds": [
+        "srv_mechanized_tank_clean",
+        "srv_car_wash",
+        "srv_bike_wash",
+        "srv_chimney_cleaning",
+        "srv_ceiling_fan_cleaning",
+        "srv_exhaust_fan_cleaning",
+        "srv_single_door_fridge",
+        "srv_double_door_fridge",
+        "srv_gas_stove_cleaning",
+        "srv_kitchen_sink_cleaning",
+        "srv_kitchen_chimney_clean",
+        "srv_empty_kitchen_appliances",
+        "srv_toilet_cleaning",
+        "srv_bathroom_sqft",
+        "srv_floor_cleaning_sqft",
+        "srv_bathroom_cleaning",
+        "srv_sofa_mattress_clean",
+        "srv_carpet_cleaning",
+        "srv_ac_foam_jet",
+        "srv_refrigerator_repair",
+        "srv_washing_machine_repair",
+        "srv_plumber_services",
+        "srv_electrician_services",
+        "srv_painter_services",
+        "srv_beedare_yellow_peel",
+        "srv_beedare_tca_peel",
+        "srv_beedare_vitc_peel",
+        "srv_beedare_glycolic_peel",
+        "srv_beedare_prp",
+        "srv_beedare_botox",
+        "srv_beedare_filler",
+        "srv_beedare_skin_booster",
+        "srv_beedare_microneedle",
+        "srv_beedare_dermapen",
+        "srv_beedare_full_body_laser",
+        "srv_beedare_full_face_laser",
+        "srv_beedare_bikini_laser",
+        "srv_beedare_full_arm_laser",
+        "srv_beedare_full_legs_laser"
+      ],
+      "workingDays": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat",
+        "Sun"
+      ],
+      "workingHoursLabel": "08:30 AM – 07:00 PM",
+      "maxActiveJobs": 5,
+      "activeAssignedJobs": 3,
+      "assignmentPriority": 1,
+      "experienceYearsLabel": "Verified Crew · UP Zone",
+      "isDemo": false,
+      "vendorCode": "TMP-VND-1003",
+      "isAvailable": true,
+      "commissionPercent": 18,
+      "password": "TankmanPartner@2026",
+      "kycNotes": "Verified Aadhaar, PAN, Police Clearance & Mechanised Tool Kit Inspection.",
+      "createdAtIso": "2026-09-15T09:00:00.000Z",
+      "updatedAtIso": "2026-10-23T16:34:09.920Z",
+      "passwordResetRequestedAtIso": "2026-10-23T16:27:51.320Z"
+    },
+    {
+      "uid": "vendor_demo_spn_2",
+      "displayName": "Sadar CleanTank & Appliance Crew",
+      "businessName": "Sadar Technical Works",
+      "phone": "+91-94150-00002",
+      "email": "sadar.demo@tankmanpro.example",
+      "status": "active",
+      "supportedCityIds": [
+        "city_shahjahanpur"
+      ],
+      "supportedAreaPins": [
+        "242001",
+        "242226",
+        "208001",
+        "208002"
+      ],
+      "supportedServiceIds": [
+        "srv_mechanized_tank_clean",
+        "srv_car_wash",
+        "srv_bike_wash",
+        "srv_chimney_cleaning",
+        "srv_ceiling_fan_cleaning",
+        "srv_exhaust_fan_cleaning",
+        "srv_single_door_fridge",
+        "srv_double_door_fridge",
+        "srv_gas_stove_cleaning",
+        "srv_kitchen_sink_cleaning",
+        "srv_kitchen_chimney_clean",
+        "srv_empty_kitchen_appliances",
+        "srv_toilet_cleaning",
+        "srv_bathroom_sqft",
+        "srv_floor_cleaning_sqft",
+        "srv_bathroom_cleaning",
+        "srv_sofa_mattress_clean",
+        "srv_carpet_cleaning",
+        "srv_ac_foam_jet",
+        "srv_refrigerator_repair",
+        "srv_washing_machine_repair",
+        "srv_plumber_services",
+        "srv_electrician_services",
+        "srv_painter_services",
+        "srv_beedare_yellow_peel",
+        "srv_beedare_tca_peel",
+        "srv_beedare_vitc_peel",
+        "srv_beedare_glycolic_peel",
+        "srv_beedare_prp",
+        "srv_beedare_botox",
+        "srv_beedare_filler",
+        "srv_beedare_skin_booster",
+        "srv_beedare_microneedle",
+        "srv_beedare_dermapen",
+        "srv_beedare_full_body_laser",
+        "srv_beedare_full_face_laser",
+        "srv_beedare_bikini_laser",
+        "srv_beedare_full_arm_laser",
+        "srv_beedare_full_legs_laser"
+      ],
+      "workingDays": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri",
+        "Sat"
+      ],
+      "workingHoursLabel": "09:00 AM – 06:30 PM",
+      "maxActiveJobs": 4,
+      "activeAssignedJobs": 0,
+      "assignmentPriority": 2,
+      "experienceYearsLabel": "Verified Crew · Sadar & Civil Lines",
+      "isDemo": true,
+      "vendorCode": "TMP-VND-1004",
+      "isAvailable": true,
+      "commissionPercent": 18,
+      "password": "TankmanPartner@2026",
+      "kycNotes": "Verified Aadhaar, PAN, Police Clearance & Mechanised Tool Kit Inspection.",
+      "createdAtIso": "2026-09-15T09:00:00.000Z",
+      "updatedAtIso": "2026-10-19T14:30:00.000Z"
+    }
+  ],
+  "priceOverrides": [
+    {
+      "id": "po_tank_500_del_city",
+      "serviceId": "srv_mechanized_tank_clean",
+      "variantId": "var_tank_500_1000",
+      "cityId": "city_delhi",
+      "amountPaise": 49900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_tank_500_knp_city",
+      "serviceId": "srv_mechanized_tank_clean",
+      "variantId": "var_tank_500_1000",
+      "cityId": "city_kanpur",
+      "amountPaise": 49900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_tank_500_spn_city",
+      "serviceId": "srv_mechanized_tank_clean",
+      "variantId": "var_tank_500_1000",
+      "cityId": "city_shahjahanpur",
+      "amountPaise": 89900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_tank_500_spn_vendor1",
+      "serviceId": "srv_mechanized_tank_clean",
+      "variantId": "var_tank_500_1000",
+      "cityId": "city_shahjahanpur",
+      "vendorUid": "vendor_demo_spn_1",
+      "amountPaise": 59900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "vendor_demo_spn_1",
+      "updatedAtIso": "2026-10-23T16:48:31.396Z",
+      "isDemo": false,
+      "approvalStatus": "approved"
+    },
+    {
+      "id": "po_tank_500_spn_vendor2",
+      "serviceId": "srv_mechanized_tank_clean",
+      "variantId": "var_tank_500_1000",
+      "cityId": "city_shahjahanpur",
+      "vendorUid": "vendor_demo_spn_2",
+      "amountPaise": 89000,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_tank_1000_spn_vendor1",
+      "serviceId": "srv_mechanized_tank_clean",
+      "variantId": "var_tank_1000_1500",
+      "cityId": "city_shahjahanpur",
+      "vendorUid": "vendor_demo_spn_1",
+      "amountPaise": 89900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_tank_1000_spn_vendor2",
+      "serviceId": "srv_mechanized_tank_clean",
+      "variantId": "var_tank_1000_1500",
+      "cityId": "city_shahjahanpur",
+      "vendorUid": "vendor_demo_spn_2",
+      "amountPaise": 94900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_tank_1500_del_city",
+      "serviceId": "srv_mechanized_tank_clean",
+      "variantId": "var_tank_1500_2000",
+      "cityId": "city_delhi",
+      "amountPaise": 149900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_tank_1500_spn_vendor1",
+      "serviceId": "srv_mechanized_tank_clean",
+      "variantId": "var_tank_1500_2000",
+      "cityId": "city_shahjahanpur",
+      "vendorUid": "vendor_demo_spn_1",
+      "amountPaise": 139900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_tank_1500_spn_vendor2",
+      "serviceId": "srv_mechanized_tank_clean",
+      "variantId": "var_tank_1500_2000",
+      "cityId": "city_shahjahanpur",
+      "vendorUid": "vendor_demo_spn_2",
+      "amountPaise": 149900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_tank_4000_spn_vendor1",
+      "serviceId": "srv_mechanized_tank_clean",
+      "variantId": "var_tank_4000_5000",
+      "cityId": "city_shahjahanpur",
+      "vendorUid": "vendor_demo_spn_1",
+      "amountPaise": 239900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_tank_4000_spn_vendor2",
+      "serviceId": "srv_mechanized_tank_clean",
+      "variantId": "var_tank_4000_5000",
+      "cityId": "city_shahjahanpur",
+      "vendorUid": "vendor_demo_spn_2",
+      "amountPaise": 249900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_ac_single_del_vendor1",
+      "serviceId": "srv_ac_foam_jet",
+      "variantId": "var_ac_single",
+      "cityId": "city_delhi",
+      "vendorUid": "vendor_demo_del_1",
+      "amountPaise": 59900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_ac_single_del_vendor2",
+      "serviceId": "srv_ac_foam_jet",
+      "variantId": "var_ac_single",
+      "cityId": "city_delhi",
+      "vendorUid": "vendor_demo_del_2",
+      "amountPaise": 62900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_ac_twin_del_vendor1",
+      "serviceId": "srv_ac_foam_jet",
+      "variantId": "var_ac_twin",
+      "cityId": "city_delhi",
+      "vendorUid": "vendor_demo_del_1",
+      "amountPaise": 109900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_ac_twin_del_vendor2",
+      "serviceId": "srv_ac_foam_jet",
+      "variantId": "var_ac_twin",
+      "cityId": "city_delhi",
+      "vendorUid": "vendor_demo_del_2",
+      "amountPaise": 114900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_ac_install_del_vendor1",
+      "serviceId": "srv_ac_foam_jet",
+      "variantId": "var_ac_install",
+      "cityId": "city_delhi",
+      "vendorUid": "vendor_demo_del_1",
+      "amountPaise": 149900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    },
+    {
+      "id": "po_ac_install_del_vendor2",
+      "serviceId": "srv_ac_foam_jet",
+      "variantId": "var_ac_install",
+      "cityId": "city_delhi",
+      "vendorUid": "vendor_demo_del_2",
+      "amountPaise": 154900,
+      "currency": "INR",
+      "active": true,
+      "updatedByUid": "admin_seed",
+      "updatedAtIso": "2026-10-20T00:00:00Z",
+      "isDemo": true
+    }
+  ],
+  "coupons": [
+    {
+      "id": "cpn_clean10",
+      "code": "CLEAN10",
+      "internalName": "10% Hygiene Discount",
+      "description": "10% off on water tank cleaning and home services (up to ₹200 max discount).",
+      "discountType": "percentage",
+      "discountValue": 10,
+      "maxDiscountCapPaise": 20000,
+      "minOrderSubtotalPaise": 30000,
+      "validFromIso": "2025-01-01T00:00:00Z",
+      "validUntilIso": "2027-12-31T23:59:59Z",
+      "totalRedemptionLimit": 500,
+      "currentRedemptions": 13,
+      "perCustomerLimit": 2,
+      "newCustomerOnly": false,
+      "active": true,
+      "isDemo": true
+    },
+    {
+      "id": "cpn_delhi150",
+      "code": "DELHI150",
+      "internalName": "Delhi NCR Flat ₹150 Off",
+      "description": "Flat ₹150 off on orders above ₹800 in New Delhi service areas.",
+      "discountType": "fixed",
+      "discountValue": 15000,
+      "minOrderSubtotalPaise": 80000,
+      "validFromIso": "2025-01-01T00:00:00Z",
+      "validUntilIso": "2027-12-31T23:59:59Z",
+      "applicableCityIds": [
+        "city_delhi"
+      ],
+      "totalRedemptionLimit": 100,
+      "currentRedemptions": 5,
+      "perCustomerLimit": 1,
+      "newCustomerOnly": false,
+      "active": true,
+      "isDemo": true
+    }
+  ],
+  "bookings": [
+    {
+      "id": "bk_1792773249943_1ika",
+      "bookingNumber": "TMP-2026-1003",
+      "bookingCode": "TMP-2026-1003",
+      "idempotencyKey": "idem_1792773243830_jky7ld",
+      "customerUid": "cust_8595318215",
+      "customerName": "salman",
+      "customerPhone": "+91 8595318215",
+      "serviceId": "srv_mechanized_tank_clean",
+      "serviceSlug": "mechanized-water-tank-cleaning",
+      "serviceTitle": "Mechanized Water Tank Cleaning",
+      "categoryId": "cat_water_tank",
+      "variantId": "var_tank_500_1000",
+      "variantName": "Water Tank Cleaning (500L to 750L)",
+      "addons": [],
+      "cityId": "city_shahjahanpur",
+      "cityName": "Shahjahanpur",
+      "pinCode": "242001",
+      "zoneLabel": "City Centre & Sadar",
+      "addressLine": "jhanda kalan",
+      "landmark": "majar",
+      "propertyType": "residential",
+      "preferredDate": "2026-10-23",
+      "preferredSlot": "09:00 AM – 11:00 AM",
+      "scheduledDate": "2026-10-23",
+      "timeWindow": "09:00 AM – 11:00 AM",
+      "pricingMode": "vendor_offer",
+      "quoteSnapshot": {
+        "bookable": true,
+        "cityId": "city_shahjahanpur",
+        "cityName": "Shahjahanpur",
+        "pinCode": "242001",
+        "zoneLabel": "City Centre & Sadar",
+        "pricingMode": "vendor_offer",
+        "pricingSource": "vendor_override",
+        "serviceId": "srv_mechanized_tank_clean",
+        "serviceTitle": "Mechanized Water Tank Cleaning",
+        "variantId": "var_tank_500_1000",
+        "variantName": "Water Tank Cleaning (500L to 750L)",
+        "selectedVendorUid": "vendor_demo_spn_1",
+        "selectedVendorName": " (Shahjahanpur)",
+        "baseServicePaise": 85000,
+        "addons": [],
+        "addonsTotalPaise": 0,
+        "subtotalPaise": 85000,
+        "discountPaise": 0,
+        "taxPaise": 0,
+        "taxRatePercent": 0,
+        "finalTotalPaise": 85000,
+        "currency": "INR",
+        "quoteExpiresAtIso": "2026-10-23T16:49:09.931Z",
+        "isDemoData": true
+      },
+      "priceSnapshot": {
+        "pricingMode": "vendor_offer",
+        "pricingSource": "vendor_override",
+        "baseServicePaise": 85000,
+        "addonsTotalPaise": 0,
+        "subtotalPaise": 85000,
+        "discountPaise": 0,
+        "taxRatePercent": 0,
+        "taxPaise": 0,
+        "finalTotalPaise": 85000,
+        "currency": "INR",
+        "lockedAtIso": "2026-10-23T16:34:09.920Z"
+      },
+      "status": "vendor_accepted",
+      "subStatus": "en_route",
+      "paymentStatus": "pay_after_service",
+      "paymentMethod": "pay_after_service",
+      "assignmentMode": "auto_score",
+      "assignedVendorUid": "vendor_demo_spn_1",
+      "assignedVendorName": " (Shahjahanpur)",
+      "vendorExecutionNotes": [
+        "Booking accepted by Partner. Crew scheduled for slot."
+      ],
+      "completionPhotos": [],
+      "createdAtIso": "2026-10-23T16:34:09.920Z",
+      "updatedAtIso": "2026-10-23T16:44:27.838Z",
+      "vendorRejectionReason": null
+    },
+    {
+      "id": "bk_1792765140500_mhrq",
+      "bookingNumber": "TMP-2026-1002",
+      "bookingCode": "TMP-2026-1002",
+      "idempotencyKey": "idem_1792765123931_xrm3wd",
+      "customerUid": "cust_8595318215",
+      "customerName": "Pranav Rajpoot",
+      "customerPhone": "+91 8595318215",
+      "serviceId": "srv_mechanized_tank_clean",
+      "serviceSlug": "mechanized-water-tank-cleaning",
+      "serviceTitle": "Mechanized Water Tank Cleaning",
+      "categoryId": "cat_water_tank",
+      "variantId": "var_tank_500_1000",
+      "variantName": "Water Tank Cleaning (500L to 750L)",
+      "addons": [],
+      "cityId": "city_shahjahanpur",
+      "cityName": "Shahjahanpur",
+      "pinCode": "242001",
+      "zoneLabel": "City Centre & Sadar",
+      "addressLine": "jhanda kalan",
+      "propertyType": "residential",
+      "preferredDate": "2026-10-24",
+      "preferredSlot": "12:00 PM – 02:00 PM",
+      "scheduledDate": "2026-10-24",
+      "timeWindow": "12:00 PM – 02:00 PM",
+      "pricingMode": "vendor_offer",
+      "quoteSnapshot": {
+        "bookable": true,
+        "cityId": "city_shahjahanpur",
+        "cityName": "Shahjahanpur",
+        "pinCode": "242001",
+        "zoneLabel": "City Centre & Sadar",
+        "pricingMode": "vendor_offer",
+        "pricingSource": "vendor_override",
+        "serviceId": "srv_mechanized_tank_clean",
+        "serviceTitle": "Mechanized Water Tank Cleaning",
+        "variantId": "var_tank_500_1000",
+        "variantName": "Water Tank Cleaning (500L to 750L)",
+        "selectedVendorUid": "vendor_demo_spn_1",
+        "selectedVendorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+        "baseServicePaise": 85000,
+        "addons": [],
+        "addonsTotalPaise": 0,
+        "subtotalPaise": 85000,
+        "discountPaise": 0,
+        "taxPaise": 0,
+        "taxRatePercent": 0,
+        "finalTotalPaise": 85000,
+        "currency": "INR",
+        "quoteExpiresAtIso": "2026-10-23T14:34:00.499Z",
+        "isDemoData": true
+      },
+      "priceSnapshot": {
+        "pricingMode": "vendor_offer",
+        "pricingSource": "vendor_override",
+        "baseServicePaise": 85000,
+        "addonsTotalPaise": 0,
+        "subtotalPaise": 85000,
+        "discountPaise": 0,
+        "taxRatePercent": 0,
+        "taxPaise": 0,
+        "finalTotalPaise": 85000,
+        "currency": "INR",
+        "lockedAtIso": "2026-10-23T14:19:00.498Z"
+      },
+      "status": "completed",
+      "subStatus": null,
+      "paymentStatus": "pay_after_service",
+      "paymentMethod": "pay_after_service",
+      "assignmentMode": "auto_score",
+      "assignedVendorUid": "vendor_demo_spn_1",
+      "assignedVendorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "vendorExecutionNotes": [
+        "Booking accepted by Partner. Crew scheduled for slot.",
+        "Technician arrived at customer premises.",
+        "Technician started mechanised service on site.",
+        "Service completed and verified with customer sign-off."
+      ],
+      "completionPhotos": [],
+      "createdAtIso": "2026-10-23T14:19:00.498Z",
+      "updatedAtIso": "2026-10-23T14:22:31.326Z",
+      "vendorRejectionReason": null,
+      "beforeServicePhotos": [],
+      "afterServicePhotos": []
+    },
+    {
+      "id": "bk_1792760159727_k8bk",
+      "bookingNumber": "TMP-2026-1001",
+      "bookingCode": "TMP-2026-1001",
+      "idempotencyKey": "idem_1792760127324_5cd73a",
+      "customerUid": "cust_8595318215",
+      "customerName": "Pranav Rajpoot",
+      "customerPhone": "+91 8595318215",
+      "serviceId": "srv_chimney_cleaning",
+      "serviceSlug": "chimney-cleaning",
+      "serviceTitle": "Chimney Cleaning",
+      "categoryId": "cat_kitchen",
+      "variantId": "var_chimney_clean_standard",
+      "variantName": "Standard Kitchen Chimney Deep Clean",
+      "addons": [],
+      "cityId": "city_shahjahanpur",
+      "cityName": "Shahjahanpur",
+      "pinCode": "242001",
+      "zoneLabel": "City Centre & Sadar",
+      "addressLine": "jhanda kalan",
+      "propertyType": "residential",
+      "preferredDate": "2026-10-24",
+      "preferredSlot": "09:00 AM – 11:00 AM",
+      "scheduledDate": "2026-10-24",
+      "timeWindow": "09:00 AM – 11:00 AM",
+      "pricingMode": "city_fixed",
+      "quoteSnapshot": {
+        "bookable": true,
+        "cityId": "city_shahjahanpur",
+        "cityName": "Shahjahanpur",
+        "pinCode": "242001",
+        "zoneLabel": "City Centre & Sadar",
+        "pricingMode": "city_fixed",
+        "pricingSource": "base_price",
+        "serviceId": "srv_chimney_cleaning",
+        "serviceTitle": "Chimney Cleaning",
+        "variantId": "var_chimney_clean_standard",
+        "variantName": "Standard Kitchen Chimney Deep Clean",
+        "baseServicePaise": 39900,
+        "addons": [],
+        "addonsTotalPaise": 0,
+        "subtotalPaise": 39900,
+        "couponCode": "CLEAN10",
+        "couponValid": true,
+        "couponMessage": "Coupon \"CLEAN10\" applied (₹39.90 savings).",
+        "discountPaise": 3990,
+        "taxPaise": 0,
+        "taxRatePercent": 0,
+        "finalTotalPaise": 35910,
+        "currency": "INR",
+        "quoteExpiresAtIso": "2026-10-23T13:10:59.706Z",
+        "isDemoData": true
+      },
+      "priceSnapshot": {
+        "pricingMode": "city_fixed",
+        "pricingSource": "base_price",
+        "baseServicePaise": 39900,
+        "addonsTotalPaise": 0,
+        "subtotalPaise": 39900,
+        "couponCode": "CLEAN10",
+        "discountPaise": 3990,
+        "taxRatePercent": 0,
+        "taxPaise": 0,
+        "finalTotalPaise": 35910,
+        "currency": "INR",
+        "lockedAtIso": "2026-10-23T12:55:59.702Z"
+      },
+      "status": "vendor_accepted",
+      "subStatus": "en_route",
+      "paymentStatus": "pay_after_service",
+      "paymentMethod": "pay_after_service",
+      "assignmentMode": "auto_score",
+      "assignedVendorUid": "vendor_demo_spn_1",
+      "assignedVendorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "vendorExecutionNotes": [
+        "Partner accepted booking from Vendor Dashboard.",
+        "Technician reached on site, safety gear on, inspection done.",
+        "Tank thoroughly cleaned, de-sludged and UV sanitized.",
+        "Partner accepted booking from Vendor Dashboard.",
+        "Technician arrived at customer premises.",
+        "Technician crew is en route to customer location."
+      ],
+      "completionPhotos": [],
+      "createdAtIso": "2026-10-23T12:55:59.702Z",
+      "updatedAtIso": "2026-10-23T14:15:50.444Z",
+      "vendorRejectionReason": null,
+      "beforeServicePhotos": [
+        "/assets/photos/sample_tank_before.jpg"
+      ],
+      "afterServicePhotos": [
+        "/assets/photos/sample_tank_after.jpg"
+      ]
+    }
+  ],
+  "bookingEvents": [
+    {
+      "id": "evt_1792773867838",
+      "bookingId": "bk_1792773249943_1ika",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": " (Shahjahanpur)",
+      "fromStatus": "assigned_to_vendor",
+      "toStatus": "vendor_accepted",
+      "note": "Booking accepted by Partner. Crew scheduled for slot.",
+      "createdAtIso": "2026-10-23T16:44:27.838Z"
+    },
+    {
+      "id": "ev_1792773249944_2hvz",
+      "bookingId": "bk_1792773249943_1ika",
+      "bookingCode": "TMP-2026-1003",
+      "actorUid": "cust_8595318215",
+      "actorRole": "customer",
+      "actorName": "salman",
+      "fromStatus": "draft",
+      "toStatus": "assigned_to_vendor",
+      "eventType": "customer_booking_created_and_dispatched",
+      "note": "Booking created by salman (242001) and assigned to  (Shahjahanpur) via auto_score policy.",
+      "createdAtIso": "2026-10-23T16:34:09.920Z"
+    },
+    {
+      "id": "evt_1792765351326",
+      "bookingId": "bk_1792765140500_mhrq",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "in_progress",
+      "toStatus": "completed",
+      "note": "Service completed and verified with customer sign-off.",
+      "createdAtIso": "2026-10-23T14:22:31.326Z"
+    },
+    {
+      "id": "evt_1792765188774",
+      "bookingId": "bk_1792765140500_mhrq",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "vendor_accepted",
+      "toStatus": "in_progress",
+      "note": "Technician started mechanised service on site.",
+      "createdAtIso": "2026-10-23T14:19:48.774Z"
+    },
+    {
+      "id": "evt_1792765187800",
+      "bookingId": "bk_1792765140500_mhrq",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "vendor_accepted",
+      "toStatus": "vendor_accepted",
+      "note": "Technician arrived at customer premises.",
+      "createdAtIso": "2026-10-23T14:19:47.800Z"
+    },
+    {
+      "id": "evt_1792765153406",
+      "bookingId": "bk_1792765140500_mhrq",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "assigned_to_vendor",
+      "toStatus": "vendor_accepted",
+      "note": "Booking accepted by Partner. Crew scheduled for slot.",
+      "createdAtIso": "2026-10-23T14:19:13.406Z"
+    },
+    {
+      "id": "ev_1792765140500_ktny",
+      "bookingId": "bk_1792765140500_mhrq",
+      "bookingCode": "TMP-2026-1002",
+      "actorUid": "cust_8595318215",
+      "actorRole": "customer",
+      "actorName": "Pranav Rajpoot",
+      "fromStatus": "draft",
+      "toStatus": "assigned_to_vendor",
+      "eventType": "customer_booking_created_and_dispatched",
+      "note": "Booking created by Pranav Rajpoot (242001) and assigned to Rohilkhand Tank & Hydro Care (Shahjahanpur) via auto_score policy.",
+      "createdAtIso": "2026-10-23T14:19:00.498Z"
+    },
+    {
+      "id": "evt_1792764950444",
+      "bookingId": "bk_1792760159727_k8bk",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "vendor_accepted",
+      "toStatus": "vendor_accepted",
+      "note": "Technician updated service inspection photos (Before: 1, After: 1).",
+      "createdAtIso": "2026-10-23T14:15:50.444Z"
+    },
+    {
+      "id": "evt_1792764948724",
+      "bookingId": "bk_1792760159727_k8bk",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "vendor_accepted",
+      "toStatus": "vendor_accepted",
+      "note": "Technician crew is en route to customer location.",
+      "createdAtIso": "2026-10-23T14:15:48.724Z"
+    },
+    {
+      "id": "evt_1792764947924",
+      "bookingId": "bk_1792760159727_k8bk",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "vendor_accepted",
+      "toStatus": "vendor_accepted",
+      "note": "Technician arrived at customer premises.",
+      "createdAtIso": "2026-10-23T14:15:47.924Z"
+    },
+    {
+      "id": "evt_1792764880269",
+      "bookingId": "bk_1792760159727_k8bk",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "assigned_to_vendor",
+      "toStatus": "vendor_accepted",
+      "note": "Partner accepted booking from Vendor Dashboard.",
+      "createdAtIso": "2026-10-23T14:14:40.269Z"
+    },
+    {
+      "id": "evt_1792764824170",
+      "bookingId": "bk_1792760159727_k8bk",
+      "actorUid": "admin_main",
+      "actorRole": "admin",
+      "actorName": "Main Admin Dispatch",
+      "fromStatus": "completed",
+      "toStatus": "assigned_to_vendor",
+      "note": "Manually assigned to Rohilkhand Tank & Hydro Care (Shahjahanpur) (TMP-VND-1003).",
+      "createdAtIso": "2026-10-23T14:13:44.170Z"
+    },
+    {
+      "id": "evt_1792764633734",
+      "bookingId": "bk_1792760159727_k8bk",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "in_progress",
+      "toStatus": "completed",
+      "note": "Tank thoroughly cleaned, de-sludged and UV sanitized.",
+      "createdAtIso": "2026-10-23T14:10:33.734Z"
+    },
+    {
+      "id": "evt_1792764633718",
+      "bookingId": "bk_1792760159727_k8bk",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "vendor_accepted",
+      "toStatus": "in_progress",
+      "note": "Technician reached on site, safety gear on, inspection done.",
+      "createdAtIso": "2026-10-23T14:10:33.718Z"
+    },
+    {
+      "id": "evt_1792764633682",
+      "bookingId": "bk_1792760159727_k8bk",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "vendor_accepted",
+      "toStatus": "vendor_accepted",
+      "note": "Technician updated service inspection photos (Before: 1, After: 1).",
+      "createdAtIso": "2026-10-23T14:10:33.682Z"
+    },
+    {
+      "id": "evt_1792764603268",
+      "bookingId": "bk_1792760159727_k8bk",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "vendor_accepted",
+      "toStatus": "vendor_accepted",
+      "note": "Technician updated service inspection photos (Before: 1, After: 1).",
+      "createdAtIso": "2026-10-23T14:10:03.268Z"
+    },
+    {
+      "id": "evt_1792760368331",
+      "bookingId": "bk_1792760159727_k8bk",
+      "actorUid": "vendor_demo_spn_1",
+      "actorRole": "vendor",
+      "actorName": "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
+      "fromStatus": "assigned_to_vendor",
+      "toStatus": "vendor_accepted",
+      "note": "Partner accepted booking from Vendor Dashboard.",
+      "createdAtIso": "2026-10-23T12:59:28.331Z"
+    },
+    {
+      "id": "ev_1792760159727_pwee",
+      "bookingId": "bk_1792760159727_k8bk",
+      "bookingCode": "TMP-2026-1001",
+      "actorUid": "cust_8595318215",
+      "actorRole": "customer",
+      "actorName": "Pranav Rajpoot",
+      "fromStatus": "draft",
+      "toStatus": "assigned_to_vendor",
+      "eventType": "customer_booking_created_and_dispatched",
+      "note": "Booking created by Pranav Rajpoot (242001) and assigned to Rohilkhand Tank & Hydro Care (Shahjahanpur) via auto_score policy.",
+      "createdAtIso": "2026-10-23T12:55:59.702Z"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "notif_1792773867838",
+      "recipientRole": "admin",
+      "recipientUid": "ALL_ADMINS",
+      "bookingId": "bk_1792773249943_1ika",
+      "title": "Vendor VENDOR ACCEPTED · TMP-2026-1003",
+      "message": " (Shahjahanpur) (TMP-VND-1003) transitioned TMP-2026-1003 (Mechanized Water Tank Cleaning in PIN 242001) to vendor_accepted.",
+      "type": "vendor_accepted",
+      "read": false,
+      "createdAtIso": "2026-10-23T16:44:27.838Z"
+    },
+    {
+      "id": "notif_vnd_1792773249944_1",
+      "recipientRole": "vendor",
+      "recipientUid": "vendor_demo_spn_1",
+      "title": "New Booking Assigned: TMP-2026-1003",
+      "message": "Mechanized Water Tank Cleaning (Water Tank Cleaning (500L to 750L)) in City Centre & Sadar (242001) for 2026-10-23 · 09:00 AM – 11:00 AM. Please accept in your Job Console to unlock customer contact details.",
+      "bookingId": "bk_1792773249943_1ika",
+      "bookingCode": "TMP-2026-1003",
+      "type": "vendor_assigned",
+      "severity": "info",
+      "read": false,
+      "createdAtIso": "2026-10-23T16:34:09.920Z"
+    },
+    {
+      "id": "notif_adm_1792773249944_2",
+      "recipientRole": "admin",
+      "recipientUid": "ALL_ADMINS",
+      "title": "New Booking Dispatched (TMP-2026-1003)",
+      "message": "salman booked Mechanized Water Tank Cleaning in Shahjahanpur (242001). Assigned to  (Shahjahanpur) via auto_score.",
+      "bookingId": "bk_1792773249943_1ika",
+      "bookingCode": "TMP-2026-1003",
+      "type": "booking_created",
+      "severity": "success",
+      "read": false,
+      "createdAtIso": "2026-10-23T16:34:09.920Z"
+    },
+    {
+      "id": "notif_1792772871320",
+      "recipientRole": "vendor",
+      "recipientUid": "vendor_demo_spn_1",
+      "title": "Password Setup / Reset Triggered",
+      "message": "Main Admin initiated a secure password reset for your login identity (rohilkhand.demo@tankmanpro.example).",
+      "type": "system_alert",
+      "read": false,
+      "createdAtIso": "2026-10-23T16:27:51.320Z"
+    },
+    {
+      "id": "notif_1792772870446",
+      "recipientRole": "vendor",
+      "recipientUid": "vendor_demo_spn_1",
+      "title": "Password Setup / Reset Triggered",
+      "message": "Main Admin initiated a secure password reset for your login identity (rohilkhand.demo@tankmanpro.example).",
+      "type": "system_alert",
+      "read": false,
+      "createdAtIso": "2026-10-23T16:27:50.446Z"
+    },
+    {
+      "id": "notif_1792772868895",
+      "recipientRole": "vendor",
+      "recipientUid": "vendor_demo_spn_1",
+      "title": "Password Setup / Reset Triggered",
+      "message": "Main Admin initiated a secure password reset for your login identity (rohilkhand.demo@tankmanpro.example).",
+      "type": "system_alert",
+      "read": false,
+      "createdAtIso": "2026-10-23T16:27:48.895Z"
+    },
+    {
+      "id": "notif_1792765351326",
+      "recipientRole": "admin",
+      "recipientUid": "ALL_ADMINS",
+      "bookingId": "bk_1792765140500_mhrq",
+      "title": "Vendor COMPLETED · TMP-2026-1002",
+      "message": "Rohilkhand Tank & Hydro Care (Shahjahanpur) (TMP-VND-1003) transitioned TMP-2026-1002 (Mechanized Water Tank Cleaning in PIN 242001) to completed.",
+      "type": "job_completed",
+      "read": false,
+      "createdAtIso": "2026-10-23T14:22:31.326Z"
+    },
+    {
+      "id": "notif_1792765188774",
+      "recipientRole": "admin",
+      "recipientUid": "ALL_ADMINS",
+      "bookingId": "bk_1792765140500_mhrq",
+      "title": "Vendor IN PROGRESS · TMP-2026-1002",
+      "message": "Rohilkhand Tank & Hydro Care (Shahjahanpur) (TMP-VND-1003) transitioned TMP-2026-1002 (Mechanized Water Tank Cleaning in PIN 242001) to in_progress.",
+      "type": "job_started",
+      "read": false,
+      "createdAtIso": "2026-10-23T14:19:48.774Z"
+    },
+    {
+      "id": "notif_1792765153406",
+      "recipientRole": "admin",
+      "recipientUid": "ALL_ADMINS",
+      "bookingId": "bk_1792765140500_mhrq",
+      "title": "Vendor VENDOR ACCEPTED · TMP-2026-1002",
+      "message": "Rohilkhand Tank & Hydro Care (Shahjahanpur) (TMP-VND-1003) transitioned TMP-2026-1002 (Mechanized Water Tank Cleaning in PIN 242001) to vendor_accepted.",
+      "type": "vendor_accepted",
+      "read": false,
+      "createdAtIso": "2026-10-23T14:19:13.406Z"
+    },
+    {
+      "id": "notif_vnd_1792765140501_1",
+      "recipientRole": "vendor",
+      "recipientUid": "vendor_demo_spn_1",
+      "title": "New Booking Assigned: TMP-2026-1002",
+      "message": "Mechanized Water Tank Cleaning (Water Tank Cleaning (500L to 750L)) in City Centre & Sadar (242001) for 2026-10-24 · 12:00 PM – 02:00 PM. Please accept in your Job Console to unlock customer contact details.",
+      "bookingId": "bk_1792765140500_mhrq",
+      "bookingCode": "TMP-2026-1002",
+      "type": "vendor_assigned",
+      "severity": "info",
+      "read": false,
+      "createdAtIso": "2026-10-23T14:19:00.498Z"
+    },
+    {
+      "id": "notif_adm_1792765140501_2",
+      "recipientRole": "admin",
+      "recipientUid": "ALL_ADMINS",
+      "title": "New Booking Dispatched (TMP-2026-1002)",
+      "message": "Pranav Rajpoot booked Mechanized Water Tank Cleaning in Shahjahanpur (242001). Assigned to Rohilkhand Tank & Hydro Care (Shahjahanpur) via auto_score.",
+      "bookingId": "bk_1792765140500_mhrq",
+      "bookingCode": "TMP-2026-1002",
+      "type": "booking_created",
+      "severity": "success",
+      "read": false,
+      "createdAtIso": "2026-10-23T14:19:00.498Z"
+    },
+    {
+      "id": "notif_1792764880269",
+      "recipientRole": "admin",
+      "recipientUid": "ALL_ADMINS",
+      "bookingId": "bk_1792760159727_k8bk",
+      "title": "Vendor VENDOR ACCEPTED · TMP-2026-1001",
+      "message": "Rohilkhand Tank & Hydro Care (Shahjahanpur) (TMP-VND-1003) transitioned TMP-2026-1001 (Chimney Cleaning in PIN 242001) to vendor_accepted.",
+      "type": "vendor_accepted",
+      "read": false,
+      "createdAtIso": "2026-10-23T14:14:40.269Z"
+    },
+    {
+      "id": "notif_1792764824170",
+      "recipientRole": "vendor",
+      "recipientUid": "vendor_demo_spn_1",
+      "bookingId": "bk_1792760159727_k8bk",
+      "title": "New Booking Assigned · TMP-2026-1001",
+      "message": "Chimney Cleaning (Standard Kitchen Chimney Deep Clean) in PIN 242001 for 2026-10-24 (09:00 AM – 11:00 AM).",
+      "type": "vendor_assigned",
+      "read": false,
+      "createdAtIso": "2026-10-23T14:13:44.170Z"
+    },
+    {
+      "id": "notif_1792764633735",
+      "recipientRole": "admin",
+      "recipientUid": "ALL_ADMINS",
+      "bookingId": "bk_1792760159727_k8bk",
+      "title": "Vendor COMPLETED · TMP-2026-1001",
+      "message": "Rohilkhand Tank & Hydro Care (Shahjahanpur) (TMP-VND-1003) transitioned TMP-2026-1001 (Chimney Cleaning in PIN 242001) to completed.",
+      "type": "job_completed",
+      "read": false,
+      "createdAtIso": "2026-10-23T14:10:33.734Z"
+    },
+    {
+      "id": "notif_1792764633718",
+      "recipientRole": "admin",
+      "recipientUid": "ALL_ADMINS",
+      "bookingId": "bk_1792760159727_k8bk",
+      "title": "Vendor IN PROGRESS · TMP-2026-1001",
+      "message": "Rohilkhand Tank & Hydro Care (Shahjahanpur) (TMP-VND-1003) transitioned TMP-2026-1001 (Chimney Cleaning in PIN 242001) to in_progress.",
+      "type": "job_started",
+      "read": false,
+      "createdAtIso": "2026-10-23T14:10:33.718Z"
+    },
+    {
+      "id": "notif_1792760368331",
+      "recipientRole": "admin",
+      "recipientUid": "ALL_ADMINS",
+      "bookingId": "bk_1792760159727_k8bk",
+      "title": "Vendor VENDOR ACCEPTED · TMP-2026-1001",
+      "message": "Rohilkhand Tank & Hydro Care (Shahjahanpur) (TMP-VND-1003) transitioned TMP-2026-1001 (Chimney Cleaning in PIN 242001) to vendor_accepted.",
+      "type": "vendor_accepted",
+      "read": false,
+      "createdAtIso": "2026-10-23T12:59:28.331Z"
+    },
+    {
+      "id": "notif_vnd_1792760159727_1",
+      "recipientRole": "vendor",
+      "recipientUid": "vendor_demo_spn_1",
+      "title": "New Booking Assigned: TMP-2026-1001",
+      "message": "Chimney Cleaning (Standard Kitchen Chimney Deep Clean) in City Centre & Sadar (242001) for 2026-10-24 · 09:00 AM – 11:00 AM. Please accept in your Job Console to unlock customer contact details.",
+      "bookingId": "bk_1792760159727_k8bk",
+      "bookingCode": "TMP-2026-1001",
+      "type": "vendor_assigned",
+      "severity": "info",
+      "read": false,
+      "createdAtIso": "2026-10-23T12:55:59.702Z"
+    },
+    {
+      "id": "notif_adm_1792760159727_2",
+      "recipientRole": "admin",
+      "recipientUid": "ALL_ADMINS",
+      "title": "New Booking Dispatched (TMP-2026-1001)",
+      "message": "Pranav Rajpoot booked Chimney Cleaning in Shahjahanpur (242001). Assigned to Rohilkhand Tank & Hydro Care (Shahjahanpur) via auto_score.",
+      "bookingId": "bk_1792760159727_k8bk",
+      "bookingCode": "TMP-2026-1001",
+      "type": "booking_created",
+      "severity": "success",
+      "read": false,
+      "createdAtIso": "2026-10-23T12:55:59.702Z"
+    }
+  ],
+  "cmsSettings": {
+    "id": "global",
+    "heroTitle": "Home services at your doorstep",
+    "heroSubtitle": "Mechanised 6-stage water tank cleaning, intense bathroom & kitchen hygiene, foam-jet AC servicing, and clinical skin care by verified professionals.",
+    "announcementText": "Live in Kanpur (208001, 208002), Shahjahanpur (242001) & New Delhi (110001) · Use code CLEAN10 for 10% off!",
+    "supportPhone": "+91 97942 00100",
+    "supportEmail": "support@tankmanpro.com",
+    "whatsappNumber": "+91 97942 00100",
+    "dispatchMode": "manual",
+    "trustBadges": [
+      "6-Stage UV & High-Pressure Jet Protocol",
+      "Background-Verified & Trained Crew",
+      "100% Transparent Paise-Exact Tariff Card"
+    ],
+    "faqs": [
+      {
+        "question": "How does TankmanPro verify serviceability for my location?",
+        "answer": "Enter your 6-digit Indian PIN code on the homepage. We verify active technician coverage and show exact city-resolved rates before you book."
+      },
+      {
+        "question": "What is included in the 6-Stage Mechanised Water Tank Cleaning?",
+        "answer": "Dewatering, sludge vacuum extraction, high-pressure rotary jet washing of walls/ceiling, anti-bacterial spray, UV radiator treatment, and inlet/float valve check."
+      },
+      {
+        "question": "Can I reschedule or cancel my booking?",
+        "answer": "Yes, bookings can be rescheduled or cancelled free of charge before technician dispatch."
+      }
+    ],
+    "updatedAtIso": "2026-10-23T04:00:00.000Z"
+  },
+  "waitlistEntries": [],
+  "contactSubmissions": [],
+  "version": "1.0.0",
+  "updatedAtIso": "2026-10-23T16:49:29.514Z"
+}

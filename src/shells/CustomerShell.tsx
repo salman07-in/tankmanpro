@@ -57,6 +57,11 @@ import type {
   Vendor,
 } from '../types/domain.ts';
 import { ServicePhoto } from '../components/ServiceIllustration.tsx';
+import { WhatsAppIcon } from '../components/WhatsAppIcon.tsx';
+import {
+  cleanIndianPhone,
+  buildWhatsAppLink,
+} from '../lib/whatsappEngine.ts';
 
 interface CustomerShellProps {
   internalPath: string;
@@ -2804,16 +2809,17 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
         {internalPath === '/checkout' && (
           <div className="max-w-[1140px] mx-auto px-4 sm:px-6 py-10">
             <div className="mb-8 flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-5 border-b border-slate-200">
-              <div>
-                <div className="text-xs text-slate-500 mb-1">
-                  Authoritative Booking &amp; Vendor Dispatch Funnel · Active Policy:{' '}
-                  <span className="font-mono font-semibold text-slate-800">
-                    {activeAssignmentPolicy}
-                  </span>
+              <div className="space-y-1.5">
+                <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 bg-emerald-50 px-3 py-1 rounded-full w-fit">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <span>Instant Technician Booking · 100% Verified Crew</span>
                 </div>
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  Complete Your Service Booking
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 tracking-tight">
+                  Fast &amp; Easy Checkout
                 </h1>
+                <p className="text-xs text-slate-500">
+                  Select your slot, enter address, and our verified specialist will arrive at your doorstep.
+                </p>
               </div>
               <div className="flex items-center gap-3 text-xs text-slate-600">
                 <button
@@ -3035,6 +3041,18 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 pt-2">
+                  <a
+                    href={buildWhatsAppLink(
+                      '9794200100',
+                      `Hello TankmanPro Support, I have just booked a service appointment.\nBooking Reference: ${confirmedBookingResult.booking.bookingCode}\nCustomer Name: ${confirmedBookingResult.booking.customerName}\nService: ${confirmedBookingResult.booking.serviceTitle} (${confirmedBookingResult.booking.variantName})\nDate: ${confirmedBookingResult.booking.preferredDate} (${confirmedBookingResult.booking.preferredSlot})\nPlease share confirmation and technician assignment details.`
+                    )}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-xs flex items-center gap-2 cursor-pointer transition-colors"
+                  >
+                    <WhatsAppIcon className="w-4 h-4" />
+                    <span>Get Updates on WhatsApp</span>
+                  </a>
                   <button
                     type="button"
                     onClick={() => onNavigate('/account/bookings')}
@@ -3062,86 +3080,76 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <form
                   onSubmit={handleCreateAuthoritativeBooking}
-                  className="lg:col-span-7 space-y-6"
+                  className="lg:col-span-7 space-y-5"
                 >
-                  {/* Step 1 & Step 2: Verified Location & Selected Service Package */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <h2 className="text-base font-bold text-slate-900">
-                        Step 1 &amp; 2. Location &amp; Service Package
-                      </h2>
-                      <span className="text-xs font-mono text-teal-700 font-semibold">
-                        PIN {pinLookup.pinCode} · {pinLookup.city?.name || 'Uncovered'}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Card 1: Selected Service & Variant Selector */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-2xs">
+                    <div className="flex items-start justify-between gap-3">
                       <div>
-                        <label
-                          htmlFor="chk-service-select"
-                          className="block text-xs font-semibold text-slate-700 mb-1"
-                        >
-                          Selected Service (Active in Location)
-                        </label>
-                        <select
-                          id="chk-service-select"
-                          value={currentService.id}
-                          onChange={(e) => {
-                            const found = DEMO_SERVICES.find((s) => s.id === e.target.value);
-                            if (found) selectServiceForDraft(found);
-                          }}
-                          className="w-full px-3 py-2 text-xs font-medium border border-slate-300 rounded-lg bg-white"
-                        >
-                          {DEMO_SERVICES.filter(
-                            (s) =>
-                              s.status === 'published' &&
-                              (!pinLookup.city || s.supportedCityIds.includes(pinLookup.city.id))
-                          ).map((srv) => (
-                            <option key={srv.id} value={srv.id}>
-                              {srv.title}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="text-[11px] font-bold text-teal-800 uppercase tracking-wider">
+                          1. Selected Service
+                        </div>
+                        <h2 className="text-lg font-extrabold text-slate-950 mt-0.5">
+                          {currentService.title}
+                        </h2>
                       </div>
-
-                      <div>
-                        <label
-                          htmlFor="chk-variant-select"
-                          className="block text-xs font-semibold text-slate-700 mb-1"
-                        >
-                          Service Package / Variant
-                        </label>
-                        <select
-                          id="chk-variant-select"
-                          value={bookingDraft.variantId}
-                          onChange={(e) =>
-                            setBookingDraft((prev) => ({
-                              ...prev,
-                              variantId: e.target.value,
-                            }))
-                          }
-                          className="w-full px-3 py-2 text-xs font-medium border border-slate-300 rounded-lg bg-white"
-                        >
-                          {currentService.variants
-                            .filter((v) => v.active)
-                            .map((v) => (
-                              <option key={v.id} value={v.id}>
-                                {v.name} ({v.durationMinutes} mins)
-                              </option>
-                            ))}
-                        </select>
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold shrink-0">
+                        <MapPin className="w-3.5 h-3.5 text-teal-700" />
+                        <span>{pinLookup.city?.name || 'Area'} ({pinLookup.pinCode})</span>
                       </div>
                     </div>
 
-                    {/* Vendor Offer Mode Picker if applicable in active city */}
+                    {/* Variant Pills (Quick 1-Click Selection) */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-2">
+                        Select Tank Size / Package:
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {currentService.variants
+                          .filter((v) => v.active)
+                          .map((v) => {
+                            const isSelected = bookingDraft.variantId === v.id;
+                            return (
+                              <button
+                                key={v.id}
+                                type="button"
+                                onClick={() =>
+                                  setBookingDraft((prev) => ({
+                                    ...prev,
+                                    variantId: v.id,
+                                  }))
+                                }
+                                className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer ${
+                                  isSelected
+                                    ? 'border-teal-700 bg-teal-50/70 text-teal-950 ring-2 ring-teal-700 shadow-2xs'
+                                    : 'border-slate-200 hover:border-slate-300 text-slate-800 bg-white'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <span className="font-bold text-xs">{v.name}</span>
+                                  {isSelected && <Check className="w-4 h-4 text-teal-700 shrink-0" />}
+                                </div>
+                                <div className="text-[11px] text-slate-500 mt-1 flex items-center justify-between">
+                                  <span>⏱ {v.durationMinutes} mins service</span>
+                                  <span className="font-mono font-bold text-teal-800 text-xs">
+                                    {formatPaiseToInr(v.basePricePaise)}
+                                  </span>
+                                </div>
+                              </button>
+                            );
+                          })}
+                      </div>
+                    </div>
+
+                    {/* Vendor Offer Mode (if applicable in active city) */}
                     {pinLookup.serviceable &&
                       currentPricingMode === 'vendor_offer' &&
                       currentVendorOffers.length > 0 && (
-                        <div className="pt-2">
-                          <div className="text-xs font-semibold text-slate-700 mb-2">
-                            Select Partner Offer in {pinLookup.city?.name} ({pinLookup.pinCode}):
+                        <div className="pt-3 border-t border-slate-100">
+                          <div className="text-xs font-bold text-slate-700 mb-2">
+                            Select Verified Specialist Crew:
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             {currentVendorOffers.map((offer) => {
                               const isChosen =
                                 bookingDraft.selectedVendorUid === offer.vendorUid;
@@ -3155,10 +3163,10 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                                       selectedVendorUid: offer.vendorUid,
                                     }))
                                   }
-                                  className={`text-left p-3 rounded-lg border text-xs transition-colors cursor-pointer ${
+                                  className={`text-left p-3 rounded-xl border text-xs transition-colors cursor-pointer ${
                                     isChosen
-                                      ? 'border-teal-700 bg-teal-50/40 text-slate-950'
-                                      : 'border-slate-200 hover:border-slate-300 text-slate-700'
+                                      ? 'border-teal-700 bg-teal-50/60 text-slate-950 ring-1 ring-teal-700'
+                                      : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'
                                   }`}
                                 >
                                   <div className="flex items-center justify-between font-bold">
@@ -3178,286 +3186,266 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                       )}
                   </div>
 
-                  {/* Step 3: Date & Real-Time Time-Slot Availability Checker */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                      <div>
-                        <h2 className="text-base font-bold text-slate-900">
-                          Step 3. Choose Date &amp; Available Time Slot
-                        </h2>
-                        <p className="text-xs text-slate-500">
-                          Checks partner coverage, working hours, capacity, and conflicting bookings
-                          in PIN {pinLookup.pinCode}.
-                        </p>
+                  {/* Card 2: Choose Date & Time Slot */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-2xs">
+                    <div>
+                      <div className="text-[11px] font-bold text-teal-800 uppercase tracking-wider">
+                        2. Service Schedule
                       </div>
-                      <div className="flex items-center gap-2">
-                        <label htmlFor="chk-date" className="text-xs font-semibold text-slate-700">
-                          Date:
-                        </label>
-                        <input
-                          id="chk-date"
-                          type="date"
-                          min={getOffsetDateIso(0)}
-                          value={scheduledDate}
-                          onChange={(e) => setScheduledDate(e.target.value)}
-                          className="px-2.5 py-1.5 text-xs font-mono border border-slate-300 rounded-lg"
-                        />
-                      </div>
+                      <h2 className="text-base font-extrabold text-slate-950 mt-0.5">
+                        When should our crew arrive?
+                      </h2>
                     </div>
 
-                    {/* Quick Date Buttons */}
-                    <div className="flex flex-wrap gap-2">
-                      {[
-                        { label: 'Today', date: getOffsetDateIso(0) },
-                        { label: 'Tomorrow', date: getOffsetDateIso(1) },
-                        { label: '+2 Days', date: getOffsetDateIso(2) },
-                        { label: '+3 Days', date: getOffsetDateIso(3) },
-                      ].map((d) => (
-                        <button
-                          key={d.date}
-                          type="button"
-                          onClick={() => setScheduledDate(d.date)}
-                          className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-colors cursor-pointer ${
-                            scheduledDate === d.date
-                              ? 'bg-slate-900 text-white border-slate-900'
-                              : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'
-                          }`}
-                        >
-                          {d.label} ({d.date.slice(5)})
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Time Window Grid with Real-Time Crew Availability */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {(slotEvaluations.length > 0
-                        ? slotEvaluations
-                        : STANDARD_TIME_WINDOWS.map((tw) => ({
-                            timeWindow: tw,
-                            available: true,
-                            availableCrewCount: 1,
-                            eligibleVendorUids: [],
-                            reason: 'Available',
-                          }))
-                      ).map((slotObj) => {
-                        const isSelected = selectedTimeWindow === slotObj.timeWindow;
-                        return (
+                    {/* Quick Date Pills */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-2">
+                        Select Preferred Day:
+                      </label>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {[
+                          { label: 'Today', date: getOffsetDateIso(0) },
+                          { label: 'Tomorrow', date: getOffsetDateIso(1) },
+                          { label: 'Day After', date: getOffsetDateIso(2) },
+                          { label: '+3 Days', date: getOffsetDateIso(3) },
+                        ].map((d) => (
                           <button
-                            key={slotObj.timeWindow}
+                            key={d.date}
                             type="button"
-                            onClick={() => setSelectedTimeWindow(slotObj.timeWindow)}
-                            className={`p-3.5 rounded-lg border text-left transition-colors cursor-pointer ${
-                              isSelected
-                                ? 'border-teal-700 bg-teal-50/50 text-teal-950'
-                                : slotObj.available
-                                  ? 'border-slate-200 text-slate-800 hover:border-slate-300'
-                                  : 'border-amber-200 bg-amber-50/40 text-slate-600'
+                            onClick={() => setScheduledDate(d.date)}
+                            className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-all text-center cursor-pointer ${
+                              scheduledDate === d.date
+                                ? 'bg-teal-700 text-white border-teal-700 shadow-2xs'
+                                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                             }`}
                           >
-                            <div className="flex items-center justify-between gap-2 text-xs font-bold">
-                              <span>{slotObj.timeWindow}</span>
-                              <span
-                                className={`font-mono text-[11px] ${
-                                  slotObj.available ? 'text-teal-700' : 'text-amber-800'
-                                }`}
-                              >
-                                {slotObj.available
-                                  ? `${slotObj.availableCrewCount} crew${slotObj.availableCrewCount > 1 ? 's' : ''} open`
-                                  : 'Admin review'}
-                              </span>
+                            <div>{d.label}</div>
+                            <div
+                              className={`text-[10px] font-mono font-normal mt-0.5 ${
+                                scheduledDate === d.date ? 'text-teal-100' : 'text-slate-500'
+                              }`}
+                            >
+                              {d.date.slice(5)}
                             </div>
-                            <div className="text-[11px] text-slate-500 mt-1">{slotObj.reason}</div>
                           </button>
-                        );
-                      })}
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Time Window Slots */}
+                    <div>
+                      <label className="block text-xs font-bold text-slate-700 mb-2">
+                        Select Preferred Time Slot:
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                        {(slotEvaluations.length > 0
+                          ? slotEvaluations
+                          : STANDARD_TIME_WINDOWS.map((tw) => ({
+                              timeWindow: tw,
+                              available: true,
+                              availableCrewCount: 1,
+                              eligibleVendorUids: [],
+                              reason: 'Available',
+                            }))
+                        ).map((slotObj) => {
+                          const isSelected = selectedTimeWindow === slotObj.timeWindow;
+                          return (
+                            <button
+                              key={slotObj.timeWindow}
+                              type="button"
+                              onClick={() => setSelectedTimeWindow(slotObj.timeWindow)}
+                              className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                                isSelected
+                                  ? 'border-teal-700 bg-teal-50/70 text-teal-950 font-bold ring-2 ring-teal-700 shadow-2xs'
+                                  : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white font-medium'
+                              }`}
+                            >
+                              <div className="flex items-center justify-center gap-1.5 text-xs">
+                                <Clock
+                                  className={`w-3.5 h-3.5 ${
+                                    isSelected ? 'text-teal-700' : 'text-slate-400'
+                                  }`}
+                                />
+                                <span>{slotObj.timeWindow}</span>
+                              </div>
+                              <div className="text-[10px] text-emerald-700 font-semibold mt-1">
+                                Available Slot ✅
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Step 4: Customer Details, Address & Service Requirements */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
-                    <h2 className="text-base font-bold text-slate-900">
-                      Step 4. Customer Details, Address &amp; Service Requirements
-                    </h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Card 3: Contact & Address Details */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-2xs">
+                    <div>
+                      <div className="text-[11px] font-bold text-teal-800 uppercase tracking-wider">
+                        3. Contact &amp; Service Location
+                      </div>
+                      <h2 className="text-base font-extrabold text-slate-950 mt-0.5">
+                        Where should we reach?
+                      </h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       <div>
                         <label
                           htmlFor="chk-name"
-                          className="block text-xs font-semibold text-slate-700 mb-1"
+                          className="block text-xs font-bold text-slate-800 mb-1"
                         >
                           Customer Full Name *
                         </label>
                         <input
                           id="chk-name"
                           type="text"
+                          required
                           value={customerName}
                           onChange={(e) => setCustomerName(e.target.value)}
-                          placeholder="Aarav Sharma"
-                          className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg"
+                          placeholder="e.g. Aarav Sharma"
+                          className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-700"
                         />
                       </div>
+
                       <div>
                         <label
                           htmlFor="chk-phone"
-                          className="block text-xs font-semibold text-slate-700 mb-1"
+                          className="block text-xs font-bold text-slate-800 mb-1"
                         >
-                          10-Digit Mobile Number *
+                          WhatsApp / Mobile Number *
                         </label>
-                        <input
-                          id="chk-phone"
-                          type="tel"
-                          inputMode="numeric"
-                          maxLength={10}
-                          value={customerPhone}
-                          onChange={(e) =>
-                            setCustomerPhone(e.target.value.replace(/\D/g, '').slice(0, 10))
-                          }
-                          placeholder="9810012345"
-                          className="w-full px-3.5 py-2.5 text-sm font-mono border border-slate-300 rounded-lg"
-                        />
+                        <div className="relative">
+                          <span className="absolute left-3.5 top-2.5 text-xs font-bold text-slate-500 font-mono">
+                            +91
+                          </span>
+                          <input
+                            id="chk-phone"
+                            type="tel"
+                            required
+                            inputMode="numeric"
+                            maxLength={10}
+                            value={customerPhone}
+                            onChange={(e) =>
+                              setCustomerPhone(e.target.value.replace(/\D/g, '').slice(0, 10))
+                            }
+                            placeholder="9876543210"
+                            className="w-full pl-12 pr-3.5 py-2.5 text-sm font-mono border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-700 font-bold"
+                          />
+                        </div>
+                        <p className="text-[10px] text-emerald-700 font-medium mt-1 flex items-center gap-1">
+                          <WhatsAppIcon className="w-3 h-3 shrink-0" />
+                          <span>Booking confirmation &amp; live tracking link will be sent here</span>
+                        </p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label
-                          htmlFor="chk-address"
-                          className="block text-xs font-semibold text-slate-700 mb-1"
-                        >
-                          House / Flat No., Building &amp; Street *
-                        </label>
-                        <input
-                          id="chk-address"
-                          type="text"
-                          value={addressLine}
-                          onChange={(e) => setAddressLine(e.target.value)}
-                          placeholder="Flat 402, Block B, Civil Lines"
-                          className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg"
-                        />
-                      </div>
+                    <div>
+                      <label
+                        htmlFor="chk-address"
+                        className="block text-xs font-bold text-slate-800 mb-1"
+                      >
+                        House / Flat No., Society &amp; Street Address *
+                      </label>
+                      <input
+                        id="chk-address"
+                        type="text"
+                        required
+                        value={addressLine}
+                        onChange={(e) => setAddressLine(e.target.value)}
+                        placeholder="e.g. Flat 402, Block B, Royal Palms, Civil Lines"
+                        className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-700"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                       <div>
                         <label
                           htmlFor="chk-landmark"
                           className="block text-xs font-semibold text-slate-700 mb-1"
                         >
-                          Landmark (Optional)
+                          Landmark / Nearby Spot (Optional)
                         </label>
                         <input
                           id="chk-landmark"
                           type="text"
                           value={landmark}
                           onChange={(e) => setLandmark(e.target.value)}
-                          placeholder="Near Metro Pillar / Water Works"
-                          className="w-full px-3.5 py-2.5 text-sm border border-slate-300 rounded-lg"
+                          placeholder="e.g. Near Water Tank / Metro Pillar 42"
+                          className="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-700"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor="chk-notes"
+                          className="block text-xs font-semibold text-slate-700 mb-1"
+                        >
+                          Special Instructions for Crew (Optional)
+                        </label>
+                        <input
+                          id="chk-notes"
+                          type="text"
+                          value={customerNotes}
+                          onChange={(e) => setCustomerNotes(e.target.value)}
+                          placeholder="e.g. Rooftop ladder access, gate code"
+                          className="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-700"
                         />
                       </div>
                     </div>
-
-                    {/* Service-Specific Booking Requirements */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {currentService.bookingRequirements?.requireTankCapacity && (
-                        <div>
-                          <label
-                            htmlFor="chk-tank-cap"
-                            className="block text-xs font-semibold text-slate-700 mb-1"
-                          >
-                            Water Tank Capacity (Service Requirement)
-                          </label>
-                          <select
-                            id="chk-tank-cap"
-                            value={tankCapacityLitres}
-                            onChange={(e) => setTankCapacityLitres(e.target.value)}
-                            className="w-full px-3 py-2 text-xs font-medium border border-slate-300 rounded-lg bg-white"
-                          >
-                            <option value="500 L – 1000 L">500 L – 1000 L</option>
-                            <option value="1000 L – 2000 L">1000 L – 2000 L</option>
-                            <option value="2000 L – 5000 L">2000 L – 5000 L</option>
-                            <option value="Underground Sump + Overhead">
-                              Underground Sump + Overhead
-                            </option>
-                          </select>
-                        </div>
-                      )}
-
-                      {currentService.bookingRequirements?.requireUnitCount && (
-                        <div>
-                          <label
-                            htmlFor="chk-units"
-                            className="block text-xs font-semibold text-slate-700 mb-1"
-                          >
-                            Number of Units / Rooms
-                          </label>
-                          <input
-                            id="chk-units"
-                            type="number"
-                            min={1}
-                            max={10}
-                            value={unitCount}
-                            onChange={(e) =>
-                              setUnitCount(Math.max(1, parseInt(e.target.value || '1', 10)))
-                            }
-                            className="w-full px-3.5 py-2 text-sm font-mono border border-slate-300 rounded-lg"
-                          />
-                        </div>
-                      )}
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="chk-notes"
-                        className="block text-xs font-semibold text-slate-700 mb-1"
-                      >
-                        Additional Instructions or Notes for Technician (Optional)
-                      </label>
-                      <textarea
-                        id="chk-notes"
-                        rows={2}
-                        value={customerNotes}
-                        onChange={(e) => setCustomerNotes(e.target.value)}
-                        placeholder="Gate pass info, rooftop ladder access, pet notice, etc."
-                        className="w-full px-3.5 py-2 text-xs border border-slate-300 rounded-lg"
-                      />
-                    </div>
                   </div>
 
-                  {/* Step 6: Payment Method & Authoritative Booking Creation */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-6 space-y-4">
-                    <h2 className="text-base font-bold text-slate-900">
-                      Step 6. Payment Mode &amp; Booking Confirmation
-                    </h2>
+                  {/* Card 4: Payment Method */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-4 shadow-2xs">
+                    <div>
+                      <div className="text-[11px] font-bold text-teal-800 uppercase tracking-wider">
+                        4. Payment Method
+                      </div>
+                      <h2 className="text-base font-extrabold text-slate-950 mt-0.5">
+                        How would you like to pay?
+                      </h2>
+                    </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Option 1: Pay after service */}
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('pay_after_service')}
-                        className={`p-3.5 rounded-lg border text-left text-xs cursor-pointer ${
+                        className={`p-4 rounded-xl border text-left transition-all cursor-pointer relative ${
                           paymentMethod === 'pay_after_service'
-                            ? 'border-teal-700 bg-teal-50/40 text-slate-950 font-semibold'
-                            : 'border-slate-200 text-slate-700'
+                            ? 'border-emerald-600 bg-emerald-50/60 ring-2 ring-emerald-600 shadow-2xs'
+                            : 'border-slate-200 hover:border-slate-300 bg-white'
                         }`}
                       >
-                        <div className="font-bold">Pay After Service Completion</div>
-                        <div className="text-[11px] text-slate-500 mt-0.5">
-                          Pay via UPI / Cash after inspection &amp; completion
+                        <span className="absolute -top-2.5 right-3 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white shadow-2xs">
+                          ⭐ Recommended
+                        </span>
+                        <div className="font-extrabold text-xs text-slate-950 flex items-center gap-1.5">
+                          <span>💵 Pay After Service</span>
+                        </div>
+                        <div className="text-[11px] text-slate-600 mt-1 leading-snug">
+                          Pay via UPI (GPay/PhonePe) or Cash on site once tank is cleaned &amp; inspected.
                         </div>
                       </button>
+
+                      {/* Option 2: Razorpay Online */}
                       <button
                         type="button"
                         onClick={() => setPaymentMethod('razorpay_online')}
-                        className={`p-3.5 rounded-lg border text-left text-xs cursor-pointer transition-all ${
+                        className={`p-4 rounded-xl border text-left transition-all cursor-pointer ${
                           paymentMethod === 'razorpay_online'
-                            ? 'border-teal-700 bg-teal-50/40 text-slate-950 font-semibold ring-1 ring-teal-700'
-                            : 'border-slate-200 text-slate-700 hover:border-slate-300'
+                            ? 'border-teal-700 bg-teal-50/60 ring-2 ring-teal-700 shadow-2xs'
+                            : 'border-slate-200 hover:border-slate-300 bg-white'
                         }`}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                            <span>Online Prepaid (Razorpay)</span>
-                            <span className="text-[10px] uppercase font-bold bg-teal-100 text-teal-800 px-1.5 py-0.5 rounded">
-                              Instant
-                            </span>
-                          </div>
+                        <div className="font-extrabold text-xs text-slate-950 flex items-center gap-1.5">
+                          <span>💳 Pay Online Prepaid</span>
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-teal-100 text-teal-800">
+                            Instant
+                          </span>
                         </div>
-                        <div className="text-[11px] text-slate-500 mt-0.5">
-                          Instant UPI (GPay/PhonePe), Credit/Debit Card, NetBanking
+                        <div className="text-[11px] text-slate-600 mt-1 leading-snug">
+                          Pay securely via UPI (GPay/PhonePe), Credit/Debit Cards, or NetBanking.
                         </div>
                       </button>
                     </div>
@@ -3465,42 +3453,46 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                     {checkoutError && (
                       <div
                         role="alert"
-                        className="p-3 rounded-lg bg-red-50 border border-red-200 text-xs font-semibold text-red-700"
+                        className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700 flex items-center gap-2"
                       >
-                        {checkoutError}
+                        <AlertCircle className="w-4 h-4 shrink-0 text-red-600" />
+                        <span>{checkoutError}</span>
                       </div>
                     )}
 
                     <button
                       type="submit"
                       disabled={!activeQuote.bookable || isSubmittingBooking}
-                      className="w-full py-3.5 px-4 bg-teal-700 hover:bg-teal-800 disabled:bg-slate-300 text-white text-sm font-bold rounded-lg transition-colors cursor-pointer"
+                      className="w-full py-4 px-5 bg-teal-700 hover:bg-teal-800 disabled:bg-slate-300 text-white text-sm font-extrabold rounded-xl shadow-md hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2"
                     >
-                      {isSubmittingBooking
-                        ? 'Connecting Payment Gateway & Slot Verification...'
-                        : paymentMethod === 'razorpay_online'
-                        ? `Pay Online & Confirm Booking (${formatPaiseToInr(activeQuote.finalTotalPaise)})`
-                        : `Confirm Booking & Dispatch Specialist (${formatPaiseToInr(activeQuote.finalTotalPaise)})`}
+                      <ShieldCheck className="w-5 h-5" />
+                      <span>
+                        {isSubmittingBooking
+                          ? 'Booking Your Appointment...'
+                          : paymentMethod === 'razorpay_online'
+                          ? `Pay Online Now — ${formatPaiseToInr(activeQuote.finalTotalPaise)}`
+                          : `Confirm Booking Now — ${formatPaiseToInr(activeQuote.finalTotalPaise)} (Pay Later)`}
+                      </span>
                     </button>
+                    <div className="text-center text-[11px] text-slate-500">
+                      🔒 Zero cancellation fee · 7-Day TankmanPro Quality Guarantee Included
+                    </div>
                   </div>
                 </form>
 
-                {/* Right Column: Step 5 Server-Calculated Price & Coupon Summary */}
-                <aside className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-6 space-y-5 sticky top-20">
-                  <div>
-                    <h2 className="text-base font-bold text-slate-900 mb-1">
-                      Step 5. Apply Coupon Code (Server-Validated)
-                    </h2>
-                    <p className="text-xs text-slate-500 mb-3">
-                      Try <span className="font-mono font-semibold text-teal-700">CLEAN10</span>{' '}
-                      (10% off) or{' '}
-                      <span className="font-mono font-semibold text-teal-700">DELHI150</span> (₹150
-                      off in New Delhi above ₹800).
-                    </p>
+                {/* Right Column: Clean Order Summary (like Urban Company / Swiggy) */}
+                <aside className="lg:col-span-5 space-y-4 sticky top-20">
+                  {/* Coupon Box */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3 shadow-2xs">
+                    <div className="flex items-center justify-between">
+                      <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                        <Sparkles className="w-4 h-4 text-teal-700" />
+                        <span>Offers &amp; Promo Codes</span>
+                      </div>
+                      <span className="text-[11px] text-teal-700 font-semibold">10% OFF Available</span>
+                    </div>
+
                     <div className="flex gap-2">
-                      <label htmlFor="coupon-input" className="sr-only">
-                        Coupon Code
-                      </label>
                       <input
                         id="coupon-input"
                         type="text"
@@ -3512,22 +3504,23 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                           }))
                         }
                         placeholder="Enter CLEAN10"
-                        className="flex-1 px-3 py-2 text-xs font-mono uppercase border border-slate-300 rounded-lg"
+                        className="flex-1 px-3 py-2 text-xs font-mono uppercase border border-slate-300 rounded-xl focus:outline-none focus:ring-1 focus:ring-teal-700"
                       />
                       <button
                         type="button"
                         onClick={() =>
                           setBookingDraft((prev) => ({ ...prev, couponCode: 'CLEAN10' }))
                         }
-                        className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-800 rounded-lg cursor-pointer"
+                        className="px-3.5 py-2 bg-teal-50 hover:bg-teal-100 text-teal-800 text-xs font-bold rounded-xl cursor-pointer border border-teal-200 transition-colors"
                       >
                         Apply CLEAN10
                       </button>
                     </div>
+
                     {activeQuote.couponMessage && (
                       <div
-                        className={`mt-2 text-xs font-medium ${
-                          activeQuote.couponValid ? 'text-teal-700' : 'text-amber-700'
+                        className={`text-xs font-semibold ${
+                          activeQuote.couponValid ? 'text-emerald-700' : 'text-amber-700'
                         }`}
                       >
                         {activeQuote.couponMessage}
@@ -3535,66 +3528,70 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                     )}
                   </div>
 
-                  <div className="pt-4 border-t border-slate-200 space-y-2.5 text-xs">
-                    <div className="font-bold text-slate-900 text-sm mb-2">
-                      Authoritative Server Price Summary
-                    </div>
-                    <div className="flex justify-between text-slate-600">
-                      <span>
-                        {activeQuote.serviceTitle} ({activeQuote.variantName})
-                      </span>
-                      <span className="font-mono tabular-nums">
-                        {formatPaiseToInr(activeQuote.baseServicePaise)}
-                      </span>
-                    </div>
-                    {activeQuote.addonsTotalPaise > 0 && (
-                      <div className="flex justify-between text-slate-600">
-                        <span>Add-ons Subtotal</span>
-                        <span className="font-mono tabular-nums">
-                          {formatPaiseToInr(activeQuote.addonsTotalPaise)}
+                  {/* Bill Details */}
+                  <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-3.5 shadow-2xs">
+                    <h3 className="text-sm font-extrabold text-slate-950 border-b border-slate-100 pb-2">
+                      Bill Details
+                    </h3>
+
+                    <div className="space-y-2 text-xs text-slate-600">
+                      <div className="flex justify-between">
+                        <span>
+                          {activeQuote.serviceTitle} ({activeQuote.variantName})
+                        </span>
+                        <span className="font-mono font-semibold text-slate-900 tabular-nums">
+                          {formatPaiseToInr(activeQuote.baseServicePaise)}
                         </span>
                       </div>
-                    )}
-                    <div className="flex justify-between text-slate-700 font-medium pt-2 border-t border-slate-100">
-                      <span>Subtotal</span>
-                      <span className="font-mono tabular-nums">
-                        {formatPaiseToInr(activeQuote.subtotalPaise)}
-                      </span>
-                    </div>
-                    {activeQuote.discountPaise > 0 && (
-                      <div className="flex justify-between text-teal-700 font-semibold">
-                        <span>Coupon Discount ({activeQuote.couponCode})</span>
-                        <span className="font-mono tabular-nums">
-                          -{formatPaiseToInr(activeQuote.discountPaise)}
+
+                      {activeQuote.addonsTotalPaise > 0 && (
+                        <div className="flex justify-between">
+                          <span>Add-ons</span>
+                          <span className="font-mono tabular-nums">
+                            {formatPaiseToInr(activeQuote.addonsTotalPaise)}
+                          </span>
+                        </div>
+                      )}
+
+                      {activeQuote.discountPaise > 0 && (
+                        <div className="flex justify-between text-emerald-700 font-bold">
+                          <span>Coupon Discount ({activeQuote.couponCode})</span>
+                          <span className="font-mono tabular-nums">
+                            -{formatPaiseToInr(activeQuote.discountPaise)}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="flex justify-between text-slate-500">
+                        <span>Mechanized Sanitization Kit</span>
+                        <span className="text-emerald-700 font-bold uppercase text-[10px]">
+                          FREE
                         </span>
                       </div>
-                    )}
-                    <div className="flex justify-between text-slate-500">
-                      <span>Taxes / GST ({activeQuote.taxRatePercent}%)</span>
-                      <span className="font-mono tabular-nums">
-                        {formatPaiseToInr(activeQuote.taxPaise)}
-                      </span>
+
+                      <div className="flex justify-between text-slate-500">
+                        <span>GST / Taxes ({activeQuote.taxRatePercent}%)</span>
+                        <span className="font-mono tabular-nums">
+                          {formatPaiseToInr(activeQuote.taxPaise)}
+                        </span>
+                      </div>
                     </div>
-                    <div className="pt-3 border-t border-slate-200 flex justify-between text-base font-extrabold text-slate-900">
-                      <span>Final Payable Total</span>
-                      <span className="font-mono tabular-nums text-teal-700">
+
+                    <div className="pt-3 border-t border-slate-200 flex justify-between items-center text-sm font-extrabold text-slate-950">
+                      <span>Total Amount Payable</span>
+                      <span className="font-mono text-base text-teal-800 tabular-nums">
                         {formatPaiseToInr(activeQuote.finalTotalPaise)}
                       </span>
                     </div>
-                  </div>
 
-                  <div className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 text-[11px] text-slate-600 space-y-1 leading-relaxed">
-                    <div>
-                      <strong>Price Priority Rule:</strong>{' '}
-                      <span className="font-mono">{activeQuote.pricingSource}</span> (
-                      {activeQuote.pricingMode})
-                    </div>
-                    <div>
-                      <strong>Selected Slot:</strong> {scheduledDate} · {selectedTimeWindow}
-                    </div>
-                    <div>
-                      Server locks an immutable price snapshot on creation and never trusts
-                      browser-submitted totals.
+                    <div className="p-3 rounded-xl bg-teal-50/60 border border-teal-100 text-xs text-teal-950 space-y-1">
+                      <div className="font-bold flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-teal-700" />
+                        <span>7-Day Service Guarantee Included</span>
+                      </div>
+                      <p className="text-[11px] text-teal-800">
+                        If you are not 100% satisfied with the cleanliness, we re-clean free of cost.
+                      </p>
                     </div>
                   </div>
                 </aside>
@@ -4292,47 +4289,80 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                         </div>
                       )}
 
-                      {/* Customer Cancellation Control */}
-                      {canCancel && (
-                        <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-                          {cancellingBookingId === booking.id ? (
-                            <div className="flex flex-wrap items-center gap-2 w-full">
-                              <input
-                                type="text"
-                                value={cancelReasonInput}
-                                onChange={(e) => setCancelReasonInput(e.target.value)}
-                                placeholder="Reason for cancellation (e.g. Rescheduling next week)"
-                                className="flex-1 min-w-[220px] px-3 py-1.5 text-xs border border-slate-300 rounded-lg"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => handleCancelCustomerBooking(booking.id)}
-                                className="px-3.5 py-1.5 bg-red-700 hover:bg-red-800 text-white text-xs font-semibold rounded-lg cursor-pointer"
-                              >
-                                Confirm Cancel
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setCancellingBookingId(null);
-                                  setCancelReasonInput('');
-                                }}
-                                className="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg cursor-pointer"
-                              >
-                                Keep Booking
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              type="button"
-                              onClick={() => setCancellingBookingId(booking.id)}
-                              className="px-3.5 py-1.5 border border-red-200 hover:border-red-400 text-red-700 text-xs font-semibold rounded-lg cursor-pointer"
+                      {/* 1-Click WhatsApp Live Assistance & Actions Toolbar */}
+                      <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <a
+                            href={buildWhatsAppLink(
+                              '9794200100',
+                              `Hello TankmanPro Support, I need assistance regarding my booking #${booking.bookingCode}.\nCustomer: ${booking.customerName}\nService: ${booking.serviceTitle}\nSlot: ${booking.scheduledDate} (${booking.timeWindow})`
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
+                          >
+                            <WhatsAppIcon className="w-3.5 h-3.5" />
+                            <span>WhatsApp Support Desk</span>
+                          </a>
+
+                          {assignedVendorSummary?.displayName && (
+                            <a
+                              href={buildWhatsAppLink(
+                                '9794200100',
+                                `Hello TankmanPro Support, please share an arrival status update for assigned technician "${assignedVendorSummary.displayName}" regarding booking #${booking.bookingCode}.`
+                              )}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1.5 rounded-lg bg-emerald-50 border border-emerald-300 hover:bg-emerald-100 text-emerald-800 text-xs font-semibold inline-flex items-center gap-1.5 shadow-2xs transition-colors cursor-pointer"
                             >
-                              Cancel Booking
-                            </button>
+                              <WhatsAppIcon className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Crew Updates on WhatsApp</span>
+                            </a>
                           )}
                         </div>
-                      )}
+
+                        {/* Customer Cancellation Control */}
+                        {canCancel && (
+                          <div>
+                            {cancellingBookingId === booking.id ? (
+                              <div className="flex flex-wrap items-center gap-2">
+                                <input
+                                  type="text"
+                                  value={cancelReasonInput}
+                                  onChange={(e) => setCancelReasonInput(e.target.value)}
+                                  placeholder="Reason for cancellation (e.g. Rescheduling next week)"
+                                  className="min-w-[200px] px-3 py-1.5 text-xs border border-slate-300 rounded-lg"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleCancelCustomerBooking(booking.id)}
+                                  className="px-3.5 py-1.5 bg-red-700 hover:bg-red-800 text-white text-xs font-semibold rounded-lg cursor-pointer"
+                                >
+                                  Confirm Cancel
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setCancellingBookingId(null);
+                                    setCancelReasonInput('');
+                                  }}
+                                  className="px-3 py-1.5 bg-slate-100 text-slate-700 text-xs font-semibold rounded-lg cursor-pointer"
+                                >
+                                  Keep Booking
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => setCancellingBookingId(booking.id)}
+                                className="px-3.5 py-1.5 border border-red-200 hover:border-red-400 text-red-700 text-xs font-semibold rounded-lg cursor-pointer"
+                              >
+                                Cancel Booking
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   );
                 })}
@@ -4525,6 +4555,27 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
           </div>
         </div>
       </footer>
+
+      {/* Floating 1-Click WhatsApp Support Widget */}
+      <aside
+        aria-label="Instant WhatsApp Support"
+        className="fixed bottom-5 right-5 z-40"
+      >
+        <a
+          href={buildWhatsAppLink(
+            '9794200100',
+            'Hello TankmanPro Support, I would like to inquire about professional mechanized water tank cleaning services.'
+          )}
+          target="_blank"
+          rel="noopener noreferrer"
+          title="Chat with TankmanPro on WhatsApp (+91 97942 00100)"
+          className="flex items-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 cursor-pointer"
+        >
+          <WhatsAppIcon className="w-5 h-5" />
+          <span className="hidden sm:inline">WhatsApp Help (+91 97942 00100)</span>
+          <span className="sm:hidden">WhatsApp</span>
+        </a>
+      </aside>
     </div>
   );
 };

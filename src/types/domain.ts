@@ -107,20 +107,24 @@ export interface ServiceArea {
   updatedAtIso?: string;
 }
 
+export type CategoryIconKey =
+  | 'water-tank'
+  | 'bathroom'
+  | 'kitchen'
+  | 'ac-service'
+  | 'sofa-mattress'
+  | 'vehicle-wash'
+  | 'fan-appliances'
+  | 'aesthetics'
+  | 'appliance-repair'
+  | 'plumbing';
+
 export interface Category {
   id: string;
   name: string;
   slug: string;
   shortDescription: string;
-  iconKey:
-    | 'water-tank'
-    | 'bathroom'
-    | 'kitchen'
-    | 'ac-service'
-    | 'sofa-mattress'
-    | 'vehicle-wash'
-    | 'fan-appliances'
-    | 'aesthetics';
+  iconKey: CategoryIconKey;
   imageUrl: string;
   sortOrder: number;
   status: PublishStatus;
@@ -177,7 +181,18 @@ export interface Service {
   categoryId: string;
   shortDescription: string;
   fullDescription: string;
-  illustrationKey: 'water-tank' | 'ac-service' | 'appliance-repair' | 'plumbing';
+  illustrationKey:
+    | 'water-tank'
+    | 'bathroom'
+    | 'kitchen'
+    | 'ac-service'
+    | 'sofa-mattress'
+    | 'vehicle-wash'
+    | 'fan-appliances'
+    | 'aesthetics'
+    | 'appliance-repair'
+    | 'plumbing'
+    | 'hero';
   imageUrl: string;
   galleryUrls?: string[];
   durationMinutes: number;
@@ -225,6 +240,7 @@ export interface Vendor {
   experienceYearsLabel: string;
   commissionPercent?: number;
   kycNotes?: string;
+  password?: string;
   passwordResetRequestedAtIso?: string;
   createdAtIso?: string;
   updatedAtIso?: string;

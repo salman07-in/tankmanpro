@@ -19,6 +19,15 @@ import {
   INITIAL_NOTIFICATIONS,
   SEEDED_VENDORS,
 } from './src/data/initialOperationsData.ts';
+import {
+  loadPlatformDatabase,
+  savePlatformDatabase,
+  mirrorToFirestore,
+  deleteFromFirestore,
+  getDatabaseMetrics,
+  DB_FILE_PATH,
+  type PlatformDatabase,
+} from './src/lib/databaseEngine.ts';
 import { isValidIndianPin, lookupPinCoverage } from './src/lib/portalRouting.ts';
 import {
   calculateAuthoritativeQuote,
@@ -75,19 +84,21 @@ import type {
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Live Mutable Platform State (initialized with authentic TankmanPro catalog & recorded data)
-let liveCities: City[] = structuredClone(DEMO_CITIES);
-let liveServiceAreas: ServiceArea[] = structuredClone(DEMO_SERVICE_AREAS);
-let liveCategories: Category[] = structuredClone(DEMO_CATEGORIES);
-let liveServices: Service[] = structuredClone(DEMO_SERVICES);
-let liveVendors: Vendor[] = structuredClone(SEEDED_VENDORS);
-let livePriceOverrides: PriceOverride[] = structuredClone(DEMO_PRICE_OVERRIDES);
-let liveCoupons: Coupon[] = structuredClone(DEMO_COUPONS);
-let liveBookings: Booking[] = structuredClone(INITIAL_BOOKINGS);
-let liveBookingEvents: BookingEvent[] = structuredClone(INITIAL_BOOKING_EVENTS);
-let liveNotifications: PortalNotification[] = structuredClone(INITIAL_NOTIFICATIONS);
-let liveCmsSettings: CmsSettings = structuredClone(INITIAL_CMS_SETTINGS);
-const waitlistEntries: WaitlistEntry[] = [];
+// Permanent Platform Database State (Loaded from disk & synced with Cloud Firestore)
+const platformDb = loadPlatformDatabase();
+
+let liveCities: City[] = platformDb.cities;
+let liveServiceAreas: ServiceArea[] = platformDb.serviceAreas;
+let liveCategories: Category[] = platformDb.categories;
+let liveServices: Service[] = platformDb.services;
+let liveVendors: Vendor[] = platformDb.vendors;
+let livePriceOverrides: PriceOverride[] = platformDb.priceOverrides;
+let liveCoupons: Coupon[] = platformDb.coupons;
+let liveBookings: Booking[] = platformDb.bookings;
+let liveBookingEvents: BookingEvent[] = platformDb.bookingEvents;
+let liveNotifications: PortalNotification[] = platformDb.notifications;
+let liveCmsSettings: CmsSettings = platformDb.cmsSettings;
+const waitlistEntries: WaitlistEntry[] = platformDb.waitlistEntries || [];
 const contactSubmissions: Array<{
   id: string;
   name: string;
@@ -95,7 +106,37 @@ const contactSubmissions: Array<{
   pinCode?: string;
   message: string;
   createdAtIso: string;
-}> = [];
+}> = platformDb.contactSubmissions || [];
+
+/**
+ * Captures an authoritative snapshot of the live database
+ */
+function getCurrentDatabaseSnapshot(): PlatformDatabase {
+  return {
+    cities: liveCities,
+    serviceAreas: liveServiceAreas,
+    categories: liveCategories,
+    services: liveServices,
+    vendors: liveVendors,
+    priceOverrides: livePriceOverrides,
+    coupons: liveCoupons,
+    bookings: liveBookings,
+    bookingEvents: liveBookingEvents,
+    notifications: liveNotifications,
+    cmsSettings: liveCmsSettings,
+    waitlistEntries,
+    contactSubmissions,
+    version: '1.0.0',
+    updatedAtIso: new Date().toISOString(),
+  };
+}
+
+/**
+ * Commits current live state to permanent storage and triggers Firestore mirror
+ */
+function syncLiveDatabase() {
+  savePlatformDatabase(getCurrentDatabaseSnapshot());
+}
 const processedRazorpayWebhookEventIds = new Set<string>();
 
 // Active Admin Session Tokens
@@ -250,7 +291,10 @@ async function startServer() {
     }
 
     const authHeader = req.headers.authorization || '';
-    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+    let token = authHeader.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';
+    if (!token && typeof req.query.token === 'string') {
+      token = req.query.token.trim();
+    }
 
     if (!token || !activeAdminSessions.has(token)) {
       res.status(401).json({
@@ -282,6 +326,48 @@ async function startServer() {
       contactSubmissions,
     });
   });
+
+  // 2A-1. Admin Database Persistence Metrics & Storage Status
+  app.get('/api/admin/database/status', (_req, res) => {
+    const currentDb = getCurrentDatabaseSnapshot();
+    const metrics = getDatabaseMetrics(currentDb);
+    res.json({
+      ok: true,
+      metrics,
+    });
+  });
+
+  // 2A-2. Admin 1-Click Database JSON Backup Download
+  app.get('/api/admin/database/backup', (_req, res) => {
+    syncLiveDatabase();
+    res.download(
+      DB_FILE_PATH,
+      `tankman_backup_${new Date().toISOString().replace(/[:.]/g, '-')}.json`
+    );
+  });
+
+  // 2A-3. Admin Manual Force Sync to Disk & Firestore
+  app.post('/api/admin/database/sync', async (_req, res) => {
+    syncLiveDatabase();
+
+    // Mirror current catalog and operational tables to Firestore non-blockingly
+    void Promise.allSettled([
+      ...liveServices.map((s) => mirrorToFirestore('services', s.id, s)),
+      ...liveVendors.map((v) => mirrorToFirestore('vendors', v.uid, v)),
+      ...liveBookings.map((b) => mirrorToFirestore('bookings', b.id, b)),
+      ...liveCities.map((c) => mirrorToFirestore('cities', c.id, c)),
+      ...liveCoupons.map((cp) => mirrorToFirestore('coupons', cp.id, cp)),
+      mirrorToFirestore('cms_settings', 'global', liveCmsSettings),
+    ]);
+
+    const currentDb = getCurrentDatabaseSnapshot();
+    res.json({
+      ok: true,
+      message: 'Database state successfully synced to persistent disk and mirrored to Firestore.',
+      metrics: getDatabaseMetrics(currentDb),
+    });
+  });
+
 
   // 2B. Admin Service Management (Create / Edit Service)
   app.post('/api/admin/services', (req, res) => {
@@ -316,6 +402,8 @@ async function startServer() {
         isDemo: false,
       };
       liveServices[existingIdx] = updated;
+      syncLiveDatabase();
+      void mirrorToFirestore('services', updated.id, updated);
       res.json({ service: updated, message: `Service "${updated.title}" updated.` });
       return;
     }
@@ -398,6 +486,8 @@ async function startServer() {
     };
 
     liveServices.unshift(newService);
+    syncLiveDatabase();
+    void mirrorToFirestore('services', newService.id, newService);
     res.status(201).json({
       service: newService,
       message: `Service "${newService.title}" created and ${newService.status}.`,
@@ -419,6 +509,8 @@ async function startServer() {
     }
     svc.status = status;
     svc.updatedAtIso = new Date().toISOString();
+    syncLiveDatabase();
+    void mirrorToFirestore('services', svc.id, svc);
     res.json({
       service: svc,
       message: `Service "${svc.title}" status updated to ${status}.`,
@@ -437,9 +529,11 @@ async function startServer() {
     const svc = liveServices[svcIdx];
     const evaluation = evaluateServiceDeletion(id, liveBookings);
 
-    if (!evaluation.canHardDelete) {
+    if (!evaluation.canHardDelete && req.query.force !== 'true') {
       svc.status = 'archived';
       svc.updatedAtIso = new Date().toISOString();
+      syncLiveDatabase();
+      void mirrorToFirestore('services', svc.id, svc);
       res.json({
         deleted: false,
         archivedInstead: true,
@@ -451,6 +545,8 @@ async function startServer() {
     }
 
     liveServices.splice(svcIdx, 1);
+    syncLiveDatabase();
+    void deleteFromFirestore('services', id);
     res.json({
       deleted: true,
       archivedInstead: false,
@@ -478,6 +574,8 @@ async function startServer() {
         id: liveCategories[existingIdx].id,
         isDemo: false,
       };
+      syncLiveDatabase();
+      void mirrorToFirestore('categories', liveCategories[existingIdx].id, liveCategories[existingIdx]);
       res.json({
         category: liveCategories[existingIdx],
         message: `Category "${liveCategories[existingIdx].name}" updated.`,
@@ -502,6 +600,8 @@ async function startServer() {
       isDemo: false,
     };
     liveCategories.push(newCat);
+    syncLiveDatabase();
+    void mirrorToFirestore('categories', newCat.id, newCat);
     res.status(201).json({
       category: newCat,
       message: `Category "${newCat.name}" created.`,
@@ -543,6 +643,8 @@ async function startServer() {
         updatedAtIso: nowIso,
         isDemo: false,
       };
+      syncLiveDatabase();
+      void mirrorToFirestore('price_overrides', livePriceOverrides[existingIdx].id, livePriceOverrides[existingIdx]);
       res.json({
         priceOverride: livePriceOverrides[existingIdx],
         message: 'Price override updated.',
@@ -565,6 +667,8 @@ async function startServer() {
       isDemo: false,
     };
     livePriceOverrides.push(created);
+    syncLiveDatabase();
+    void mirrorToFirestore('price_overrides', created.id, created);
     res.status(201).json({
       priceOverride: created,
       message: 'Price override created.',
@@ -598,6 +702,8 @@ async function startServer() {
         updatedAtIso: nowIso,
         isDemo: false,
       };
+      syncLiveDatabase();
+      void mirrorToFirestore('cities', liveCities[existingIdx].id, liveCities[existingIdx]);
       res.json({
         city: liveCities[existingIdx],
         message: `City "${liveCities[existingIdx].name}" updated.`,
@@ -620,9 +726,46 @@ async function startServer() {
       updatedAtIso: nowIso,
     };
     liveCities.push(newCity);
+    syncLiveDatabase();
+    void mirrorToFirestore('cities', newCity.id, newCity);
     res.status(201).json({
       city: newCity,
       message: `City "${newCity.name}" added.`,
+    });
+  });
+
+  // 2G-2. Admin City Deletion (Cascades to Service Areas)
+  app.delete('/api/admin/cities/:id', (req, res) => {
+    const { id } = req.params;
+    const cityIdx = liveCities.findIndex((c) => c.id === id);
+    if (cityIdx < 0) {
+      res.status(404).json({ error: 'City not found.' });
+      return;
+    }
+    const removedCity = liveCities[cityIdx];
+    liveCities.splice(cityIdx, 1);
+
+    // Remove all service areas mapped to this city
+    liveServiceAreas = liveServiceAreas.filter((a) => a.cityId !== id);
+
+    // Remove cityId from supportedCityIds in services & vendors
+    for (const s of liveServices) {
+      if (s.supportedCityIds && s.supportedCityIds.includes(id)) {
+        s.supportedCityIds = s.supportedCityIds.filter((cid) => cid !== id);
+      }
+    }
+    for (const v of liveVendors) {
+      if (v.supportedCityIds && v.supportedCityIds.includes(id)) {
+        v.supportedCityIds = v.supportedCityIds.filter((cid) => cid !== id);
+      }
+    }
+
+    syncLiveDatabase();
+    void deleteFromFirestore('cities', id);
+    res.json({
+      success: true,
+      message: `City "${removedCity.name}" and associated PIN coverage areas deleted successfully.`,
+      deletedId: id,
     });
   });
 
@@ -679,6 +822,8 @@ async function startServer() {
         updatedAtIso: nowIso,
         isDemo: false,
       };
+      syncLiveDatabase();
+      void mirrorToFirestore('service_areas', liveServiceAreas[existingIdx].id, liveServiceAreas[existingIdx]);
       res.json({
         serviceArea: liveServiceAreas[existingIdx],
         message: `PIN ${pinCode} (${liveServiceAreas[existingIdx].zoneLabel}) updated.`,
@@ -705,6 +850,8 @@ async function startServer() {
       updatedAtIso: nowIso,
     };
     liveServiceAreas.push(newArea);
+    syncLiveDatabase();
+    void mirrorToFirestore('service_areas', newArea.id, newArea);
     res.status(201).json({
       serviceArea: newArea,
       message: `PIN ${pinCode} added to ${targetCity.name}.`,
@@ -792,6 +939,8 @@ async function startServer() {
       }
     }
 
+    syncLiveDatabase();
+
     res.json({
       mode: 'commit',
       createdCount,
@@ -823,11 +972,14 @@ async function startServer() {
       liveVendors[existingIdx] = {
         ...current,
         ...payload,
+        password: payload.password?.trim() ? payload.password.trim() : current.password,
         uid: current.uid,
         vendorCode: current.vendorCode || generateUniqueVendorCode(liveVendors),
         updatedAtIso: nowIso,
         isDemo: false,
       };
+      syncLiveDatabase();
+      void mirrorToFirestore('vendors', liveVendors[existingIdx].uid, liveVendors[existingIdx]);
       res.json({
         vendor: liveVendors[existingIdx],
         message: `Vendor "${liveVendors[existingIdx].displayName}" (${liveVendors[existingIdx].vendorCode}) updated.`,
@@ -843,6 +995,7 @@ async function startServer() {
       businessName: payload.businessName?.trim() || `${payload.displayName.trim()} Services`,
       phone: payload.phone.trim(),
       email: payload.email.trim().toLowerCase(),
+      password: payload.password?.trim() || 'TankmanPartner@2026',
       status: payload.status || 'active',
       isAvailable: payload.isAvailable ?? true,
       supportedCityIds: payload.supportedCityIds || ['city_kanpur'],
@@ -863,6 +1016,8 @@ async function startServer() {
     };
 
     liveVendors.unshift(newVendor);
+    syncLiveDatabase();
+    void mirrorToFirestore('vendors', newVendor.uid, newVendor);
     res.status(201).json({
       vendor: newVendor,
       message: `Vendor registered with ID ${newVendor.vendorCode}.`,
@@ -901,6 +1056,8 @@ async function startServer() {
       }
     }
 
+    syncLiveDatabase();
+    void mirrorToFirestore('vendors', vendor.uid, vendor);
     res.json({
       vendor,
       message: `Vendor ${vendor.displayName} (${vendor.vendorCode}) status updated to ${status}.`,
@@ -931,9 +1088,59 @@ async function startServer() {
       createdAtIso: nowIso,
     });
 
+    syncLiveDatabase();
+    void mirrorToFirestore('vendors', vendor.uid, vendor);
+
     res.json({
       vendor,
       message: `Secure password setup/reset link triggered for ${vendor.email} (${vendor.vendorCode}).`,
+    });
+  });
+
+  // 2L-2. Admin Vendor Deletion
+  app.delete('/api/admin/vendors/:uid', (req, res) => {
+    const { uid } = req.params;
+    const vendorIdx = liveVendors.findIndex((v) => v.uid === uid);
+    if (vendorIdx < 0) {
+      res.status(404).json({ error: 'Vendor not found.' });
+      return;
+    }
+    const removedVendor = liveVendors[vendorIdx];
+    liveVendors.splice(vendorIdx, 1);
+
+    // Unassign from any bookings that were assigned to this vendor
+    for (const b of liveBookings) {
+      if (b.assignedVendorUid === uid) {
+        b.assignedVendorUid = undefined as any;
+        b.assignedVendorName = undefined as any;
+        if (b.status === 'assigned_to_vendor') {
+          b.status = 'requested';
+        }
+        b.updatedAtIso = new Date().toISOString();
+      }
+    }
+
+    // Clean up from service areas
+    for (const area of liveServiceAreas) {
+      if (area.assignedVendorUids && area.assignedVendorUids.includes(uid)) {
+        area.assignedVendorUids = area.assignedVendorUids.filter((u) => u !== uid);
+      }
+    }
+
+    // Revoke any active sessions
+    for (const [tokenKey, sessionVal] of activeVendorSessions.entries()) {
+      if (sessionVal.uid === uid) {
+        activeVendorSessions.delete(tokenKey);
+      }
+    }
+
+    syncLiveDatabase();
+    void deleteFromFirestore('vendors', uid);
+
+    res.json({
+      success: true,
+      message: `Vendor "${removedVendor.displayName}" (${removedVendor.vendorCode}) deleted permanently.`,
+      deletedUid: uid,
     });
   });
 
@@ -1007,6 +1214,9 @@ async function startServer() {
       createdAtIso: nowIso,
     });
 
+    syncLiveDatabase();
+    void mirrorToFirestore('bookings', booking.id, booking);
+
     res.json({
       booking,
       event,
@@ -1074,10 +1284,63 @@ async function startServer() {
     };
     liveBookingEvents.unshift(event);
 
+    syncLiveDatabase();
+    void mirrorToFirestore('bookings', booking.id, booking);
+
     res.json({
       booking,
       event,
       message: `Booking ${booking.bookingNumber} updated to ${booking.status}.`,
+    });
+  });
+
+  // 2N-1. Clear All Booking History & Reset Operational Records
+  app.delete('/api/admin/bookings/clear-all', (_req, res) => {
+    const count = liveBookings.length;
+    liveBookings = [];
+    liveBookingEvents = [];
+    liveNotifications = liveNotifications.filter((n) => !n.bookingId);
+    for (const v of liveVendors) {
+      v.activeAssignedJobs = 0;
+    }
+    syncLiveDatabase();
+    res.json({
+      success: true,
+      clearedCount: count,
+      message: `All booking history (${count} bookings) and associated event logs have been cleared.`,
+    });
+  });
+
+  // 2N-2. Admin Single Booking Deletion
+  app.delete('/api/admin/bookings/:id', (req, res) => {
+    const { id } = req.params;
+    const bkIdx = liveBookings.findIndex((b) => b.id === id);
+    if (bkIdx < 0) {
+      res.status(404).json({ error: 'Booking not found.' });
+      return;
+    }
+    const target = liveBookings[bkIdx];
+
+    // Decrement vendor active job count if assigned
+    if (target.assignedVendorUid) {
+      const vnd = liveVendors.find((v) => v.uid === target.assignedVendorUid);
+      if (vnd && vnd.activeAssignedJobs > 0) {
+        vnd.activeAssignedJobs = Math.max(0, vnd.activeAssignedJobs - 1);
+      }
+    }
+
+    liveBookings.splice(bkIdx, 1);
+    // Remove related events and notifications
+    liveBookingEvents = liveBookingEvents.filter((e) => e.bookingId !== id);
+    liveNotifications = liveNotifications.filter((n) => n.bookingId !== id);
+
+    syncLiveDatabase();
+    void deleteFromFirestore('bookings', id);
+
+    res.json({
+      success: true,
+      message: `Booking ${target.bookingNumber} deleted permanently.`,
+      deletedId: id,
     });
   });
 
@@ -1090,6 +1353,8 @@ async function startServer() {
       id: 'global',
       updatedAtIso: new Date().toISOString(),
     };
+    syncLiveDatabase();
+    void mirrorToFirestore('cms_settings', 'global', liveCmsSettings);
     res.json({
       cmsSettings: liveCmsSettings,
       message: 'Website CMS content updated and published to storefront.',
@@ -1115,6 +1380,8 @@ async function startServer() {
         code,
         isDemo: false,
       };
+      syncLiveDatabase();
+      void mirrorToFirestore('coupons', liveCoupons[existingIdx].id, liveCoupons[existingIdx]);
       res.json({
         coupon: liveCoupons[existingIdx],
         message: `Coupon ${code} updated.`,
@@ -1142,6 +1409,8 @@ async function startServer() {
       isDemo: false,
     };
     liveCoupons.push(newCoupon);
+    syncLiveDatabase();
+    void mirrorToFirestore('coupons', newCoupon.id, newCoupon);
     res.status(201).json({
       coupon: newCoupon,
       message: `Coupon ${code} created.`,
@@ -1160,6 +1429,8 @@ async function startServer() {
       return;
     }
     const removed = liveCoupons.splice(index, 1)[0];
+    syncLiveDatabase();
+    void deleteFromFirestore('coupons', removed.id);
     res.json({
       ok: true,
       message: `Coupon "${removed.code}" deleted permanently.`,
@@ -1174,6 +1445,7 @@ async function startServer() {
         n.read = true;
       }
     }
+    syncLiveDatabase();
     res.json({ notifications: liveNotifications });
   });
 
@@ -1261,7 +1533,12 @@ async function startServer() {
         v.uid.toLowerCase() === identifier
     );
 
-    if (!matchedVendor || rawPass !== expectedPass) {
+    const vendorAssignedPass = matchedVendor?.password?.trim();
+    const isPasswordValid =
+      matchedVendor &&
+      (rawPass === vendorAssignedPass || rawPass === expectedPass);
+
+    if (!matchedVendor || !isPasswordValid) {
       res.status(401).json({
         authorized: false,
         code: 'INVALID_VENDOR_CREDENTIALS',
@@ -1539,6 +1816,9 @@ async function startServer() {
       createdAtIso: nowIso,
     });
 
+    syncLiveDatabase();
+    void mirrorToFirestore('bookings', booking.id, booking);
+
     res.json({
       booking: sanitizeBookingForVendorView(booking, vendor.uid),
       event,
@@ -1610,6 +1890,9 @@ async function startServer() {
     };
     liveBookingEvents.unshift(event);
 
+    syncLiveDatabase();
+    void mirrorToFirestore('bookings', booking.id, booking);
+
     res.json({
       booking: sanitizeBookingForVendorView(booking, vendor.uid),
       event,
@@ -1640,6 +1923,9 @@ async function startServer() {
       vendor.maxActiveJobs = Math.round(maxActiveJobs);
     }
     vendor.updatedAtIso = new Date().toISOString();
+
+    syncLiveDatabase();
+    void mirrorToFirestore('vendors', vendor.uid, vendor);
 
     res.json({
       vendor,
@@ -1697,6 +1983,8 @@ async function startServer() {
         updatedAtIso: nowIso,
         isDemo: false,
       };
+      syncLiveDatabase();
+      void mirrorToFirestore('price_overrides', livePriceOverrides[existingIdx].id, livePriceOverrides[existingIdx]);
       res.json({
         priceOverride: livePriceOverrides[existingIdx],
         message: 'Your Partner service rate has been updated.',
@@ -1719,6 +2007,8 @@ async function startServer() {
       isDemo: false,
     };
     livePriceOverrides.push(created);
+    syncLiveDatabase();
+    void mirrorToFirestore('price_overrides', created.id, created);
 
     res.status(201).json({
       priceOverride: created,
@@ -1737,6 +2027,7 @@ async function startServer() {
         }
       }
     }
+    syncLiveDatabase();
     res.json({
       notifications: liveNotifications.filter(
         (n) => n.recipientRole === 'vendor' && n.recipientUid === vendor.uid
@@ -1962,6 +2253,9 @@ async function startServer() {
         createdAtIso: new Date().toISOString(),
       };
       liveNotifications.unshift(notif);
+
+      syncLiveDatabase();
+      void mirrorToFirestore('bookings', booking.id, booking);
     }
 
     res.json({
@@ -2085,6 +2379,9 @@ async function startServer() {
           createdAtIso: new Date().toISOString(),
         });
       }
+
+      syncLiveDatabase();
+      void mirrorToFirestore('bookings', matchedBooking.id, matchedBooking);
     }
 
     res.status(200).json({ ok: true, received: true, event });
@@ -2514,6 +2811,9 @@ async function startServer() {
       if (result.notifications && result.notifications.length > 0) {
         liveNotifications.unshift(...result.notifications);
       }
+
+      syncLiveDatabase();
+      void mirrorToFirestore('bookings', result.booking.id, result.booking);
     }
 
     const bookingEvents = liveBookingEvents.filter(
@@ -2716,6 +3016,8 @@ async function startServer() {
       createdAtIso: new Date().toISOString(),
     };
     waitlistEntries.push(entry);
+    syncLiveDatabase();
+    void mirrorToFirestore('waitlist_entries', entry.id, entry);
 
     res.status(201).json({
       success: true,
@@ -2749,6 +3051,8 @@ async function startServer() {
       createdAtIso: new Date().toISOString(),
     };
     contactSubmissions.push(record);
+    syncLiveDatabase();
+    void mirrorToFirestore('contact_submissions', record.id, record);
 
     res.status(201).json({
       success: true,

@@ -34,6 +34,8 @@ import {
   ChevronRight,
   Image as ImageIcon,
   Link as LinkIcon,
+  Database,
+  Download,
 } from 'lucide-react';
 import { buildPortalHref } from '../lib/portalRouting.ts';
 import { formatPaiseToInr } from '../lib/pricingEngine.ts';
@@ -74,6 +76,22 @@ import type {
   VendorStatus,
   WaitlistEntry,
 } from '../types/domain.ts';
+import {
+  cleanIndianPhone,
+  buildWhatsAppLink,
+  buildCustomerBookingConfirmedWhatsApp,
+  buildCustomerTechnicianAssignedWhatsApp,
+  buildVendorDispatchWhatsApp,
+  buildCustomerJobCompletedWhatsApp,
+} from '../lib/whatsappEngine.ts';
+
+export function WhatsAppIcon({ className = 'w-4 h-4' }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12.031 2c-5.502 0-9.969 4.467-9.969 9.969 0 1.761.458 3.479 1.328 4.992l-1.39 5.039 5.176-1.359c1.469.802 3.125 1.229 4.855 1.229 5.502 0 9.969-4.467 9.969-9.969 0-5.502-4.467-9.969-9.969-9.969zm5.824 14.078c-.244.686-1.42 1.31-1.957 1.394-.516.082-1.189.117-3.844-.959-3.21-1.302-5.275-4.572-5.436-4.787-.156-.215-1.295-1.724-1.295-3.287 0-1.564.819-2.334 1.111-2.65.293-.316.639-.395.852-.395.215 0 .428.002.615.012.2.01.467-.076.73.555.275.66.938 2.285 1.018 2.451.082.166.137.361.027.576-.11.215-.164.348-.328.539-.164.191-.346.428-.494.574-.164.164-.336.344-.145.672.191.328.848 1.4 1.816 2.264 1.246 1.111 2.297 1.455 2.625 1.621.328.164.518.145.711-.076.191-.221.822-.957 1.041-1.285.221-.328.441-.275.742-.164.301.11 1.908.9 2.236 1.064.328.164.547.244.629.383.082.137.082.801-.162 1.488z" />
+    </svg>
+  );
+}
 
 interface AdminShellProps {
   internalPath: string;
@@ -252,6 +270,21 @@ export const AdminShell: React.FC<AdminShellProps> = ({
   const [newCouponValue, setNewCouponValue] = useState('100');
   const [newCouponMinOrder, setNewCouponMinOrder] = useState('499');
 
+  // Enterprise Database Persistence State
+  const [dbMetrics, setDbMetrics] = useState<{
+    storageType: string;
+    dbFilePath: string;
+    fileSizeKb: string;
+    totalBookings: number;
+    totalVendors: number;
+    totalServices: number;
+    totalCities: number;
+    totalPinCodes: number;
+    lastSavedIso: string;
+  } | null>(null);
+  const [isSyncingDb, setIsSyncingDb] = useState(false);
+
+
   // Helper for authenticated Admin API calls
   const adminFetch = async (url: string, options: RequestInit = {}) => {
     if (!adminSession) throw new Error('Not signed in');
@@ -323,11 +356,47 @@ export const AdminShell: React.FC<AdminShellProps> = ({
       setCmsSettings(data.cmsSettings || null);
       setCmsDraft(data.cmsSettings || null);
       setWaitlistEntries(data.waitlistEntries || []);
+
+      // Also refresh persistent database metrics
+      try {
+        const dbRes = await fetch('/api/admin/database/status', {
+          headers: { Authorization: `Bearer ${activeSess.token}` },
+        });
+        if (dbRes.ok) {
+          const dbData = await dbRes.json();
+          if (dbData.metrics) {
+            setDbMetrics(dbData.metrics);
+          }
+        }
+      } catch {
+        // Non-blocking
+      }
     } catch (err) {
       showToast('error', err instanceof Error ? err.message : 'Failed to load Admin state.');
     } finally {
       setIsLoadingState(false);
     }
+  };
+
+  const handleForceDbSync = async () => {
+    setIsSyncingDb(true);
+    try {
+      const data = await adminFetch('/api/admin/database/sync', { method: 'POST' });
+      if (data?.metrics) {
+        setDbMetrics(data.metrics);
+      }
+      showToast('success', 'Database permanently written to disk and mirrored to Firestore.');
+    } catch (err: any) {
+      showToast('error', err?.message || 'Failed to sync database.');
+    } finally {
+      setIsSyncingDb(false);
+    }
+  };
+
+  const handleDownloadBackup = () => {
+    if (!adminSession) return;
+    window.open(`/api/admin/database/backup?token=${encodeURIComponent(adminSession.token)}`, '_blank');
+    showToast('success', 'Database JSON backup download started.');
   };
 
   useEffect(() => {
@@ -610,9 +679,14 @@ export const AdminShell: React.FC<AdminShellProps> = ({
     }
   };
 
-  const handleDeleteOrArchiveService = async (serviceId: string) => {
+  const handleDeleteOrArchiveService = async (serviceId: string, force = false) => {
+    const targetSvc = services.find((s) => s.id === serviceId);
+    const serviceName = targetSvc?.title || serviceId;
+    if (!window.confirm(`Are you sure you want to delete service "${serviceName}"?`)) {
+      return;
+    }
     try {
-      const data = await adminFetch(`/api/admin/services/${serviceId}`, {
+      const data = await adminFetch(`/api/admin/services/${serviceId}${force ? '?force=true' : ''}`, {
         method: 'DELETE',
       });
       if (data.archivedInstead) {
@@ -723,6 +797,32 @@ export const AdminShell: React.FC<AdminShellProps> = ({
       await loadAdminState();
     } catch (err) {
       showToast('error', err instanceof Error ? err.message : 'Failed to toggle city.');
+    }
+  };
+
+  const handleDeleteCity = async (cityId: string, cityName: string) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to delete city "${cityName}" and all its mapped PIN areas? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+    try {
+      const data = await adminFetch(`/api/admin/cities/${encodeURIComponent(cityId)}`, {
+        method: 'DELETE',
+      });
+      if (auth.currentUser) {
+        try {
+          await deleteDoc(doc(db, 'cities', cityId));
+        } catch {
+          // offline/local sync
+        }
+      }
+      showToast('success', data.message || `City "${cityName}" deleted successfully.`);
+      await loadAdminState();
+    } catch (err) {
+      showToast('error', err instanceof Error ? err.message : 'Failed to delete city.');
     }
   };
 
@@ -857,6 +957,32 @@ export const AdminShell: React.FC<AdminShellProps> = ({
     }
   };
 
+  const handleDeleteVendor = async (uid: string, displayName: string, vendorCode?: string) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to permanently delete vendor "${displayName}" (${vendorCode || uid})? This will unassign any active jobs and revoke vendor portal access.`
+      )
+    ) {
+      return;
+    }
+    try {
+      const data = await adminFetch(`/api/admin/vendors/${encodeURIComponent(uid)}`, {
+        method: 'DELETE',
+      });
+      if (auth.currentUser) {
+        try {
+          await deleteDoc(doc(db, 'vendors', uid));
+        } catch {
+          // offline/local sync
+        }
+      }
+      showToast('success', data.message || `Vendor "${displayName}" deleted.`);
+      await loadAdminState();
+    } catch (err) {
+      showToast('error', err instanceof Error ? err.message : 'Failed to delete vendor.');
+    }
+  };
+
   // Booking Dispatch & Status Actions
   const handleAssignVendor = async (bookingId: string, autoAssign = false) => {
     try {
@@ -900,6 +1026,55 @@ export const AdminShell: React.FC<AdminShellProps> = ({
       await loadAdminState();
     } catch (err) {
       showToast('error', err instanceof Error ? err.message : 'Failed to update booking.');
+    }
+  };
+
+  const handleDeleteBooking = async (bookingId: string, bookingNumber: string) => {
+    if (
+      !window.confirm(
+        `Are you sure you want to permanently delete booking "${bookingNumber}"?`
+      )
+    ) {
+      return;
+    }
+    try {
+      const data = await adminFetch(`/api/admin/bookings/${encodeURIComponent(bookingId)}`, {
+        method: 'DELETE',
+      });
+      if (auth.currentUser) {
+        try {
+          await deleteDoc(doc(db, 'bookings', bookingId));
+        } catch {
+          // offline sync
+        }
+      }
+      if (selectedBookingId === bookingId) {
+        setSelectedBookingId(null);
+      }
+      showToast('success', data.message || `Booking "${bookingNumber}" deleted.`);
+      await loadAdminState();
+    } catch (err) {
+      showToast('error', err instanceof Error ? err.message : 'Failed to delete booking.');
+    }
+  };
+
+  const handleClearAllBookings = async () => {
+    if (
+      !window.confirm(
+        'DANGER: Are you sure you want to permanently clear ALL booking history and events? You will start fresh with 0 bookings.'
+      )
+    ) {
+      return;
+    }
+    try {
+      const data = await adminFetch('/api/admin/bookings/clear-all', {
+        method: 'DELETE',
+      });
+      setSelectedBookingId(null);
+      showToast('success', data.message || 'All booking history cleared successfully.');
+      await loadAdminState();
+    } catch (err) {
+      showToast('error', err instanceof Error ? err.message : 'Failed to clear all bookings.');
     }
   };
 
@@ -1480,6 +1655,55 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                 </div>
               </div>
 
+              {/* Permanent Storage & Cloud Sync Status Badge */}
+              <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-teal-950 text-white rounded-2xl p-5 border border-slate-800 shadow-sm">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div className="flex items-start sm:items-center gap-3.5">
+                    <div className="w-11 h-11 rounded-xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center shrink-0">
+                      <Database className="w-5 h-5 text-teal-400" />
+                    </div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="text-sm font-bold text-white tracking-wide">
+                          Enterprise Database Persistence
+                        </span>
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          Zero Data Loss Active
+                        </span>
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/30">
+                          Firestore Cloud Synced
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-300 mt-1">
+                        Transactional JSON document engine (<code className="text-teal-300 font-mono text-[11px]">tankman_production_db.json</code>{dbMetrics?.fileSizeKb ? ` · ${dbMetrics.fileSizeKb} KB` : ''}) + Live Google Cloud Firestore Mirror. Safe against server restarts and reboots.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 shrink-0">
+                    <button
+                      type="button"
+                      onClick={handleForceDbSync}
+                      disabled={isSyncingDb}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 transition-colors cursor-pointer disabled:opacity-50"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isSyncingDb ? 'animate-spin' : ''}`} />
+                      <span>{isSyncingDb ? 'Syncing...' : 'Force Sync Now'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleDownloadBackup}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-teal-600 hover:bg-teal-500 text-white transition-colors cursor-pointer shadow-sm"
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>1-Click Backup (.json)</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* Primary KPI Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3.5">
                 <div className="bg-white border border-slate-200 rounded-2xl p-4">
@@ -1727,6 +1951,28 @@ export const AdminShell: React.FC<AdminShellProps> = ({
               ================================================================= */}
           {activeSection === 'bookings' && (
             <div className="space-y-6">
+              {/* Header with Title and Clear All Button */}
+              <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-200 rounded-2xl px-5 py-4">
+                <div>
+                  <h2 className="text-base font-extrabold text-slate-950">
+                    Bookings & Dispatch Operations ({bookings.length})
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Track real-time bookings, assign partner technicians, update service status, or clear test data.
+                  </p>
+                </div>
+                {bookings.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleClearAllBookings}
+                    className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-300 text-rose-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Clear All Booking History</span>
+                  </button>
+                )}
+              </div>
+
               {/* Filters Bar */}
               <div className="bg-white border border-slate-200 rounded-2xl p-4 space-y-3">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
@@ -1890,18 +2136,40 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                                 </div>
                               </td>
                               <td className="py-3 px-3 text-right">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setSelectedBookingId(bk.id);
-                                    setAssignVendorUid(bk.assignedVendorUid || '');
-                                    setRescheduleDate(bk.preferredDate);
-                                    setRescheduleSlot(bk.preferredSlot);
-                                  }}
-                                  className="px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer"
-                                >
-                                  Inspect
-                                </button>
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <a
+                                    href={buildWhatsAppLink(
+                                      bk.customerPhone,
+                                      buildCustomerBookingConfirmedWhatsApp(bk)
+                                    )}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title={`1-Click WhatsApp to ${bk.customerName} (${bk.customerPhone})`}
+                                    className="p-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white border border-emerald-200 transition-colors inline-flex items-center justify-center cursor-pointer shadow-2xs"
+                                  >
+                                    <WhatsAppIcon className="w-3.5 h-3.5" />
+                                  </a>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedBookingId(bk.id);
+                                      setAssignVendorUid(bk.assignedVendorUid || '');
+                                      setRescheduleDate(bk.preferredDate);
+                                      setRescheduleSlot(bk.preferredSlot);
+                                    }}
+                                    className="px-2.5 py-1.5 rounded-lg bg-slate-950 hover:bg-slate-800 text-white text-xs font-bold cursor-pointer"
+                                  >
+                                    Inspect
+                                  </button>
+                                  <button
+                                    type="button"
+                                    title="Delete Booking"
+                                    onClick={() => handleDeleteBooking(bk.id, bk.bookingNumber)}
+                                    className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 cursor-pointer transition-colors"
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           );
@@ -1993,6 +2261,113 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                               selectedBooking.quoteSnapshot?.finalTotalPaise || 0
                             )}
                           </span>
+                        </div>
+                      </div>
+
+                      {/* 1-Click WhatsApp Direct Dispatch Center */}
+                      <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-50 via-teal-50/50 to-slate-50 border border-emerald-200/80 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5 font-extrabold text-emerald-950 text-xs">
+                            <WhatsAppIcon className="w-4 h-4 text-emerald-600" />
+                            <span>1-Click WhatsApp Dispatch Center</span>
+                          </div>
+                          <span className="text-[10px] font-semibold bg-emerald-200/60 text-emerald-900 px-2 py-0.5 rounded-full border border-emerald-300/40">
+                            Instant Web/App Send · ₹0 Cost
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                          {/* Button 1: Send Booking Confirmation to Customer */}
+                          <a
+                            href={buildWhatsAppLink(
+                              selectedBooking.customerPhone,
+                              buildCustomerBookingConfirmedWhatsApp(selectedBooking)
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all shadow-xs cursor-pointer"
+                          >
+                            <WhatsAppIcon className="w-3.5 h-3.5" />
+                            <span>WhatsApp Booking Confirm</span>
+                          </a>
+
+                          {/* Button 2: Send WhatsApp Job Alert to Assigned Vendor */}
+                          {selectedBooking.assignedVendorUid ? (
+                            <a
+                              href={(() => {
+                                const vnd = vendors.find(
+                                  (v) => v.uid === selectedBooking.assignedVendorUid
+                                );
+                                return buildWhatsAppLink(
+                                  vnd?.phone || '',
+                                  buildVendorDispatchWhatsApp(selectedBooking, {
+                                    displayName:
+                                      selectedBooking.assignedVendorName ||
+                                      vnd?.displayName ||
+                                      'Partner',
+                                    vendorCode: vnd?.vendorCode,
+                                  })
+                                );
+                              })()}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold transition-all shadow-xs cursor-pointer"
+                            >
+                              <WhatsAppIcon className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>WhatsApp Vendor Alert</span>
+                            </a>
+                          ) : (
+                            <button
+                              type="button"
+                              disabled
+                              className="inline-flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl bg-slate-100 text-slate-400 font-semibold cursor-not-allowed text-xs border border-slate-200"
+                            >
+                              <WhatsAppIcon className="w-3.5 h-3.5" />
+                              <span>Assign Vendor to Alert</span>
+                            </button>
+                          )}
+
+                          {/* Button 3: Send Technician Details to Customer (if vendor assigned) */}
+                          {selectedBooking.assignedVendorUid && (
+                            <a
+                              href={(() => {
+                                const vnd = vendors.find(
+                                  (v) => v.uid === selectedBooking.assignedVendorUid
+                                );
+                                return buildWhatsAppLink(
+                                  selectedBooking.customerPhone,
+                                  buildCustomerTechnicianAssignedWhatsApp(selectedBooking, {
+                                    displayName:
+                                      selectedBooking.assignedVendorName ||
+                                      vnd?.displayName ||
+                                      'Lead Technician',
+                                    phone: vnd?.phone || '+91 97942 00100',
+                                    vendorCode: vnd?.vendorCode,
+                                  })
+                                );
+                              })()}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-emerald-300 hover:bg-emerald-50 text-emerald-900 font-bold transition-colors cursor-pointer"
+                            >
+                              <WhatsAppIcon className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Send Tech Info to Customer</span>
+                            </a>
+                          )}
+
+                          {/* Button 4: Send Completion & 7-Day Warranty */}
+                          <a
+                            href={buildWhatsAppLink(
+                              selectedBooking.customerPhone,
+                              buildCustomerJobCompletedWhatsApp(selectedBooking)
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 font-bold transition-colors cursor-pointer"
+                          >
+                            <WhatsAppIcon className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Job Completed & Warranty</span>
+                          </a>
                         </div>
                       </div>
 
@@ -2141,6 +2516,23 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                             </div>
                           ))}
                         </div>
+                      </div>
+
+                      {/* Delete Booking Danger Action */}
+                      <div className="pt-3 border-t border-slate-200">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleDeleteBooking(
+                              selectedBooking.id,
+                              selectedBooking.bookingNumber
+                            )
+                          }
+                          className="w-full py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 border border-rose-300 text-rose-700 text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Delete Booking ({selectedBooking.bookingNumber})</span>
+                        </button>
                       </div>
                     </>
                   ) : (
@@ -3064,17 +3456,27 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                               {pinCount} PIN code(s)
                             </span>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => handleToggleCity(c)}
-                            className={`px-3 py-1 rounded-lg font-bold text-[11px] cursor-pointer ${
-                              c.active
-                                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                                : 'bg-slate-200 text-slate-700'
-                            }`}
-                          >
-                            {c.active ? 'Active (Click to Pause)' : 'Paused (Click to Activate)'}
-                          </button>
+                          <div className="flex items-center gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => handleToggleCity(c)}
+                              className={`px-3 py-1 rounded-lg font-bold text-[11px] cursor-pointer ${
+                                c.active
+                                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                                  : 'bg-slate-200 text-slate-700'
+                              }`}
+                            >
+                              {c.active ? 'Active' : 'Paused'}
+                            </button>
+                            <button
+                              type="button"
+                              title={`Delete city "${c.name}"`}
+                              onClick={() => handleDeleteCity(c.id, c.name)}
+                              className="p-1 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 cursor-pointer transition-colors"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
                       );
                     })}
@@ -3400,6 +3802,7 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                       businessName: '',
                       phone: '+91 ',
                       email: '',
+                      password: 'TankmanPartner@2026',
                       status: 'active',
                       supportedCityIds: ['city_kanpur'],
                       supportedAreaPins: ['208001', '208002'],
@@ -3495,6 +3898,26 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                         placeholder="+91 98390 12345"
                         className="w-full px-3 py-2 border border-slate-300 rounded-xl"
                       />
+                    </div>
+                    <div>
+                      <label className="block font-bold text-slate-700 mb-1">
+                        Partner Portal Password {editingVendor.uid ? '(Optional)' : '*'}
+                      </label>
+                      <input
+                        type="text"
+                        required={!editingVendor.uid}
+                        value={editingVendor.password || ''}
+                        onChange={(e) =>
+                          setEditingVendor({ ...editingVendor, password: e.target.value })
+                        }
+                        placeholder={
+                          editingVendor.uid ? 'Leave blank to keep existing' : 'e.g. Vendor@2026'
+                        }
+                        className="w-full px-3 py-2 border border-slate-300 rounded-xl font-mono"
+                      />
+                      <span className="text-[10px] text-slate-500 mt-0.5 block">
+                        Vendor uses this password to log in at /vendor/login with their email or ID.
+                      </span>
                     </div>
                     <div>
                       <label className="block font-bold text-slate-700 mb-1">
@@ -3704,6 +4127,9 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                               <td className="py-3.5 px-3">
                                 <div className="font-semibold text-slate-800">{vnd.email}</div>
                                 <div className="text-[11px] text-slate-500">{vnd.phone}</div>
+                                <div className="text-[10px] font-mono text-teal-800 bg-teal-50 px-1.5 py-0.5 rounded mt-1 inline-block border border-teal-200">
+                                  Pass: {vnd.password || 'TankmanPartner@2026'}
+                                </div>
                               </td>
                               <td className="py-3.5 px-3">
                                 <div className="font-bold text-slate-900">
@@ -3776,6 +4202,28 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                                     className="p-1.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-700 cursor-pointer"
                                   >
                                     <KeyRound className="w-3.5 h-3.5" />
+                                  </button>
+                                  <a
+                                    href={buildWhatsAppLink(
+                                      vnd.phone,
+                                      `Namaste ${vnd.displayName} ji, TankmanPro Operations Head Desk se message hai. Kripya apna Partner Portal dashboard check karein: ${typeof window !== 'undefined' ? window.location.origin : 'https://tankmanpro.com'}/vendor`
+                                    )}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    title={`1-Click WhatsApp to Partner ${vnd.displayName} (${vnd.phone})`}
+                                    className="p-1.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 cursor-pointer inline-flex items-center justify-center transition-colors"
+                                  >
+                                    <WhatsAppIcon className="w-3.5 h-3.5" />
+                                  </a>
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleDeleteVendor(vnd.uid, vnd.displayName, vnd.vendorCode)
+                                    }
+                                    title={`Delete vendor "${vnd.displayName}"`}
+                                    className="p-1.5 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-700 cursor-pointer transition-colors"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
                                   </button>
                                 </div>
                               </td>

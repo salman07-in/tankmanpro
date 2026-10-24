@@ -45,6 +45,13 @@ import type {
   ServiceArea,
   Vendor,
 } from '../types/domain.ts';
+import { WhatsAppIcon } from '../components/WhatsAppIcon.tsx';
+import {
+  cleanIndianPhone,
+  buildWhatsAppLink,
+  buildVendorToCustomerEnRouteWhatsApp,
+  buildVendorToCustomerArrivedWhatsApp,
+} from '../lib/whatsappEngine.ts';
 
 interface VendorShellProps {
   internalPath: string;
@@ -1345,6 +1352,20 @@ export const VendorShell: React.FC<VendorShellProps> = ({
                         </div>
 
                         <div className="flex items-center gap-2 shrink-0">
+                          {b.piiRevealed && (
+                            <a
+                              href={buildWhatsAppLink(
+                                b.customerPhone,
+                                `Hello ${b.customerName}, this is your TankmanPro service technician regarding booking #${b.bookingNumber}.`
+                              )}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title={`WhatsApp Customer ${b.customerName} (${b.customerPhone})`}
+                              className="p-1.5 rounded-lg border border-emerald-300 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 cursor-pointer inline-flex items-center justify-center transition-colors"
+                            >
+                              <WhatsAppIcon className="w-3.5 h-3.5" />
+                            </a>
+                          )}
                           <span className="text-xs font-mono font-bold text-slate-900">
                             {formatPaiseToRupees(b.quoteSnapshot?.finalTotalPaise || 0)}
                           </span>
@@ -1658,9 +1679,26 @@ export const VendorShell: React.FC<VendorShellProps> = ({
 
                         <div>
                           <div className="text-slate-500">Customer Phone</div>
-                          <div className="font-mono font-bold text-slate-900 mt-0.5 flex items-center gap-1.5">
-                            <Phone className="w-3.5 h-3.5 text-teal-700" />
-                            <span>{selectedBooking.customerPhone}</span>
+                          <div className="font-mono font-bold text-slate-900 mt-0.5 flex items-center justify-between gap-1.5">
+                            <div className="flex items-center gap-1.5">
+                              <Phone className="w-3.5 h-3.5 text-teal-700" />
+                              <span>{selectedBooking.customerPhone}</span>
+                            </div>
+                            {selectedBooking.piiRevealed && (
+                              <a
+                                href={buildWhatsAppLink(
+                                  selectedBooking.customerPhone,
+                                  `Hello ${selectedBooking.customerName}, this is ${vendorProfile?.displayName || 'your technician'} from TankmanPro regarding booking #${selectedBooking.bookingNumber}.`
+                                )}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title={`WhatsApp Customer ${selectedBooking.customerName}`}
+                                className="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold inline-flex items-center gap-1 shadow-xs cursor-pointer"
+                              >
+                                <WhatsAppIcon className="w-3 h-3" />
+                                <span>WhatsApp</span>
+                              </a>
+                            )}
                           </div>
                         </div>
 
@@ -1690,6 +1728,80 @@ export const VendorShell: React.FC<VendorShellProps> = ({
                         )}
                       </div>
                     </div>
+
+                    {/* 1-Click WhatsApp Direct Dispatch Panel (Visible when job is accepted / active) */}
+                    {selectedBooking.piiRevealed && (
+                      <div className="p-4 rounded-xl bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-300 space-y-3 shadow-xs">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-xs">
+                              <WhatsAppIcon className="w-4 h-4" />
+                            </div>
+                            <div>
+                              <h3 className="text-xs font-extrabold text-emerald-950">
+                                1-Click WhatsApp Direct Dispatch
+                              </h3>
+                              <p className="text-[11px] text-emerald-800">
+                                Customer ko 1 click me update bhejein · Poora message already typed aayega
+                              </p>
+                            </div>
+                          </div>
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-200/70 text-emerald-900 uppercase">
+                            Instant · ₹0 Cost
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                          {/* Action 1: En Route */}
+                          <a
+                            href={buildWhatsAppLink(
+                              selectedBooking.customerPhone,
+                              buildVendorToCustomerEnRouteWhatsApp(selectedBooking, {
+                                displayName: vendorProfile?.displayName || 'Lead Technician',
+                                phone: vendorProfile?.phone || '+91 97942 00100',
+                              })
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-emerald-950 font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+                          >
+                            <WhatsAppIcon className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>🚗 Send &quot;En Route&quot; Alert</span>
+                          </a>
+
+                          {/* Action 2: Arrived */}
+                          <a
+                            href={buildWhatsAppLink(
+                              selectedBooking.customerPhone,
+                              buildVendorToCustomerArrivedWhatsApp(selectedBooking, {
+                                displayName: vendorProfile?.displayName || 'Lead Technician',
+                                phone: vendorProfile?.phone || '+91 97942 00100',
+                              })
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 rounded-lg bg-white border border-emerald-300 hover:bg-emerald-100 text-emerald-950 font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+                          >
+                            <WhatsAppIcon className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>📍 Send &quot;Arrived&quot; Alert</span>
+                          </a>
+
+                          {/* Action 3: General Direct Chat */}
+                          <a
+                            href={buildWhatsAppLink(
+                              selectedBooking.customerPhone,
+                              `Hello ${selectedBooking.customerName}, this is ${vendorProfile?.displayName || 'your lead technician'} from TankmanPro regarding your booking #${selectedBooking.bookingNumber} (${selectedBooking.serviceTitle}). Please let me know if we can begin the service setup.`
+                            )}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+                          >
+                            <WhatsAppIcon className="w-3.5 h-3.5" />
+                            <span>💬 Direct WhatsApp</span>
+                          </a>
+                        </div>
+                      </div>
+                    )}
 
                     {/* Permitted Lifecycle Actions Panel */}
                     <div className="p-4 rounded-xl border border-slate-200 bg-white space-y-4">
