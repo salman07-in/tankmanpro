@@ -97,7 +97,7 @@ ${trackingUrl}
 
 Our verified crew will arrive equipped with commercial mechanized cleaning machinery and eco-safe sanitization kits.
 
-For any assistance or rescheduling requests, please reach our helpline: +91 97942 00100
+For any assistance or rescheduling requests, please reach our helpline: +91 96481 75639
 Warm regards,
 *Team TankmanPro* 🛡`;
 }
@@ -127,7 +127,7 @@ A verified specialist crew has been assigned to your booking *#${booking.booking
 Our crew will reach your premises with high-pressure cleaning machinery and safety gear.
 📲 *Live Tracker:* ${trackingUrl}
 
-Helpline: +91 97942 00100
+Helpline: +91 96481 75639
 *TankmanPro Operations* 🛡`;
 }
 
@@ -186,7 +186,7 @@ Aapke Partner account par naya job assign kiya gaya hai:
 Kripya Partner Portal me login karke booking turant ACCEPT karein:
 ${portalUrl}
 
-Operations Desk: +91 97942 00100`;
+Operations Desk: +91 96481 75639`;
 }
 
 /**

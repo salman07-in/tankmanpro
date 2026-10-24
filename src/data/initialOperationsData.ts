@@ -40,9 +40,10 @@ export const INITIAL_CMS_SETTINGS: CmsSettings = {
     'Mechanised 6-stage water tank cleaning, intense bathroom & kitchen hygiene, foam-jet AC servicing, and clinical skin care by verified professionals.',
   announcementText:
     'Live in Kanpur (208001, 208002), Shahjahanpur (242001) & New Delhi (110001) · Use code CLEAN10 for 10% off!',
-  supportPhone: '+91 97942 00100',
+  supportPhone: '+91 96481 75639',
   supportEmail: 'support@tankmanpro.com',
-  whatsappNumber: '+91 97942 00100',
+  whatsappNumber: '+91 96481 75639',
+  instagramUrl: 'https://www.instagram.com/tankmanpro.in/',
   dispatchMode: 'manual',
   trustBadges: [
     '6-Stage UV & High-Pressure Jet Protocol',

@@ -491,6 +491,7 @@ export interface CmsSettings {
   supportPhone: string;
   supportEmail: string;
   whatsappNumber: string;
+  instagramUrl?: string;
   dispatchMode: 'manual' | 'auto_lowest_load' | 'round_robin';
   defaultAssignmentPolicy?: AssignmentPolicy;
   defaultTaxRatePercent?: number;

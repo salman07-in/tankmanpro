@@ -1758,7 +1758,7 @@ export const VendorShell: React.FC<VendorShellProps> = ({
                               selectedBooking.customerPhone,
                               buildVendorToCustomerEnRouteWhatsApp(selectedBooking, {
                                 displayName: vendorProfile?.displayName || 'Lead Technician',
-                                phone: vendorProfile?.phone || '+91 97942 00100',
+                                phone: vendorProfile?.phone || '+91 96481 75639',
                               })
                             )}
                             target="_blank"
@@ -1775,7 +1775,7 @@ export const VendorShell: React.FC<VendorShellProps> = ({
                               selectedBooking.customerPhone,
                               buildVendorToCustomerArrivedWhatsApp(selectedBooking, {
                                 displayName: vendorProfile?.displayName || 'Lead Technician',
-                                phone: vendorProfile?.phone || '+91 97942 00100',
+                                phone: vendorProfile?.phone || '+91 96481 75639',
                               })
                             )}
                             target="_blank"

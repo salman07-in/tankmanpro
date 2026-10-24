@@ -229,7 +229,7 @@ export const AdminShell: React.FC<AdminShellProps> = ({
   const [pinCityFilter, setPinCityFilter] = useState('ALL');
   const [newCityName, setNewCityName] = useState('');
   const [newCityState, setNewCityState] = useState('Uttar Pradesh');
-  const [newCityPhone, setNewCityPhone] = useState('+91 97942 00100');
+  const [newCityPhone, setNewCityPhone] = useState('+91 96481 75639');
   const [newPinCode, setNewPinCode] = useState('');
   const [newPinCityId, setNewPinCityId] = useState('city_kanpur');
   const [newPinZone, setNewPinZone] = useState('');
@@ -2341,7 +2341,7 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                                       selectedBooking.assignedVendorName ||
                                       vnd?.displayName ||
                                       'Lead Technician',
-                                    phone: vnd?.phone || '+91 97942 00100',
+                                    phone: vnd?.phone || '+91 96481 75639',
                                     vendorCode: vnd?.vendorCode,
                                   })
                                 );

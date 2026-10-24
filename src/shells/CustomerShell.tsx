@@ -16,6 +16,7 @@ import {
   User,
   Calendar,
   Sparkles,
+  Instagram,
 } from 'lucide-react';
 import {
   DEMO_CATEGORIES as INITIAL_DEMO_CATEGORIES,
@@ -1029,8 +1030,20 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
             </a>
           </nav>
 
-          {/* Zone 3: Urban Company Location Pill Selector */}
-          <div className="flex items-center gap-2.5 shrink-0">
+          {/* Zone 3: Urban Company Location Pill Selector & Instagram */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Instagram Social Link */}
+            <a
+              href="https://www.instagram.com/tankmanpro.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Follow @tankmanpro.in on Instagram"
+              className="px-2.5 py-2 text-xs font-semibold text-pink-700 bg-pink-50/80 hover:bg-pink-100 border border-pink-200 rounded-lg transition-colors whitespace-nowrap shrink-0 flex items-center gap-1.5 cursor-pointer shadow-2xs"
+            >
+              <Instagram className="w-3.5 h-3.5 text-pink-600 shrink-0" />
+              <span className="hidden sm:inline">@tankmanpro.in</span>
+            </a>
+
             <button
               type="button"
               onClick={() => setIsLocationModalOpen(true)}
@@ -1081,6 +1094,15 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                 {link.label}
               </a>
             ))}
+            <a
+              href="https://www.instagram.com/tankmanpro.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 py-2.5 px-3 text-sm font-semibold text-pink-700 hover:bg-pink-50 rounded-lg"
+            >
+              <Instagram className="w-4 h-4 text-pink-600" />
+              <span>Follow on Instagram (@tankmanpro.in)</span>
+            </a>
           </div>
         )}
       </header>
@@ -3043,7 +3065,7 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                 <div className="flex flex-wrap items-center gap-3 pt-2">
                   <a
                     href={buildWhatsAppLink(
-                      '9794200100',
+                      '9648175639',
                       `Hello TankmanPro Support, I have just booked a service appointment.\nBooking Reference: ${confirmedBookingResult.booking.bookingCode}\nCustomer Name: ${confirmedBookingResult.booking.customerName}\nService: ${confirmedBookingResult.booking.serviceTitle} (${confirmedBookingResult.booking.variantName})\nDate: ${confirmedBookingResult.booking.preferredDate} (${confirmedBookingResult.booking.preferredSlot})\nPlease share confirmation and technician assignment details.`
                     )}
                     target="_blank"
@@ -3804,8 +3826,45 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                 Have a question about service scope, water tank capacity, or an existing booking?
                 Send us a message and our operations team will assist you.
               </p>
-              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2 text-slate-700">
-                <div>
+              <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs space-y-2.5 text-slate-700">
+                <div className="flex items-center gap-2">
+                  <PhoneCall className="w-4 h-4 text-teal-700 shrink-0" />
+                  <div>
+                    <strong>Customer Support:</strong>{' '}
+                    <a href="tel:+919648175639" className="font-semibold text-teal-700 hover:underline">
+                      +91 96481 75639
+                    </a>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <WhatsAppIcon className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <div>
+                    <strong>WhatsApp Helpline:</strong>{' '}
+                    <a
+                      href="https://wa.me/919648175639"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-emerald-700 hover:underline"
+                    >
+                      +91 96481 75639
+                    </a>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Instagram className="w-4 h-4 text-pink-600 shrink-0" />
+                  <div>
+                    <strong>Official Instagram:</strong>{' '}
+                    <a
+                      href="https://www.instagram.com/tankmanpro.in/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-pink-600 hover:underline"
+                    >
+                      @tankmanpro.in
+                    </a>
+                  </div>
+                </div>
+                <div className="pt-2 border-t border-slate-200">
                   <strong>Support Email:</strong> support@tankmanpro.com
                 </div>
                 <div>
@@ -4294,7 +4353,7 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                         <div className="flex flex-wrap items-center gap-2">
                           <a
                             href={buildWhatsAppLink(
-                              '9794200100',
+                              '9648175639',
                               `Hello TankmanPro Support, I need assistance regarding my booking #${booking.bookingCode}.\nCustomer: ${booking.customerName}\nService: ${booking.serviceTitle}\nSlot: ${booking.scheduledDate} (${booking.timeWindow})`
                             )}
                             target="_blank"
@@ -4308,7 +4367,7 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                           {assignedVendorSummary?.displayName && (
                             <a
                               href={buildWhatsAppLink(
-                                '9794200100',
+                                '9648175639',
                                 `Hello TankmanPro Support, please share an arrival status update for assigned technician "${assignedVendorSummary.displayName}" regarding booking #${booking.bookingCode}.`
                               )}
                               target="_blank"
@@ -4412,12 +4471,39 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
       <footer className="bg-slate-50 border-t border-slate-200 mt-16">
         <div className="max-w-[1220px] mx-auto px-4 sm:px-6 py-10">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 pb-8 border-b border-slate-200 text-xs">
-            <div className="space-y-2.5">
+            <div className="space-y-3">
               <div className="text-base font-extrabold text-slate-950 font-display">TankmanPro</div>
               <p className="text-slate-600 leading-relaxed">
                 Doorstep home services for mechanized water tank cleaning, AC service, bathroom &amp;
                 kitchen deep cleaning, sofa shampooing, car wash, and Beedare skin aesthetics.
               </p>
+              <div className="pt-2 space-y-2 border-t border-slate-200/80">
+                <a
+                  href="tel:+919648175639"
+                  className="flex items-center gap-2 text-slate-700 hover:text-teal-700 font-medium"
+                >
+                  <PhoneCall className="w-3.5 h-3.5 text-teal-700 shrink-0" />
+                  <span>Call: <strong>+91 96481 75639</strong></span>
+                </a>
+                <a
+                  href="https://wa.me/919648175639"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-slate-700 hover:text-emerald-700 font-medium"
+                >
+                  <WhatsAppIcon className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                  <span>WhatsApp: <strong>+91 96481 75639</strong></span>
+                </a>
+                <a
+                  href="https://www.instagram.com/tankmanpro.in/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-pink-700 hover:text-pink-800 font-semibold"
+                >
+                  <Instagram className="w-3.5 h-3.5 text-pink-600 shrink-0" />
+                  <span>Instagram: <strong>@tankmanpro.in</strong></span>
+                </a>
+              </div>
             </div>
 
             <div>
@@ -4549,9 +4635,21 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
             </div>
           </div>
 
-          <div className="pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs text-slate-500">
+          <div className="pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-slate-500">
             <div>© {new Date().getFullYear()} TankmanPro India. All prices in INR (₹).</div>
-            <div>New Delhi · Shahjahanpur · Kanpur</div>
+            <div className="flex items-center gap-4">
+              <a
+                href="https://www.instagram.com/tankmanpro.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 text-pink-700 hover:text-pink-900 font-semibold transition-colors"
+              >
+                <Instagram className="w-4 h-4 text-pink-600" />
+                <span>Follow @tankmanpro.in</span>
+              </a>
+              <span>·</span>
+              <div>New Delhi · Shahjahanpur · Kanpur</div>
+            </div>
           </div>
         </div>
       </footer>
@@ -4563,16 +4661,16 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
       >
         <a
           href={buildWhatsAppLink(
-            '9794200100',
+            '9648175639',
             'Hello TankmanPro Support, I would like to inquire about professional mechanized water tank cleaning services.'
           )}
           target="_blank"
           rel="noopener noreferrer"
-          title="Chat with TankmanPro on WhatsApp (+91 97942 00100)"
+          title="Chat with TankmanPro on WhatsApp (+91 96481 75639)"
           className="flex items-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-105 cursor-pointer"
         >
           <WhatsAppIcon className="w-5 h-5" />
-          <span className="hidden sm:inline">WhatsApp Help (+91 97942 00100)</span>
+          <span className="hidden sm:inline">WhatsApp Help (+91 96481 75639)</span>
           <span className="sm:hidden">WhatsApp</span>
         </a>
       </aside>
