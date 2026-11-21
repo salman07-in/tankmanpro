@@ -120,7 +120,12 @@ export interface Category {
     | 'sofa-mattress'
     | 'vehicle-wash'
     | 'fan-appliances'
-    | 'aesthetics';
+    | 'aesthetics'
+    | 'appliance-repair'
+    | 'plumbing'
+    | 'electrician'
+    | 'painter'
+    | 'carpenter';
   imageUrl: string;
   sortOrder: number;
   status: PublishStatus;

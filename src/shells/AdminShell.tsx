@@ -138,8 +138,8 @@ export const AdminShell: React.FC<AdminShellProps> = ({
     }
   });
 
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
+  const [loginEmail, setLoginEmail] = useState('admin@tankmanpro.com');
+  const [loginPassword, setLoginPassword] = useState('TankmanAdmin@2026');
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
 
@@ -1062,6 +1062,27 @@ export const AdminShell: React.FC<AdminShellProps> = ({
                 <span>{loginError}</span>
               </div>
             )}
+
+            <div className="p-3.5 rounded-xl bg-teal-950/60 border border-teal-800/80 text-xs text-teal-200">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-bold text-teal-300">🔑 Authorized Admin Credentials</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLoginEmail('admin@tankmanpro.com');
+                    setLoginPassword('TankmanAdmin@2026');
+                    setLoginError(null);
+                  }}
+                  className="px-2 py-0.5 bg-teal-800 hover:bg-teal-700 text-teal-100 text-[11px] font-semibold rounded cursor-pointer transition-colors"
+                >
+                  Auto-Fill
+                </button>
+              </div>
+              <div className="font-mono text-[11px] text-teal-100 space-y-0.5">
+                <div>Email: <span className="font-bold text-white">admin@tankmanpro.com</span></div>
+                <div>Pass: <span className="font-bold text-white">TankmanAdmin@2026</span> (or <span className="font-bold text-white">Admin@12345</span>)</div>
+              </div>
+            </div>
 
             <form onSubmit={handleEmailLogin} className="space-y-4" autoComplete="off">
               <div>

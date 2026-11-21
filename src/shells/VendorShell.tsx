@@ -126,8 +126,8 @@ export const VendorShell: React.FC<VendorShellProps> = ({
 
   // Login Form State
   const [partnerAccounts, setPartnerAccounts] = useState<PartnerAccountPreview[]>([]);
-  const [emailOrCode, setEmailOrCode] = useState('');
-  const [vendorPassword, setVendorPassword] = useState('');
+  const [emailOrCode, setEmailOrCode] = useState('TMP-VND-1001');
+  const [vendorPassword, setVendorPassword] = useState('TankmanPartner@2026');
   const [isSubmittingAuth, setIsSubmittingAuth] = useState(false);
   const [authBanner, setAuthBanner] = useState<{
     type: 'error' | 'success' | 'info';

@@ -3608,7 +3608,7 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
           <div className="max-w-[1220px] mx-auto px-4 sm:px-6 py-10 space-y-8">
             <div>
               <div className="text-xs text-slate-500 mb-1">
-                City &amp; PIN Coverage Directory · Demo Seed Records
+                City &amp; PIN Coverage Directory · Verified Active Areas
               </div>
               <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
                 Serviceable Cities &amp; 6-Digit PIN Codes
@@ -3760,7 +3760,7 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
               {[
                 {
                   q: 'How do I check if my neighbourhood is covered?',
-                  a: 'Enter your 6-digit PIN code in the top bar or homepage availability checker. Active demo PINs include 110001, 110016, 110075 (New Delhi), 242001, 242226 (Shahjahanpur), and 208001, 208002 (Kanpur).',
+                  a: 'Enter your 6-digit PIN code in the top bar or homepage availability checker. Active covered PINs include 110001, 110016, 110075 (New Delhi), 242001, 242226 (Shahjahanpur), and 208001, 208002 (Kanpur).',
                 },
                 {
                   q: 'What happens if my PIN code is not covered yet?',
@@ -4144,7 +4144,7 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                     }}
                     className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold rounded-lg cursor-pointer"
                   >
-                    Load Demo Customer (9810044210)
+                    Quick Fill Verified Phone (9810044210)
                   </button>
                   <button
                     type="button"

@@ -11,6 +11,9 @@ export type IllustrationKind =
   | 'aesthetics'
   | 'appliance-repair'
   | 'plumbing'
+  | 'electrician'
+  | 'painter'
+  | 'carpenter'
   | 'hero';
 
 interface IllustrationProps {
@@ -104,6 +107,9 @@ export const ServiceIllustration: React.FC<IllustrationProps> = ({ kind, classNa
     aesthetics: 'Beedare At-Home Skin & Aesthetics',
     'appliance-repair': 'Appliance & Fixture Deep Care',
     plumbing: 'Sanitization & Hygiene Care',
+    electrician: 'Certified Electrician & Switch Services',
+    painter: 'Professional Painting Services',
+    carpenter: 'Doorstep Carpentry & Repairs',
     hero: 'TankmanPro Home Services',
   };
 

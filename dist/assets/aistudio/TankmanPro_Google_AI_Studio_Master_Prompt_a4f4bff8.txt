@@ -1,0 +1,159 @@
+TANKMANPRO — GOOGLE AI STUDIO MASTER BUILD PROMPT
+Version 1.0 | Greenfield build from scratch | 20 October 2026
+
+IMPORTANT CONTEXT
+I deleted the previous project. Build a completely new project from scratch. Do not refer to, restore, or assume access to any previous project files. Use the attached/provided TankmanPro PRD as the product source of truth. If the PRD cannot be attached in AI Studio, I will paste its content in this conversation.
+
+PRODUCT
+Build TankmanPro, a responsive full-stack home-services booking website for India, with an original clean and premium UI inspired by the usability patterns of leading home-service booking platforms. Do NOT clone Urban Company pixel-for-pixel. Do not use its logo, exact copy, proprietary images, layout or identity. Use TankmanPro branding.
+
+DESIGN DIRECTION
+Use a light, clean, modern home-services marketplace design: white/off-white surfaces, dark readable text, restrained teal accents, useful whitespace, clean service cards, city/PIN code selector, popular categories, transparent pricing, clear booking CTA, trust information backed by real data, and mobile-first checkout. The current product must not look like a developer dashboard or dark terminal UI. Remove all debug identity strips, demo navigation bars, raw status labels and developer-facing controls from the customer-facing experience. Make Customer, Vendor and Admin views visually consistent but role-specific.
+
+SEPARATE URLS FOR CUSTOMER / ADMIN / VENDOR — MANDATORY
+- Production customer storefront URL: https://tankmanpro.com/
+- Production Main Admin portal URL: https://admin.tankmanpro.com/login
+- Production Vendor portal URL: https://partner.tankmanpro.com/login
+- During Google AI Studio preview before custom DNS is configured, use protected fallbacks `/admin/login` and `/vendor/login` on the preview host.
+- Do not show Admin/Vendor links, tabs, dashboard buttons, role switchers, or an Active Identity/developer strip anywhere in the public customer website, including header, footer, home, service pages and customer account pages. The business owner will give the portal URLs separately to authorized people.
+- Implement hostname-aware app shells. The public hostname must render customer pages only; the Admin hostname must render only Admin UI; the partner hostname must render only Vendor UI. All use the same codebase, shared server APIs, and one authoritative Firestore database unless deployment constraints require separate frontend deployments. Never duplicate or independently seed production business data per portal.
+- Configure the domain mappings, HTTPS, Firebase Auth authorized domains, callback/password-reset URLs, exact CORS/origin allowlist and post-login redirects for all hostnames. Test sign-in and refresh/deep links on every hostname.
+- A separate URL is not security. Validate the authenticated role on every sensitive server route and Firestore operation. Customer cannot become Admin/Vendor by changing a URL; Vendor cannot access Admin; Admin-only operations remain Admin-only. Do not trust hostname or hidden navigation as authorization.
+
+
+MANDATORY STACK
+- Use Google AI Studio Build mode's supported full-stack scaffold.
+- Frontend: React + TypeScript, responsive components and a sensible router. Use Tailwind CSS and an accessible component kit only if compatible with the scaffold.
+- Backend: Node.js server-side runtime with typed, validated API endpoints and service modules.
+- Firebase Authentication for sign-in and Cloud Firestore for persistent data; enable Firebase integration when prompted, choose the project/location carefully and create explicit secure rules/indexes.
+- Role-based authorization checked on server and enforced by Firestore Security Rules. Default deny. Hiding links in the UI is NOT authorization.
+- Razorpay integration only from server-side code with secrets configured through AI Studio's Secrets feature or a suitable managed secret store.
+- Deploy through AI Studio/Cloud Run only after acceptance tests pass. Sync/export source to GitHub with checkpoints.
+
+DO NOT BUILD EVERYTHING AS ONE STATIC MOCKUP
+Work in incremental phases. Start by responding with:
+1. A concise architecture summary.
+2. The proposed folder/module structure based on the actual generated scaffold.
+3. Firestore collections, indexes and security model.
+4. API route plan.
+5. Phase-by-phase implementation plan.
+6. Risks/decisions requiring owner-provided values.
+Then implement Phase 0 and Phase 1 only. Run the available build/type checks, fix errors and summarize actual files changed. Do not claim features work unless implemented and tested. After each phase, wait for me to review before proceeding.
+
+CORE BUSINESS REQUIREMENTS
+There are three distinct role-based experiences:
+1. Customer storefront/account: browse published categories/services, select city or six-digit PIN code, see actual area coverage, view prices, select variants/add-ons, schedule a service, enter address, apply coupons, pay using a configured method, and view their own bookings.
+2. Main Admin: manage cities, PIN codes, coverage, categories, services, variants, add-ons, base/city/vendor prices, vendors, vendor-service coverage, schedules/capacity, coupons, orders, assignments/reassignments, refunds via verified payment flow, content, policies, settings, reports and audit logs. All operational values must be manageable without code changes.
+3. Vendor Portal: separate login at https://partner.tankmanpro.com/login (with `/vendor/login` as a preview fallback); vendors can see and manage only orders assigned to their own authenticated UID. Main Admin uses https://admin.tankmanpro.com/login (with `/admin/login` fallback). Neither portal is linked anywhere in the public storefront. They can accept/reject assigned work, provide rejection reason, and update allowed work status. They cannot read other vendors' orders, access global customers, change prices, alter payment/refund state, assign themselves jobs or enter the Admin console.
+
+CITY / PIN CODE ROUTING
+- Customer chooses city or enters a valid six-digit Indian PIN code.
+- Resolve PIN to Admin-configured, active service area. Never trust client-supplied city without server verification.
+- Filter services and vendor offers to active service area and service coverage.
+- Admin can define which vendors serve which cities/areas and services, vendor working schedule, capacity and active status.
+- If no matching area/vendor is available, do not create a fake confirmed booking or collect payment; show a clear unavailable state and optionally collect an opt-in waitlist request.
+- Assignment must happen server-side. Do not accept arbitrary vendor UID from the client.
+
+PRICING REQUIREMENTS — CRITICAL
+Support both modes per service/city:
+A. CITY-FIXED / AUTO-ASSIGN: customer sees one Admin-configured city price; backend assigns an eligible vendor via configured round-robin/least-active strategy.
+B. VENDOR-OFFER / CUSTOMER-SELECTS: customer sees eligible Admin-configured vendor-specific prices for that service/city and selects an offer. Keep that vendor and price attached to the checkout/booking; do not silently substitute another vendor.
+Price precedence where enabled: vendor + service + city + variant override > city + service + variant override > base price. If no valid price/policy exists, fail safely and ask Admin to configure it. Admin, not vendor, controls V1 customer prices. Store prices as integer paise. At checkout, recalculate every amount server-side and snapshot all prices/discounts on the booking. A stale or tampered client quote must be rejected or reconfirmed.
+
+SERVICE MANAGEMENT
+Admin CRUD for categories, services, descriptions, slugs, images, inclusions/exclusions, duration, variants/packages, add-ons, dynamic service questions, published/draft/archive status, city coverage and SEO fields. Archived services remain in old booking snapshots but cannot be booked for new orders. Customer catalogue reads only published records.
+
+COUPONS
+Admin can create percentage or fixed coupons with validity dates, max discount, minimum subtotal, global and per-customer use limits, active flag, city/service/category restrictions, new-customer condition, non-stackable default and redemption log. Backend is the source of truth; never trust a frontend-discount amount. Check and consume redemption eligibility atomically at booking confirmation. Abandoned or failed payments must not permanently consume a coupon unless the configured policy says so.
+
+BOOKING FLOW
+1. Location check.
+2. Choose category/service/variant/add-ons.
+3. Show city price or eligible vendor offers.
+4. Select date/time slot from configured availability.
+5. Select/add service address and contact details.
+6. Apply coupon and recalculate.
+7. Show transparent subtotal, discount, configured tax/fees, total, policies and payment method.
+8. Create a short-lived slot/booking hold server-side to avoid overbooking.
+9. Create Razorpay order server-side if online payment is enabled.
+10. Verify payment signature on server; process webhook with exact raw body, signature verification and idempotency. Never trust frontend redirect alone.
+11. Confirm booking and finalize assignment only according to the payment/booking policy. Release expired holds; if a selected vendor/slot becomes unavailable, ask customer to choose again rather than silently changing price/provider.
+12. Notify customer/vendor/Admin if delivery providers are configured.
+13. Vendor accepts/rejects then updates permitted job status; Admin can reassign with audit log.
+
+BOOKING / PAYMENT / JOB STATES
+Keep separate fields for assignment status, job status and payment status. Suggested assignment states: unassigned, assigned, accepted, rejected, reassignment_required. Suggested job states: assigned, accepted, in_progress, completed, cancelled. Payment states: pending, authorized/created where applicable, paid, failed, refund_pending, refunded, partial_refund where supported. Enforce valid transitions server-side and write audit records for privileged changes.
+
+SECURITY REQUIREMENTS
+- Never expose Razorpay secret/webhook secret in frontend bundles, public config or logs.
+- No public self-service Admin/Vendor role creation. Vendor must be created/invited and approved by Admin.
+- Initial Admin is provisioned by a controlled one-time server-side bootstrap or trusted Admin SDK process. INITIAL_ADMIN_EMAIL alone must not create a privilege escalation path.
+- Verify auth and role on every sensitive backend route.
+- Vendor list/detail/update APIs must query/verify assignedVendorId == authenticated UID on server. Do not fetch all orders then filter in the browser.
+- Customer can read only their own address/bookings/invoices.
+- Firestore rules default-deny, allow only explicit roles/fields. Test rules. If Admin SDK bypasses rules, backend must perform explicit authorization.
+- Validate inputs and sanitize output, prevent duplicate booking/payment events, rate limit sensitive endpoints where practical, protect uploaded files and never store card PAN/CVV.
+- No fake payment success, fake real-world reviews, fake certifications or fake performance metrics.
+
+RAZORPAY
+Use test mode first. Environment names if actually referenced by code: RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET, RAZORPAY_MODE and APP_BASE_URL. Use AI Studio Secrets for sensitive values, not source files. Implement server-side order creation, signature verification, a POST webhook route, raw-body webhook signature verification, event ID idempotency, safe payment state updates, Admin-only refund initiation and provider-confirmed refund tracking. Do not enable online payment in production until valid secrets/account/webhook are configured. If configuration is missing, fail safely and explain online payment is unavailable. Any local simulator must only run in development and be disabled for production.
+
+UI SCREEN CHECKLIST
+CUSTOMER:
+- Home with location selector, hero, search/availability CTA, service categories, featured service cards, how-it-works, trustworthy benefits, service-area section, FAQs and footer.
+- Services/category listing and filters; service detail with variants/add-ons/price.
+- City PIN code validation and uncovered-area state.
+- Vendor offer selector only for vendor-offer mode.
+- Slot picker, address form, coupon/price summary, payment screen, processing/failure/success states.
+- My bookings, booking detail/timeline, address book, profile, reviews, help and policies.
+ADMIN:
+- Login; dashboard; all orders; unassigned queue; booking details and assignment history.
+- City/PIN area CRUD; categories/services/variants/add-ons; pricing matrix/price preview; vendor account and coverage management; coupon CRUD; slots/capacity; customers; reviews; site content and policies; reports/export; payment/refund exception queue; settings; audit logs.
+VENDOR:
+- Separate login; assigned-order-only dashboard and filters; order detail; accept/reject with reason; update permitted job status; own schedule/profile if enabled; notes/evidence if enabled; proper Access Denied for any other vendor's booking ID.
+
+DESIGN DETAILS
+- Mobile first; test 360px, tablet and desktop. No horizontal overflow.
+- White/off-white background, readable navy/charcoal text, restrained teal accents, subtle borders, consistent spacing and typography.
+- Original TankmanPro logo/wordmark treatment; don't copy another brand.
+- Use original or licensed assets; do not make up customer reviews or numbers.
+- Clear location label in header, service images, actual dynamic pricing, honest empty/error/loading states and accessible focus/labels.
+- Normal customer pages must not show debug identity banners, developer shortcuts, environment variables or Admin/Vendor controls.
+- Dashboards use clean light UI with sidebar/top navigation on desktop and accessible mobile drawer/cards on small screens.
+
+DATABASE COLLECTION PLAN
+Propose normalized/queryable Firestore collections including cities, serviceAreas, categories, services, variants/add-ons (or subcollections), vendors, vendorCoverage, priceOverrides, slotPolicies/slotHolds, bookings, payments, coupons, couponRedemptions, reviews, notifications, auditLogs and non-secret siteSettings. Keep a protected user profile/role model. Do not embed all bookings into one user or vendor document. Add necessary query indexes. Each booking stores immutable snapshots of service title, variant, add-ons, address, chosen location, vendor, price breakdown, coupon and important timestamps.
+
+API MODULES
+Create clear modules for auth/roles, locations, catalog, pricing, vendors, slots, bookings, assignment, coupons, Razorpay payments/webhooks, notifications, Admin reporting and audit logs. Implement typed input validation and consistent errors. Suggested routes should be adapted to the current scaffold; at minimum expose public area/catalog/quote, customer create/list/detail/cancel bookings, vendor assigned-order list/detail/status endpoints, Admin CRUD/reassign/report endpoints, Razorpay create/verify/webhook and coupon validate.
+
+TESTS THAT MUST PASS BEFORE SAYING “DONE”
+1. Delhi and Shahjahanpur test PINs map only to configured active areas.
+2. An uncovered PIN cannot complete paid booking.
+3. City and vendor price overrides return the correct authoritative amount.
+4. A customer-selected offer cannot silently change vendor or price.
+5. Auto-assignment only chooses active, eligible vendors in the proper city/area who support the service and slot.
+6. No eligible vendor means unassigned/admin review; no false success.
+7. Vendor A cannot read/update Vendor B’s booking by URL/document ID/API payload.
+8. Customer A cannot read Customer B’s profile/address/booking/invoice.
+9. Public user cannot self-promote to Admin or Vendor.
+10. Expired/restricted/over-limit coupons fail server-side.
+11. Browser-tampered amount/discount/role/status is ignored or rejected.
+12. Invalid Razorpay signature and duplicate webhook events are rejected/idempotent.
+13. Concurrent slot booking cannot overbook capacity.
+14. Invalid job status transition is rejected and logged.
+15. All primary screens work on mobile/tablet/desktop; no developer identity strip remains in customer UI.
+
+IMPLEMENTATION PHASES
+Phase 0: inspect AI Studio scaffold and present architecture, repo structure, database schema, API plan and risk list. Implement scaffold/readme/types only.
+Phase 1: original responsive light UI for public customer screens using clearly labeled demo data.
+Phase 2: Firebase Auth, Firestore, rules/indexes, role model and secure first Admin setup.
+Phase 3: real Admin CRUD for cities, PINs, service catalog, vendors, coverage and prices.
+Phase 4: server pricing resolver, two pricing modes and coupons with tests.
+Phase 5: booking slots, holds, booking lifecycle and vendor assignment/portal with cross-role security tests.
+Phase 6: Razorpay test mode, server signature verification, webhook, idempotency, refund handling and notification abstraction.
+Phase 7: customer booking history, Admin reports, invoices, reviews, responsive/accessibility polish.
+Phase 8: full P0 test suite, security review, deployment checklist, README and launch readiness.
+
+FIRST ACTION NOW
+Do not attempt a gigantic unverified code dump. First return the architecture and a phase plan, then build Phase 0 and Phase 1 only. After implementation, run the available build/type checks and fix errors. Clearly state what is implemented, what is mock/demo, and what still needs Firebase or Razorpay configuration. Wait for my review before moving to the next phase.

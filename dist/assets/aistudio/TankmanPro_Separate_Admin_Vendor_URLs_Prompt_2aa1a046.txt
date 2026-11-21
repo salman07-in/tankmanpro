@@ -1,0 +1,24 @@
+TANKMANPRO — SEPARATE ADMIN & VENDOR URLS REQUIREMENT
+
+This is a mandatory product requirement. Implement it in the existing newly-created TankmanPro codebase. Do not rebuild the whole app or remove completed work; inspect the current scaffold first.
+
+Production URLs:
+- Customer website: https://tankmanpro.com/
+- Main Admin portal: https://admin.tankmanpro.com/login
+- Vendor portal: https://partner.tankmanpro.com/login
+
+During Google AI Studio preview, until custom domains are configured, also support these protected fallback paths on the preview hostname:
+- /admin/login and /admin/*
+- /vendor/login and /vendor/*
+
+Requirements:
+1. The public customer site must not show Admin/Vendor links, tabs, buttons, identity strips, developer shortcuts or role switchers anywhere: not in header, footer, homepage, service pages or customer-account screens. The business owner will share portal URLs separately with authorized staff/vendors.
+2. Implement hostname-aware app shells: tankmanpro.com only renders customer storefront/account UI; admin.tankmanpro.com only renders Admin UI; partner.tankmanpro.com only renders Vendor UI. When deployed as a single host in Preview, use the fallback path routing above.
+3. Use one shared backend/API and one authoritative Firestore database for all portals. Do not create three disconnected databases or duplicate business records.
+4. Admin login is available only to users with an Admin role; vendor login only to approved active Vendor accounts. Redirect wrong-role users to an appropriate forbidden/login screen.
+5. URL separation is not a security boundary. Verify Firebase identity and role on every sensitive API and Firestore operation. A Vendor must never access Admin APIs or another Vendor's orders by changing URL, booking ID, query parameter or request payload. A public user must never self-promote.
+6. Document HTTPS/domain mapping, Firebase Authentication authorized domains, auth callback/password reset URLs, exact CORS origins, login redirects and deployment steps for the three hostnames. Browser storage is origin-specific; do not assume login state automatically transfers between subdomains.
+7. Add automated/manual test cases for correct host rendering, deep links, refresh, logout, wrong-role access, cross-vendor order access, and the absence of portal links in the customer UI.
+8. If custom domain mapping cannot be configured in AI Studio itself, implement code-side host/path routing and clearly list the manual DNS/Cloud Run steps. Do not claim that the production subdomains are live until deployment verifies them.
+
+Return a concise summary of changed files, the implemented routes, tests run, and any domain configuration that still requires manual work. Do not ask me to paste any API secrets into source code or chat.
