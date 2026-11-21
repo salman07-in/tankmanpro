@@ -1555,8 +1555,7 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                         Home services at your doorstep
                       </h1>
                       <p className="text-sm text-slate-600 mt-2">
-                        Mechanized water tank cleaning, AC service, bathroom &amp; kitchen deep
-                        cleaning, sofa shampooing, car wash, and Beedare skin aesthetics.
+                        Mechanized water tank cleaning, car &amp; bike wash, sofa &amp; carpet shampooing, AC service, electrician, and plumbing.
                       </p>
                     </div>
 
@@ -2087,55 +2086,65 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
               </div>
             </section>
 
-            {/* ======================== URBAN COMPANY RAIL 3: BEEDARE BY TANKMANPRO AESTHETICS ======================== */}
+            {/* ======================== URBAN COMPANY RAIL 3: SIGNATURE HYGIENE SERVICES ======================== */}
             <section className="py-10 lg:py-14 border-b border-slate-200">
               <div className="max-w-[1220px] mx-auto px-4 sm:px-6">
                 <div className="bg-slate-950 text-white rounded-2xl p-6 sm:p-8 lg:p-10">
                   <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 mb-8">
                     <div>
                       <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-300 mb-2">
-                        <Sparkles className="w-4 h-4" />
-                        <span>Beedare by TankmanPro · Clinical Aesthetics at Home</span>
+                        <ShieldCheck className="w-4 h-4 text-teal-400" />
+                        <span>TankmanPro Signature Specialists · On-Demand Doorstep Care</span>
                       </div>
                       <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                        Advanced Skin Peels, Laser &amp; Dermapen at Home
+                        Mechanized Tank, Vehicle Wash &amp; Sofa Cleaning
                       </h2>
                       <p className="text-xs sm:text-sm text-slate-300 mt-1.5 max-w-2xl">
-                        Professional aesthetic care in the comfort of your home — Glycolic, Vitamin
-                        C &amp; Salicylic peels, TCA pigmentation care, and collagen microneedling.
+                        Scientific 4-stage water tank dewatering, doorstep car &amp; bike active foam wash, and fabric wet-extraction sofa sanitization with certified equipment.
                       </p>
                     </div>
                     <button
                       type="button"
-                      onClick={() => openServiceModal(DEMO_SERVICES[7])}
+                      onClick={() => onNavigate('/services')}
                       className="px-4 py-2.5 bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-extrabold rounded-lg transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                     >
-                      Explore Beedare Treatments
+                      Explore All Services →
                     </button>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
                       {
-                        variantId: 'var_plumb_standard',
-                        title: 'Glycolic / Vitamin C / Salicylic Peel',
-                        desc: 'Skin resurfacing, brightening, even tone & acne control',
-                        price: '₹1,999',
-                        img: '/assets/tankmanpro/chemical-peel.jpg',
+                        service: DEMO_SERVICES.find((s) => s.id === 'srv_tank_cleaning') || DEMO_SERVICES[0],
+                        variantId: 'var_tank_1000',
+                        title: 'Water Tank Cleaning (Up to 1000L)',
+                        desc: '4-stage dewatering, rotary jet scrub & UV sterilize',
+                        price: '₹499',
+                        img: 'https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg',
                       },
                       {
-                        variantId: 'var_prp_laser',
-                        title: 'Full Face Laser / PRP Rejuvenation',
-                        desc: 'At-home diode laser hair reduction or PRP facial therapy',
-                        price: '₹3,999',
-                        img: '/assets/tankmanpro/laser-skin.jpg',
+                        service: DEMO_SERVICES.find((s) => s.id === 'srv_car_wash') || DEMO_SERVICES[1],
+                        variantId: 'var_car_standard',
+                        title: 'Doorstep Car Deep Wash',
+                        desc: 'Active foam jet bath, tyre shine & interior vacuum',
+                        price: '₹399',
+                        img: 'https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175929.jpg',
                       },
                       {
-                        variantId: 'var_dermapen',
-                        title: 'Dermapen / Micro-Needle Therapy',
-                        desc: 'Collagen induction, scar reduction & skin texture renewal',
-                        price: '₹4,999',
-                        img: '/assets/tankmanpro/aesthetic-facial.jpg',
+                        service: DEMO_SERVICES.find((s) => s.id === 'srv_bike_wash') || DEMO_SERVICES[2],
+                        variantId: 'var_bike_standard',
+                        title: 'Two-Wheeler / Bike Foam Wash',
+                        desc: 'Pressure jet foam bath, chain degrease & polish',
+                        price: '₹199',
+                        img: 'https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175929.jpg',
+                      },
+                      {
+                        service: DEMO_SERVICES.find((s) => s.id === 'srv_sofa_mattress_clean') || DEMO_SERVICES[3],
+                        variantId: 'var_sofa_5seat',
+                        title: 'Sofa Deep Shampooing',
+                        desc: 'Anti-dust mite dry vacuum & wet extraction scrub',
+                        price: '₹399',
+                        img: 'https://tankmanpro.com/wp-content/uploads/2023/12/How-Do-we-Clean-Your-Sofa.jpg',
                       },
                     ].map((card) => (
                       <div
@@ -2159,10 +2168,10 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
                           </span>
                           <button
                             type="button"
-                            onClick={() => openServiceModal(DEMO_SERVICES[7], card.variantId)}
-                            className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-950 text-xs font-bold rounded-lg cursor-pointer"
+                            onClick={() => card.service && openServiceModal(card.service, card.variantId)}
+                            className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-950 text-xs font-bold rounded-lg cursor-pointer transition-colors"
                           >
-                            + Add Session
+                            + Book Service
                           </button>
                         </div>
                       </div>
@@ -3731,13 +3740,12 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
           <div className="max-w-[900px] mx-auto px-4 sm:px-6 py-10 space-y-6">
             <div className="text-xs text-slate-500">About TankmanPro</div>
             <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
-              Structured Home Hygiene, Repair &amp; Aesthetic Care
+              Structured Home Hygiene, Maintenance &amp; Repair Care
             </h1>
             <p className="text-sm text-slate-600 leading-relaxed">
               TankmanPro connects households with area-verified service specialists for mechanized
-              overhead and underground water tank cleaning, split/window AC servicing, bathroom and
-              kitchen deep cleaning, sofa/mattress shampooing, vehicle wash, and Beedare at-home
-              aesthetic treatments.
+              overhead and underground water tank cleaning, doorstep car &amp; bike wash, sofa and carpet
+              deep shampooing, electrical, plumbing, and complete home care.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
               <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl">
@@ -4474,8 +4482,8 @@ export const CustomerShell: React.FC<CustomerShellProps> = ({
             <div className="space-y-3">
               <div className="text-base font-extrabold text-slate-950 font-display">TankmanPro</div>
               <p className="text-slate-600 leading-relaxed">
-                Doorstep home services for mechanized water tank cleaning, AC service, bathroom &amp;
-                kitchen deep cleaning, sofa shampooing, car wash, and Beedare skin aesthetics.
+                Doorstep home services for mechanized water tank cleaning, car &amp; bike wash,
+                sofa shampooing, electrical, plumbing, and deep home sanitization.
               </p>
               <div className="pt-2 space-y-2 border-t border-slate-200/80">
                 <a
