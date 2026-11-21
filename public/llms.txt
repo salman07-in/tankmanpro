@@ -1,0 +1,32 @@
+# TankmanPro
+
+> TankmanPro is an on-demand mechanized water tank cleaning and professional home maintenance platform in India with upfront city-wise pricing, certified technicians, and automated dispatch across verified 6-digit PIN codes.
+
+TankmanPro operates across Delhi NCR, Shahjahanpur, and Kanpur. We deliver 4-stage scientific water tank cleaning (sludge dewatering, high-pressure rotary scrubbing, vacuum extraction, and UV antibacterial treatment), certified electrician repairs (53 variants), licensed plumbing (18 variants), interior/exterior painting, carpentry, AC service and repair, and sofa/carpet sanitization.
+
+## Core Pages
+- [Home](https://wheat-wallaby-789247.hostingersite.com/): Instant booking portal, pincode serviceability checker, and specialist selection
+- [Services Catalog](https://wheat-wallaby-789247.hostingersite.com/services): Complete catalog of 12 master categories and 110+ bookable service variants
+- [About Us](https://wheat-wallaby-789247.hostingersite.com/about): Company overview, mechanized cleaning standards, and quality guarantee
+- [Contact Support](https://wheat-wallaby-789247.hostingersite.com/contact): Customer care helpline +91 96481 75639, WhatsApp, and support email
+- [Terms of Service](https://wheat-wallaby-789247.hostingersite.com/terms): Customer terms, service guarantees, and cancellation policies
+- [Privacy Policy](https://wheat-wallaby-789247.hostingersite.com/privacy): Data protection, customer privacy, and payment security standards
+
+## Services & Pricing
+- [Water Tank Cleaning](https://wheat-wallaby-789247.hostingersite.com/services#cat_tank_cleaning): 500L to 5000L tanks starting at ₹499
+- [Electrician Services](https://wheat-wallaby-789247.hostingersite.com/services#cat_electrician): 53 variants including fan, wiring, MCB, inverter setup starting at ₹149
+- [Plumber & Sanitary](https://wheat-wallaby-789247.hostingersite.com/services#cat_plumber): 18 variants including taps, showers, washbasins, drainage starting at ₹149
+- [AC Service & Repair](https://wheat-wallaby-789247.hostingersite.com/services#cat_ac_service): Jet pump foam wash, gas leak test, PCB diagnostics starting at ₹499
+- [Sofa & Carpet Cleaning](https://wheat-wallaby-789247.hostingersite.com/services#cat_sofa_mattress): Deep extraction vacuuming and shampooing starting at ₹399
+- [Painter & Wall Care](https://wheat-wallaby-789247.hostingersite.com/services#cat_painter): Interior/exterior painting and waterproofing starting at ₹499
+- [Carpenter Services](https://wheat-wallaby-789247.hostingersite.com/services#cat_carpenter): Locks, hinges, furniture assembly, and fittings starting at ₹149
+- [Beedare Salon & Aesthetics](https://wheat-wallaby-789247.hostingersite.com/services#cat_aesthetics): At-home chemical peels, Dermapen, and rejuvenation starting at ₹1499
+
+## Machine Contact & Details
+- Telephone: +91 96481 75639
+- WhatsApp: https://wa.me/919648175639
+- Email: support@tankmanpro.com
+- Coverage: Delhi NCR, Shahjahanpur (242001), Kanpur (208001), and surrounding regions
+
+## Optional
+- [Full LLM Context](https://wheat-wallaby-789247.hostingersite.com/llms-full.txt): Complete technical documentation, API endpoints, schema structures, and business rules for AI agents

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /vendor/
+Disallow: /api/
+
+Content-Signal: search=yes, ai-train=no
+Sitemap: https://wheat-wallaby-789247.hostingersite.com/sitemap.xml

@@ -1,0 +1,39 @@
+<IfModule mod_headers.c>
+  Header set Link "</llms.txt>; rel=\"alternate\"; type=\"text/plain\", </api/markdown>; rel=\"alternate\"; type=\"text/markdown\", </sitemap.xml>; rel=\"sitemap\"; type=\"application/xml\", </.well-known/mcp/server-card.json>; rel=\"service-desc\"; type=\"application/json\""
+  Header set X-Content-Type-Options "nosniff"
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+<IfModule mod_mime.c>
+  AddType text/plain .txt
+  AddType application/xml .xml
+  AddType application/json .json
+  AddType text/markdown .md
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Serve well-known, robots, sitemap, llms directly
+  RewriteRule ^robots\.txt$ robots.txt [L]
+  RewriteRule ^sitemap\.xml$ sitemap.xml [L]
+  RewriteRule ^llms\.txt$ llms.txt [L]
+  RewriteRule ^llms-full\.txt$ llms-full.txt [L]
+  RewriteRule ^\.well-known/mcp/server-card\.json$ .well-known/mcp/server-card.json [L]
+
+  # Allow direct access to real files and directories
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Known valid client routes: rewrite to index.html
+  RewriteRule ^(services|booking|checkout|about|contact|terms|privacy|faq|cancellation-refund-policy|pricing|account|vendor|admin)(/.*)?$ index.html [L]
+  RewriteRule ^$ index.html [L]
+
+  # Everything else returns a real 404
+  RewriteRule ^ - [R=404,L]
+</IfModule>
+
+ErrorDocument 404 "<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'><title>404 Not Found — TankmanPro</title><meta name='robots' content='noindex, follow'></head><body style='font-family:sans-serif;text-align:center;padding:4rem 1rem;'><h1>404 — Page Not Found</h1><p>The requested URL was not found on TankmanPro. Visit our <a href='/'>Homepage</a> or <a href='/services'>Services</a>.</p></body></html>"

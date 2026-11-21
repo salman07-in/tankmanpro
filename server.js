@@ -1,5 +1,6 @@
 // server.ts
 import dotenv from "dotenv";
+import fs2 from "fs";
 import crypto2 from "crypto";
 import express from "express";
 import path2 from "path";
@@ -7749,18 +7750,242 @@ async function startServer() {
       message: "Your inquiry has been logged."
     });
   });
-  if (process.env.NODE_ENV !== "production") {
+  const TANKMAN_HOMEPAGE_MARKDOWN = `# TankmanPro \u2014 Professional Water Tank Cleaning & Home Maintenance Services
+
+> On-demand mechanized water tank cleaning, certified electrician repairs, licensed plumbing, interior/exterior painting, carpentry, and AC service across Delhi NCR, Shahjahanpur, and Kanpur with transparent city-wise pricing.
+
+## Immediate Contact & Machine Details
+- **Helpline / Phone:** +91 96481 75639
+- **WhatsApp Direct Booking:** https://wa.me/919648175639
+- **Email:** support@tankmanpro.com
+- **Operating Hours:** 07:00 \u2013 21:00 IST (All 7 Days)
+- **Headquarters:** Shahjahanpur, Uttar Pradesh 242001, India
+- **Canonical Website:** https://wheat-wallaby-789247.hostingersite.com
+
+## 12 Core Service Categories & Pricing
+1. **Water Tank Cleaning (cat_tank_cleaning):** 4-stage scientific mechanized process (sludge dewatering, high pressure rotary scrubbing, vacuum extraction, UV antibacterial treatment). 500L to 5000L tanks. Starting from \u20B9499.
+2. **Electrician Services (cat_electrician):** 53 bookable variants including switchboards, fans, concealed wiring, MCB distribution, inverter setup. Starting from \u20B9149.
+3. **Plumber & Sanitary Services (cat_plumber):** 18 variants including taps, showers, washbasins, waste pipes, bathroom drainage, grouting. Starting from \u20B9149.
+4. **AC Service & Repair (cat_ac_service):** Split and window AC jet foam cleaning, gas leakage check, cooling diagnostics. Starting from \u20B9499.
+5. **Sofa, Mattress & Carpet Cleaning (cat_sofa_mattress):** Wet vacuum extraction, fabric shampooing, and dust-mite sanitization. Starting from \u20B9399.
+6. **Painter & Wall Care (cat_painter):** Interior accent walls, full flat painting, exterior waterproofing, damp touch-ups. Starting from \u20B9499.
+7. **Carpenter Services (cat_carpenter):** Door locks, modular hinges, furniture assembly, curtain rod and wall drillings. Starting from \u20B9149.
+8. **Kitchen Deep Cleaning (cat_kitchen):** Degreasing chimney filters, refrigerator interior/exterior, stove & sink descaling. Starting from \u20B9699.
+9. **Bathroom & Tile Cleaning (cat_bathroom):** Machine scrubbing, limescale removal, grout brightening, and toilet sanitization. Starting from \u20B9499.
+10. **Fan, Floor & Home Care (cat_fan_appliances):** High-reach ceiling fan cleaning, microfiber floor buffing. Starting from \u20B9199.
+11. **Car & Bike Wash (cat_vehicle_wash):** Doorstep foam wash, exterior wax, interior vacuuming. Starting from \u20B9199.
+12. **Beedare Skin & Aesthetics (cat_aesthetics):** At-home professional chemical peels, Dermapen rejuvenation, aesthetic salon care. Starting from \u20B91499.
+
+## Verified Service Locations
+- **Delhi NCR:** 110001\u2013110096, Noida, Gurgaon
+- **Shahjahanpur:** 242001 and surrounding sectors
+- **Kanpur:** 208001\u2013208027
+
+## Machine-Readable Resources
+- [llms.txt](https://wheat-wallaby-789247.hostingersite.com/llms.txt): Agent discovery document
+- [llms-full.txt](https://wheat-wallaby-789247.hostingersite.com/llms-full.txt): Full documentation and pricing tables
+- [sitemap.xml](https://wheat-wallaby-789247.hostingersite.com/sitemap.xml): XML Sitemap
+- [MCP Server Card](https://wheat-wallaby-789247.hostingersite.com/.well-known/mcp/server-card.json): Model Context Protocol metadata
+`;
+  const AGENT_LINK_HEADER = [
+    '</llms.txt>; rel="alternate"; type="text/plain"',
+    '</api/markdown>; rel="alternate"; type="text/markdown"',
+    '</sitemap.xml>; rel="sitemap"; type="application/xml"',
+    '</.well-known/mcp/server-card.json>; rel="service-desc"; type="application/json"'
+  ].join(", ");
+  app2.get("/robots.txt", (_req, res) => {
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    const robotsPath = path2.join(__dirname2, "public", "robots.txt");
+    if (fs2.existsSync(robotsPath)) {
+      res.sendFile(robotsPath);
+    } else {
+      res.send(`User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /vendor/
+Disallow: /api/
+
+Content-Signal: search=yes, ai-train=no
+Sitemap: https://wheat-wallaby-789247.hostingersite.com/sitemap.xml
+`);
+    }
+  });
+  app2.get("/sitemap.xml", (_req, res) => {
+    res.setHeader("Content-Type", "application/xml; charset=utf-8");
+    const sitemapPath = path2.join(__dirname2, "public", "sitemap.xml");
+    if (fs2.existsSync(sitemapPath)) {
+      res.sendFile(sitemapPath);
+    } else {
+      res.status(404).send("<error>Sitemap not found</error>");
+    }
+  });
+  app2.get("/llms.txt", (_req, res) => {
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Link", AGENT_LINK_HEADER);
+    const llmsPath = path2.join(__dirname2, "public", "llms.txt");
+    if (fs2.existsSync(llmsPath)) {
+      res.sendFile(llmsPath);
+    } else {
+      res.send(TANKMAN_HOMEPAGE_MARKDOWN);
+    }
+  });
+  app2.get("/llms-full.txt", (_req, res) => {
+    res.setHeader("Content-Type", "text/plain; charset=utf-8");
+    res.setHeader("Link", AGENT_LINK_HEADER);
+    const llmsFullPath = path2.join(__dirname2, "public", "llms-full.txt");
+    if (fs2.existsSync(llmsFullPath)) {
+      res.sendFile(llmsFullPath);
+    } else {
+      res.send(TANKMAN_HOMEPAGE_MARKDOWN);
+    }
+  });
+  app2.get("/.well-known/mcp/server-card.json", (_req, res) => {
+    res.setHeader("Content-Type", "application/json; charset=utf-8");
+    const cardPath = path2.join(__dirname2, "public", ".well-known", "mcp", "server-card.json");
+    if (fs2.existsSync(cardPath)) {
+      res.sendFile(cardPath);
+    } else {
+      res.json({
+        $schema: "https://modelcontextprotocol.io/schemas/server-card.json",
+        name: "tankmanpro-server",
+        version: "1.0.0",
+        description: "TankmanPro Home Services MCP Server",
+        homepage: "https://wheat-wallaby-789247.hostingersite.com",
+        endpoint: "https://wheat-wallaby-789247.hostingersite.com/api/mcp"
+      });
+    }
+  });
+  app2.get("/api/markdown", (_req, res) => {
+    res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+    res.setHeader("Link", AGENT_LINK_HEADER);
+    res.send(TANKMAN_HOMEPAGE_MARKDOWN);
+  });
+  app2.get("/api/mcp", (_req, res) => {
+    res.json({
+      protocol: "mcp-json-rpc",
+      version: "1.0.0",
+      server: "tankmanpro-server",
+      tools: [
+        {
+          name: "search_services",
+          description: "Search available home services by keyword or category"
+        },
+        {
+          name: "check_serviceability",
+          description: "Check if a 6-digit Indian PIN code is covered"
+        },
+        {
+          name: "calculate_quote",
+          description: "Authoritative pricing calculator in paise for service variants"
+        },
+        {
+          name: "get_contact_info",
+          description: "Customer helpline, WhatsApp, and email contact information"
+        }
+      ]
+    });
+  });
+  const VALID_CLIENT_ROUTES = /* @__PURE__ */ new Set([
+    "/",
+    "",
+    "/services",
+    "/booking",
+    "/checkout",
+    "/about",
+    "/contact",
+    "/terms",
+    "/privacy",
+    "/faq",
+    "/cancellation-refund-policy",
+    "/pricing",
+    "/account",
+    "/account/addresses",
+    "/account/reviews",
+    "/orders",
+    "/help",
+    "/vendor",
+    "/vendor/login",
+    "/admin",
+    "/admin/login"
+  ]);
+  const isValidClientRoute = (rawPath) => {
+    const clean = rawPath.split("?")[0].replace(/\/+$/, "") || "/";
+    if (VALID_CLIENT_ROUTES.has(clean)) return true;
+    if (clean.startsWith("/services/") || clean.startsWith("/category/")) return true;
+    if (clean.startsWith("/vendor/") || clean.startsWith("/admin/")) return true;
+    if (clean.startsWith("/account/")) return true;
+    return false;
+  };
+  const renderNotFoundHtml = (reqPath) => `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>404 Not Found \u2014 TankmanPro</title>
+  <meta name="robots" content="noindex, follow">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: system-ui, -apple-system, sans-serif; text-align: center; padding: 4rem 1rem; color: #1e293b; background: #f8fafc; }
+    .card { max-width: 28rem; margin: 0 auto; background: white; padding: 2.5rem 2rem; border-radius: 1rem; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+    h1 { font-size: 2.5rem; font-weight: 800; color: #0f766e; margin: 0 0 0.5rem; }
+    h2 { font-size: 1.25rem; font-weight: 600; color: #0f172a; margin: 0 0 1rem; }
+    p { color: #64748b; font-size: 0.95rem; margin-bottom: 1.75rem; line-height: 1.5; }
+    .btn { display: inline-block; background: #0f766e; color: white; padding: 0.625rem 1.25rem; border-radius: 0.5rem; text-decoration: none; font-weight: 600; font-size: 0.875rem; margin: 0 0.25rem; }
+    .btn-secondary { background: white; color: #334155; border: 1px solid #cbd5e1; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>404</h1>
+    <h2>Page Not Found</h2>
+    <p>The URL <code>${reqPath.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code> was not found on TankmanPro. Agents and crawlers treat HTTP 404 as non-existent.</p>
+    <a href="/" class="btn">Return to Homepage</a>
+    <a href="/services" class="btn btn-secondary">Browse Services</a>
+  </div>
+</body>
+</html>`;
+  if (process.env.NODE_ENV === "production") {
+    const distPath = path2.join(__dirname2, "dist");
+    app2.use(express.static(distPath));
+    app2.get("*", (req, res) => {
+      const acceptHeader = req.headers.accept || "";
+      if (acceptHeader.includes("text/markdown") || acceptHeader.includes("text/x-markdown") || req.query.format === "markdown") {
+        res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+        res.setHeader("Link", AGENT_LINK_HEADER);
+        res.send(TANKMAN_HOMEPAGE_MARKDOWN);
+        return;
+      }
+      if (!isValidClientRoute(req.path)) {
+        res.status(404).setHeader("Content-Type", "text/html; charset=utf-8").send(renderNotFoundHtml(req.path));
+        return;
+      }
+      res.setHeader("Link", AGENT_LINK_HEADER);
+      res.sendFile(path2.join(distPath, "index.html"));
+    });
+  } else {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa"
     });
-    app2.use(vite.middlewares);
-  } else {
-    const distPath = path2.join(__dirname2, "dist");
-    app2.use(express.static(distPath));
-    app2.get("*", (_req, res) => {
-      res.sendFile(path2.join(distPath, "index.html"));
+    app2.use((req, res, next) => {
+      if (req.method !== "GET") return next();
+      const acceptHeader = req.headers.accept || "";
+      if (acceptHeader.includes("text/markdown") || acceptHeader.includes("text/x-markdown") || req.query.format === "markdown") {
+        res.setHeader("Content-Type", "text/markdown; charset=utf-8");
+        res.setHeader("Link", AGENT_LINK_HEADER);
+        res.send(TANKMAN_HOMEPAGE_MARKDOWN);
+        return;
+      }
+      if (req.path.startsWith("/@") || req.path.startsWith("/src/") || req.path.startsWith("/node_modules/") || req.path.startsWith("/public/") || req.path.includes(".")) {
+        return next();
+      }
+      if (!isValidClientRoute(req.path)) {
+        res.status(404).setHeader("Content-Type", "text/html; charset=utf-8").send(renderNotFoundHtml(req.path));
+        return;
+      }
+      res.setHeader("Link", AGENT_LINK_HEADER);
+      next();
     });
+    app2.use(vite.middlewares);
   }
   app2.listen(PORT, "0.0.0.0", () => {
     console.log(`TankmanPro server listening on http://localhost:${PORT}`);

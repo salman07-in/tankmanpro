@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   resolvePortalFromLocation,
   buildPortalHref,
@@ -770,6 +772,50 @@ test('WhatsApp 1-Click Engine: sanitizes Indian phone numbers and builds pre-fil
   const completedMsg = buildCustomerJobCompletedWhatsApp(sampleBooking, 'https://tankmanpro.com');
   assert.ok(completedMsg.includes('SERVICE COMPLETED'));
   assert.ok(completedMsg.includes('7-Day TankmanPro Service Guarantee'));
+});
+
+test('Agent-Readiness & Discovery: validates robots.txt, sitemap, llms.txt, MCP card, and HTML structured data', () => {
+  // 1. robots.txt
+  const robots = fs.readFileSync(path.resolve('public/robots.txt'), 'utf8');
+  assert.ok(robots.includes('Content-Signal: search=yes, ai-train=no'), 'robots.txt must declare Content-Signal');
+  assert.ok(robots.includes('Sitemap: https://wheat-wallaby-789247.hostingersite.com/sitemap.xml'), 'robots.txt must declare Sitemap');
+
+  // 2. sitemap.xml
+  const sitemap = fs.readFileSync(path.resolve('public/sitemap.xml'), 'utf8');
+  assert.ok(sitemap.includes('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'));
+  assert.ok(sitemap.includes('https://wheat-wallaby-789247.hostingersite.com/services'));
+  assert.ok(sitemap.includes('https://wheat-wallaby-789247.hostingersite.com/about'));
+
+  // 3. llms.txt
+  const llms = fs.readFileSync(path.resolve('public/llms.txt'), 'utf8');
+  assert.ok(llms.startsWith('# TankmanPro'), 'llms.txt must have top-level # heading');
+  assert.ok(llms.includes('> '), 'llms.txt must have summary quote');
+  assert.ok(llms.includes('[Services Catalog](https://wheat-wallaby-789247.hostingersite.com/services)'));
+  assert.ok(llms.includes('+91 96481 75639'));
+
+  // 4. MCP Server Card
+  const serverCard = JSON.parse(fs.readFileSync(path.resolve('public/.well-known/mcp/server-card.json'), 'utf8'));
+  assert.equal(serverCard.name, 'tankmanpro-server');
+  assert.ok(Array.isArray(serverCard.tools));
+  assert.ok(serverCard.tools.length >= 3);
+
+  // 5. index.html Head & Body Requirements
+  const indexHtml = fs.readFileSync(path.resolve('index.html'), 'utf8');
+  assert.ok(indexHtml.includes('<link rel="canonical" href="https://wheat-wallaby-789247.hostingersite.com/" />'), 'Missing canonical tag');
+  assert.ok(indexHtml.includes('<meta name="description"'), 'Missing meta description');
+  assert.ok(indexHtml.includes('<script type="application/ld+json">'), 'Missing JSON-LD');
+  assert.ok(indexHtml.includes('"HomeAndConstructionBusiness"') || indexHtml.includes('"LocalBusiness"'), 'Missing LocalBusiness schema');
+  assert.ok(indexHtml.includes('"sameAs"'), 'Missing sameAs external profiles');
+  assert.ok(indexHtml.includes('https://instagram.com/tankmanpro'));
+  assert.ok(indexHtml.includes('https://wa.me/919648175639'));
+  assert.ok(indexHtml.includes('tel:+919648175639'), 'Missing machine-readable tel: link');
+  assert.ok(indexHtml.includes('mailto:support@tankmanpro.com'), 'Missing machine-readable mailto: link');
+  assert.ok(indexHtml.includes('href="/about"'), 'Missing about link');
+  assert.ok(indexHtml.includes('href="/contact"'), 'Missing contact link');
+  assert.ok(indexHtml.includes('href="/terms"'), 'Missing terms link');
+  assert.ok(indexHtml.includes('href="/privacy"'), 'Missing privacy link');
+  assert.ok(indexHtml.includes('<h1>TankmanPro'), 'Missing <h1> heading');
+  assert.ok(indexHtml.includes('navigator.modelContext.registerTool'), 'Missing WebMCP registration');
 });
 
 

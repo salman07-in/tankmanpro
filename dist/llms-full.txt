@@ -1,0 +1,45 @@
+# TankmanPro Full Technical & Service Documentation for AI Agents
+
+> Authoritative reference on TankmanPro on-demand home maintenance ecosystem, API routes, pricing engine, deterministic pricing matrices, and MCP tools.
+
+## 1. Company Profile
+- Legal Entity: TankmanPro India
+- Brand: TankmanPro
+- Headquarters: Shahjahanpur, Uttar Pradesh 242001, India
+- Phone: +91 96481 75639
+- WhatsApp: https://wa.me/919648175639
+- Email: support@tankmanpro.com
+- Domain: https://wheat-wallaby-789247.hostingersite.com
+- Production Portal: https://tankmanpro.com
+
+## 2. Core Service Offerings & Pricing Rules
+Pricing is calculated deterministically in integer Indian Paise (1 INR = 100 paise) following strict precedence:
+1. Vendor Approved Override
+2. City Override (Delhi, Shahjahanpur, Kanpur)
+3. Base Catalog Price
+
+### Master Categories (12 Categories, 110 Bookable Variants):
+1. Water Tank Cleaning (cat_tank_cleaning): 500L, 1000L, 1500L, 2000L, 5000L overhead & underground tanks.
+2. Electrician Services (cat_electrician): 53 variants covering switchboards, ceiling fans, concealed wiring, MCB distribution boards, smart switches, inverters.
+3. Plumber & Sanitary (cat_plumber): 18 variants covering tap replacement, shower installations, washbasin repair, siphon/waste pipe, bathroom drainage, RO water filter connections.
+4. Painter & Wall Care (cat_painter): 1-wall accent, full room, exterior weatherproof coating, waterproof primer coats.
+5. Carpenter Services (cat_carpenter): Lock installation, bed assembly, modular kitchen hinge adjustment, curtain rod drilling.
+6. AC Service & Repair (cat_ac_service): Split AC jet pump service, window AC deep wash, gas leak check, PCB diagnostics.
+7. Sofa, Mattress & Carpet (cat_sofa_mattress): 3-seater, 5-seater sofa foam wash, single/queen/king mattress vacuuming, carpet extraction.
+8. Kitchen Deep Cleaning (cat_kitchen): Chimney degreasing, refrigerator interior/exterior cleaning, modular cabinet scrub.
+9. Bathroom & Tile Cleaning (cat_bathroom): Machine floor buffing, grout descaling, toilet bowl sanitization.
+10. Fan, Floor & Home Care (cat_fan_appliances): High-reach ceiling fan degreasing, balcony floor machine scrubbing.
+11. Car & Bike Wash (cat_vehicle_wash): Hatchback, sedan, SUV doorstep foam wash and interior vacuum.
+12. Beedare Skin & Aesthetics (cat_aesthetics): Aesthetic skin peels, Dermapen rejuvenation, salon aesthetics.
+
+## 3. Public API Endpoints
+- `GET /api/public/catalog`: Returns categories, services, and base prices
+- `GET /api/public/lookup-pin?pin=XXXXXX`: Returns serviceability status, city, and active vendor count
+- `POST /api/public/calculate-quote`: Accepts `{ serviceId, variantId, pinCode, couponCode, addonIds }` and returns authoritative price in paise
+- `POST /api/public/contact`: Submits customer support / service inquiry
+- `GET /api/mcp`: Lightweight MCP server tool definitions
+- `GET /llms.txt`: Summary of site and services for LLMs
+
+## 4. MCP Server Card
+- Located at: `/.well-known/mcp/server-card.json`
+- Supports WebMCP in-browser tools and server-to-server AI agents.

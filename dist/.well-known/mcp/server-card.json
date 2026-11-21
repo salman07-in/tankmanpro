@@ -1,0 +1,77 @@
+{
+  "$schema": "https://modelcontextprotocol.io/schemas/server-card.json",
+  "name": "tankmanpro-server",
+  "version": "1.0.0",
+  "description": "TankmanPro Home Services & Water Tank Cleaning MCP Server",
+  "homepage": "https://wheat-wallaby-789247.hostingersite.com",
+  "endpoint": "https://wheat-wallaby-789247.hostingersite.com/api/mcp",
+  "capabilities": {
+    "tools": {
+      "list": true,
+      "call": true
+    },
+    "resources": {
+      "list": true,
+      "read": true
+    }
+  },
+  "tools": [
+    {
+      "name": "list_services",
+      "description": "List all 12 master categories and 110+ home maintenance services with pricing and descriptions",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Optional category filter, e.g. electrician, plumber, cat_tank_cleaning"
+          }
+        }
+      }
+    },
+    {
+      "name": "check_serviceability",
+      "description": "Check if a 6-digit Indian PIN code is covered for TankmanPro services",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "pincode": {
+            "type": "string",
+            "description": "6-digit Indian PIN code, e.g. 110001, 242001, 208001"
+          }
+        },
+        "required": ["pincode"]
+      }
+    },
+    {
+      "name": "calculate_quote",
+      "description": "Get transparent quote in paise/INR for services and variants",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "serviceId": {
+            "type": "string",
+            "description": "Service ID to book"
+          },
+          "variantId": {
+            "type": "string",
+            "description": "Variant or capacity ID"
+          },
+          "pincode": {
+            "type": "string",
+            "description": "6-digit PIN code"
+          }
+        },
+        "required": ["serviceId"]
+      }
+    },
+    {
+      "name": "get_contact_info",
+      "description": "Retrieve customer care phone number, WhatsApp link, and support email",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  ]
+}
