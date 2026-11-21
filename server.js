@@ -2,9 +2,14 @@
 import dotenv from "dotenv";
 import crypto2 from "crypto";
 import express from "express";
+import path2 from "path";
+import { fileURLToPath as fileURLToPath2 } from "url";
+import { createServer as createViteServer } from "vite";
+
+// src/lib/databaseEngine.ts
+import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { createServer as createViteServer } from "vite";
 
 // src/data/demoCatalog.ts
 var DEMO_CITIES = [
@@ -13,6 +18,7 @@ var DEMO_CITIES = [
     name: "New Delhi",
     state: "Delhi NCR",
     slug: "new-delhi",
+    supportPhone: "+91 96481 75639",
     active: true,
     isDemo: true
   },
@@ -21,6 +27,7 @@ var DEMO_CITIES = [
     name: "Shahjahanpur",
     state: "Uttar Pradesh",
     slug: "shahjahanpur",
+    supportPhone: "+91 96481 75639",
     active: true,
     isDemo: true
   },
@@ -29,71 +36,100 @@ var DEMO_CITIES = [
     name: "Kanpur",
     state: "Uttar Pradesh",
     slug: "kanpur",
+    supportPhone: "+91 96481 75639",
     active: true,
     isDemo: true
   }
 ];
 var DEMO_SERVICE_AREAS = [
   {
-    id: "area_del_110001",
+    id: "sa_del_110001",
     cityId: "city_delhi",
+    cityName: "New Delhi",
+    state: "Delhi NCR",
     pinCode: "110001",
-    zoneLabel: "Connaught Place, central New Delhi",
-    neighbourhoods: ["Connaught Place", "Barakhamba Road", "Janpath", "Mandi House"],
+    zoneLabel: "Central Delhi",
+    neighbourhoods: ["Connaught Place", "Barakhamba", "Janpath"],
+    supportedServiceIds: [],
+    assignedVendorUids: ["vendor_demo_del_1", "vendor_demo_del_2"],
     active: true,
     isDemo: true
   },
   {
-    id: "area_del_110016",
+    id: "sa_del_110016",
     cityId: "city_delhi",
+    cityName: "New Delhi",
+    state: "Delhi NCR",
     pinCode: "110016",
-    zoneLabel: "Hauz Khas & Green Park, South Delhi",
-    neighbourhoods: ["Hauz Khas", "Green Park", "SDA Market", "IIT Gate"],
+    zoneLabel: "South Delhi",
+    neighbourhoods: ["Hauz Khas", "Green Park", "IIT Delhi Area"],
+    supportedServiceIds: [],
+    assignedVendorUids: ["vendor_demo_del_1", "vendor_demo_del_2"],
     active: true,
     isDemo: true
   },
   {
-    id: "area_del_110075",
+    id: "sa_del_110075",
     cityId: "city_delhi",
+    cityName: "New Delhi",
+    state: "Delhi NCR",
     pinCode: "110075",
-    zoneLabel: "Dwarka Sectors 4\u201312, West Delhi",
-    neighbourhoods: ["Dwarka Sector 6", "Dwarka Sector 10", "Dwarka Sector 12"],
+    zoneLabel: "Dwarka Sub-City",
+    neighbourhoods: ["Dwarka Sector 4", "Dwarka Sector 10", "Dwarka Sector 12"],
+    supportedServiceIds: [],
+    assignedVendorUids: ["vendor_demo_del_1"],
     active: true,
     isDemo: true
   },
   {
-    id: "area_spn_242001",
+    id: "sa_spn_242001",
     cityId: "city_shahjahanpur",
+    cityName: "Shahjahanpur",
+    state: "Uttar Pradesh",
     pinCode: "242001",
-    zoneLabel: "Sadar Bazar & Civil Lines, Shahjahanpur",
-    neighbourhoods: ["Sadar Bazar", "Civil Lines", "Bahadurganj", "Town Hall"],
+    zoneLabel: "City Centre & Sadar",
+    neighbourhoods: ["Sadar Bazar", "Civil Lines", "Town Hall", "Kanth Road"],
+    supportedServiceIds: [],
+    assignedVendorUids: ["vendor_demo_spn_1", "vendor_demo_spn_2"],
     active: true,
     isDemo: true
   },
   {
-    id: "area_spn_242226",
+    id: "sa_spn_242226",
     cityId: "city_shahjahanpur",
+    cityName: "Shahjahanpur",
+    state: "Uttar Pradesh",
     pinCode: "242226",
-    zoneLabel: "Roza & Avas Vikas, Shahjahanpur",
-    neighbourhoods: ["Roza Junction", "Avas Vikas Colony", "Cantt Area"],
+    zoneLabel: "Roza Industrial & Residential",
+    neighbourhoods: ["Roza Junction", "Railway Colony", "Lodhipur"],
+    supportedServiceIds: [],
+    assignedVendorUids: ["vendor_demo_spn_1", "vendor_demo_spn_2"],
     active: true,
     isDemo: true
   },
   {
-    id: "area_knp_208002",
+    id: "sa_knp_208001",
     cityId: "city_kanpur",
-    pinCode: "208002",
-    zoneLabel: "Tilak Nagar & Swaroop Nagar, Kanpur",
-    neighbourhoods: ["Tilak Nagar", "Swaroop Nagar", "Arya Nagar", "Civil Lines Kanpur"],
-    active: true,
-    isDemo: true
-  },
-  {
-    id: "area_knp_208001",
-    cityId: "city_kanpur",
+    cityName: "Kanpur",
+    state: "Uttar Pradesh",
     pinCode: "208001",
-    zoneLabel: "Mall Road & Birhana Road, Kanpur",
-    neighbourhoods: ["Mall Road", "Phool Bagh", "Birhana Road", "Gumti No. 5"],
+    zoneLabel: "Kanpur Central",
+    neighbourhoods: ["Mall Road", "Civil Lines", "Canal Road"],
+    supportedServiceIds: [],
+    assignedVendorUids: ["vendor_demo_spn_1"],
+    active: true,
+    isDemo: true
+  },
+  {
+    id: "sa_knp_208002",
+    cityId: "city_kanpur",
+    cityName: "Kanpur",
+    state: "Uttar Pradesh",
+    pinCode: "208002",
+    zoneLabel: "South Kanpur",
+    neighbourhoods: ["Kidwai Nagar", "Govind Nagar", "Barra"],
+    supportedServiceIds: [],
+    assignedVendorUids: ["vendor_demo_spn_1"],
     active: true,
     isDemo: true
   }
@@ -105,18 +141,18 @@ var DEMO_CATEGORIES = [
     slug: "water-tank-cleaning",
     shortDescription: "Mechanized dewatering, sludge removal, high-pressure jet cleaning & UV sanitization (500L to 5000L).",
     iconKey: "water-tank",
-    imageUrl: "/assets/tankmanpro/water-tank.jpg",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg",
     sortOrder: 1,
     status: "published",
     isDemo: true
   },
   {
-    id: "cat_bathroom",
-    name: "Bathroom & Tile Cleaning",
-    slug: "bathroom-cleaning",
-    shortDescription: "Machine & hand scrubbing, complete A-to-Z bathroom deep cleaning, toilet & washbasin descaling.",
-    iconKey: "bathroom",
-    imageUrl: "/assets/tankmanpro/bathroom-deep.jpg",
+    id: "cat_vehicle_wash",
+    name: "Car & Bike Wash",
+    slug: "car-bike-wash",
+    shortDescription: "Doorstep car interior vacuum + exterior polish wash and two-wheeler foam wash.",
+    iconKey: "vehicle-wash",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175929.jpg",
     sortOrder: 2,
     status: "published",
     isDemo: true
@@ -127,19 +163,30 @@ var DEMO_CATEGORIES = [
     slug: "kitchen-cleaning",
     shortDescription: "Empty kitchen deep cleaning, chimney degreasing, single/double door fridge, gas stove & sink cleaning.",
     iconKey: "kitchen",
-    imageUrl: "/assets/tankmanpro/kitchen-chimney.png",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/t_chimeny.png",
     sortOrder: 3,
     status: "published",
     isDemo: true
   },
   {
-    id: "cat_ac_service",
-    name: "AC Service & Repair",
-    slug: "ac-service-repair",
-    shortDescription: "Split & window AC foam-jet service, cooling diagnostics, and complete AC installation.",
-    iconKey: "ac-service",
-    imageUrl: "/assets/tankmanpro/ac-service.jpg",
+    id: "cat_bathroom",
+    name: "Bathroom & Tile Cleaning",
+    slug: "bathroom-cleaning",
+    shortDescription: "Machine & hand scrubbing, complete A-to-Z bathroom deep cleaning, toilet & washbasin descaling.",
+    iconKey: "bathroom",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/bathroom-.webp",
     sortOrder: 4,
+    status: "published",
+    isDemo: true
+  },
+  {
+    id: "cat_fan_appliances",
+    name: "Fan, Floor & Home Care",
+    slug: "fan-floor-door-cleaning",
+    shortDescription: "Ceiling fan & exhaust fan degreasing, door cleaning, and microfiber floor scrubbing.",
+    iconKey: "fan-appliances",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/asian-man-wearing-a-protective-mask-cleaning-ceiling-fan-at-home.jpg",
+    sortOrder: 5,
     status: "published",
     isDemo: true
   },
@@ -149,30 +196,30 @@ var DEMO_CATEGORIES = [
     slug: "sofa-mattress-carpet",
     shortDescription: "Dry dusting, shampooing, wet vacuum extraction for sofas, single/double mattresses & carpets.",
     iconKey: "sofa-mattress",
-    imageUrl: "/assets/tankmanpro/sofa-clean.jpg",
-    sortOrder: 5,
-    status: "published",
-    isDemo: true
-  },
-  {
-    id: "cat_vehicle_wash",
-    name: "Car & Bike Wash",
-    slug: "car-bike-wash",
-    shortDescription: "Doorstep car interior vacuum + exterior polish wash and two-wheeler foam wash.",
-    iconKey: "vehicle-wash",
-    imageUrl: "/assets/tankmanpro/car-wash.jpg",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/How-Do-we-Clean-Your-Sofa.jpg",
     sortOrder: 6,
     status: "published",
     isDemo: true
   },
   {
-    id: "cat_fan_appliances",
-    name: "Fan, Floor & Door Care",
-    slug: "fan-floor-door-cleaning",
-    shortDescription: "Ceiling fan & exhaust fan degreasing, door cleaning, and microfiber floor scrubbing.",
-    iconKey: "fan-appliances",
-    imageUrl: "/assets/tankmanpro/ceiling-fan.jpg",
+    id: "cat_ac_service",
+    name: "AC Service & Repair",
+    slug: "ac-service-repair",
+    shortDescription: "Split & window AC foam-jet service, cooling diagnostics, and complete AC installation.",
+    iconKey: "ac-service",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/repairman-uniform-installing-outside-unit-air-conditioner_93675-91162.jpg",
     sortOrder: 7,
+    status: "published",
+    isDemo: true
+  },
+  {
+    id: "cat_repairs",
+    name: "Home Maintenance & Technicians",
+    slug: "home-maintenance-technicians",
+    shortDescription: "Certified Plumber, Electrician, Painter, Washing Machine & Refrigerator technicians on call.",
+    iconKey: "appliance-repair",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/colorful-electricity-elements-concept_1284-37811.jpg",
+    sortOrder: 8,
     status: "published",
     isDemo: true
   },
@@ -183,7 +230,7 @@ var DEMO_CATEGORIES = [
     shortDescription: "Switches, wiring, fans, lighting, MCB distribution, inverters & smart appliance setup.",
     iconKey: "appliance-repair",
     imageUrl: "/assets/tankmanpro/ceiling-fan.jpg",
-    sortOrder: 8,
+    sortOrder: 9,
     status: "published",
     isDemo: true
   },
@@ -194,7 +241,7 @@ var DEMO_CATEGORIES = [
     shortDescription: "Bath accessories, showers, basins, waste pipes, grouting, drainage & water filters.",
     iconKey: "plumbing",
     imageUrl: "/assets/tankmanpro/bathroom-deep.jpg",
-    sortOrder: 9,
+    sortOrder: 10,
     status: "published",
     isDemo: true
   },
@@ -203,9 +250,9 @@ var DEMO_CATEGORIES = [
     name: "Painter & Wall Care",
     slug: "painter-services",
     shortDescription: "Interior walls, exterior weatherproofing, ceiling coats & touch-up painting.",
-    iconKey: "appliance-repair",
+    iconKey: "painter",
     imageUrl: "/assets/tankmanpro/bathroom-deep.jpg",
-    sortOrder: 10,
+    sortOrder: 11,
     status: "published",
     isDemo: true
   },
@@ -214,9 +261,9 @@ var DEMO_CATEGORIES = [
     name: "Carpenter Services",
     slug: "carpenter-services",
     shortDescription: "Door lock installation, hinge repair, furniture assembly & wall mounts.",
-    iconKey: "appliance-repair",
+    iconKey: "carpenter",
     imageUrl: "/assets/tankmanpro/sofa-clean.jpg",
-    sortOrder: 11,
+    sortOrder: 12,
     status: "published",
     isDemo: true
   },
@@ -226,14 +273,15 @@ var DEMO_CATEGORIES = [
     slug: "beedare-aesthetics",
     shortDescription: "At-home chemical peels, Dermapen, PRP rejuvenation & laser hair removal by Beedare by TankmanPro.",
     iconKey: "aesthetics",
-    imageUrl: "/assets/tankmanpro/aesthetic-facial.jpg",
-    sortOrder: 12,
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/54a488b2-c84c-4ea4-ad5b-62f4610ece16.jpg",
+    sortOrder: 13,
     status: "published",
     isDemo: true
   }
 ];
+var ALL_CITIES = ["city_delhi", "city_shahjahanpur", "city_kanpur"];
 var DEMO_SERVICES = [
-  // 1. WATER TANK CLEANING (Exact tankmanpro.com capacities & prices: ₹499, ₹899, ₹1499, ₹2499)
+  // 1. WATER TANK CLEANING
   {
     id: "srv_mechanized_tank_clean",
     slug: "mechanized-water-tank-cleaning",
@@ -242,11 +290,10 @@ var DEMO_SERVICES = [
     shortDescription: "Manhole & surroundings cleaned off dirt, mud, and algae; water pumped out; high-pressure rotary jet wash & sanitization.",
     fullDescription: "The manhole and surroundings are cleaned of dirt, mud, and algae, after which water below the foot-valve level is pumped out using specialized dewatering equipment. Includes internal sludge vacuuming, high-pressure jet wash of walls and ceiling, and anti-bacterial UV treatment.",
     illustrationKey: "water-tank",
-    imageUrl: "/assets/tankmanpro/water-tank.jpg",
-    galleryUrls: ["/assets/tankmanpro/water-tank.jpg"],
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg",
+    galleryUrls: ["https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg"],
     durationMinutes: 60,
     basePricePaise: 49900,
-    // ₹499 starting (500L-750L on tankmanpro.com)
     regularPricePaise: 69900,
     defaultPricingMode: "city_fixed",
     cityModeOverrides: {
@@ -280,9 +327,8 @@ var DEMO_SERVICES = [
         scopeSummary: "Standard residential overhead tank (500 ltr to 750 ltr capacity)",
         durationMinutes: 45,
         basePricePaise: 49900,
-        // ₹499 on tankmanpro.com
         regularPricePaise: 69900,
-        imageUrl: "/assets/tankmanpro/water-tank.jpg",
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg",
         active: true
       },
       {
@@ -292,9 +338,8 @@ var DEMO_SERVICES = [
         scopeSummary: "Medium overhead or underground tank (1000 ltr to 1500 ltr capacity)",
         durationMinutes: 60,
         basePricePaise: 89900,
-        // ₹899 on tankmanpro.com
         regularPricePaise: 109900,
-        imageUrl: "/assets/tankmanpro/water-tank.jpg",
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg",
         active: true
       },
       {
@@ -304,9 +349,8 @@ var DEMO_SERVICES = [
         scopeSummary: "Large overhead or sump tank (2000 ltr to 3000 ltr capacity)",
         durationMinutes: 90,
         basePricePaise: 149900,
-        // ₹1,499 on tankmanpro.com
         regularPricePaise: 179900,
-        imageUrl: "/assets/tankmanpro/water-tank.jpg",
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg",
         active: true
       },
       {
@@ -316,9 +360,8 @@ var DEMO_SERVICES = [
         scopeSummary: "Extra-large commercial / society storage tank (4000 ltr to 5000 ltr)",
         durationMinutes: 120,
         basePricePaise: 249900,
-        // ₹2,499 on tankmanpro.com
         regularPricePaise: 299900,
-        imageUrl: "/assets/tankmanpro/water-tank.jpg",
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/10/s1.jpg",
         active: true
       }
     ],
@@ -326,8 +369,8 @@ var DEMO_SERVICES = [
       {
         id: "addon_float_valve",
         serviceId: "srv_mechanized_tank_clean",
-        name: "Float Ball Valve & Inlet Washer Check",
-        description: "Inspection and washer replacement to prevent tank overflow.",
+        name: "Heavy Duty Float Valve Replacement",
+        description: "Prevent overflow and save water with anti-corrosion brass valve assembly.",
         pricePaise: 14900,
         required: false,
         maxQuantity: 2,
@@ -336,45 +379,815 @@ var DEMO_SERVICES = [
       {
         id: "addon_pipeline_flush",
         serviceId: "srv_mechanized_tank_clean",
-        name: "Outlet Pipeline Airlock & Scale Flush",
-        description: "Clears settled scale from main outlet distribution line.",
+        name: "Main Pipeline Air & Sludge Flush",
+        description: "Flush out sediment from main header downpipe to internal distribution lines.",
         pricePaise: 29900,
         required: false,
         maxQuantity: 1,
         active: true
       }
     ],
-    questions: [
-      {
-        id: "q_tank_material",
-        label: "Tank Material",
-        options: ["PVC / Sintex Plastic Tank", "Concrete / Cement RCC Tank", "Steel Tank"]
-      }
-    ],
+    questions: [],
     faqs: [
       {
-        question: "How is the water tank cleaned?",
-        answer: "The manhole and surroundings are cleaned of dirt, mud, and algae, water below the foot-valve is pumped out, sludge is vacuumed, walls are pressure-jet washed, and UV sanitization is performed."
+        question: "Do I need to completely drain the tank before the crew arrives?",
+        answer: "No. Turn off your water pump 3\u20134 hours before so only residual water is left."
       }
     ],
-    supportedCityIds: ["city_delhi", "city_shahjahanpur", "city_kanpur"],
+    supportedCityIds: ALL_CITIES,
     status: "published",
     isDemo: true
   },
-  // 2. AC SERVICES & INSTALLATION (Exact tankmanpro.com prices: ₹599 AC Services, ₹1499 AC Installation)
+  // 2. CAR WASH
+  {
+    id: "srv_car_wash",
+    slug: "car-wash",
+    title: "Car wash",
+    categoryId: "cat_vehicle_wash",
+    shortDescription: "We provide interior and exterior Cleaning Via vacuum + polish. Car Cleaning services at Tankmanpro cleaning services.",
+    fullDescription: "A high pressure water jet is used to clean the car exterior as well as the engine compartment. The flexible nozzle makes it easy to target areas with tough stains and the high pressure maintained guarantees that it removes the dirt completely and effortlessly. Includes full interior high-suction vacuuming, dashboard polish, tyre dressing, and crystal glass cleaning.",
+    illustrationKey: "vehicle-wash",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175929.jpg",
+    galleryUrls: ["https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175929.jpg"],
+    durationMinutes: 60,
+    basePricePaise: 29900,
+    regularPricePaise: 39900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "High-pressure water jet exterior foam wash",
+      "Engine compartment surface dust and grime jet clean",
+      "Interior high-suction vacuuming (seats, floor mats, boot)",
+      "Dashboard, console and interior trim UV conditioning polish",
+      "Tyre cleaning and high-gloss dressing",
+      "Streak-free glass cleaning inside and out"
+    ],
+    exclusions: [
+      "Interior roof fabric foam extraction (quoted as add-on)",
+      "Exterior rubbing, compound buffing or ceramic coating"
+    ],
+    preparationInstructions: [
+      "Park vehicle in an accessible driveway, parking spot or open area.",
+      "Ensure a standard water tap and electrical plug socket are available nearby."
+    ],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_car_wash_standard",
+        serviceId: "srv_car_wash",
+        name: "Doorstep Car Wash (Hatchback / Sedan / SUV)",
+        scopeSummary: "Full exterior high pressure foam wash, interior vacuuming & polish",
+        durationMinutes: 60,
+        basePricePaise: 29900,
+        regularPricePaise: 39900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175929.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 3. BIKE WASH
+  {
+    id: "srv_bike_wash",
+    slug: "bike-wash",
+    title: "Bike Wash",
+    categoryId: "cat_vehicle_wash",
+    shortDescription: "This service includes Foam Wash of Bike\u2019s Body paint together with the polishing of Tyre/ Plastic/ Vinyl components.",
+    fullDescription: "Recommended to maintain the basic hygiene and shine of your two-wheeler. Includes high pressure water jet exterior wash, engine dirt blast, snow foam body wash, tyre/plastic/vinyl polishing, and chain clean & lube check.",
+    illustrationKey: "vehicle-wash",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175942.jpg",
+    galleryUrls: ["https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175942.jpg"],
+    durationMinutes: 30,
+    basePricePaise: 9900,
+    regularPricePaise: 14900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "High-pressure water jet pre-wash",
+      "Snow foam body shampoo & scrub",
+      "Engine area degreasing and grime removal",
+      "Tyre and rim cleaning with gloss polish",
+      "Plastic and vinyl dashboard/mirror trim polishing"
+    ],
+    exclusions: ["Engine oil change or mechanical tune-ups"],
+    preparationInstructions: ["Keep bike parked on double stand with power socket nearby."],
+    cancellationPolicySummary: "Free cancellation up to 2 hours before service.",
+    variants: [
+      {
+        id: "var_bike_wash_standard",
+        serviceId: "srv_bike_wash",
+        name: "Two-Wheeler Foam Wash & Polish",
+        scopeSummary: "Complete foam wash, pressure jet, tyre and plastic polish",
+        durationMinutes: 30,
+        basePricePaise: 9900,
+        regularPricePaise: 14900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/10/IMG_20231220_175942.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 4. CHIMNEY CLEANING
+  {
+    id: "srv_chimney_cleaning",
+    slug: "chimney-cleaning",
+    title: "Chimney Cleaning",
+    categoryId: "cat_kitchen",
+    shortDescription: "Disassembling filters, chemical spray & scrubbing out stains, chimney exterior cleaning, wet wipe, reassembling.",
+    fullDescription: "1. Disassembling: Unlock and remove baffle/mesh filters from the chimney.\n2. Filter Cleaning: Specialized grease-cutting chemical spray and heavy scrub.\n3. Exterior Cleaning: Stain removal and polishing of stainless steel / glass outer body.\n4. Wet Wipe: Microfiber moisture wipe down.\n5. Reassembling: Fit back parts with safety check.",
+    illustrationKey: "kitchen",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/t_chimeny.png",
+    galleryUrls: [
+      "https://tankmanpro.com/wp-content/uploads/2023/11/t_chimeny.png",
+      "https://tankmanpro.com/wp-content/uploads/2023/11/electric-kitchen-chimney-cleaning-service-500x500-1.jpg"
+    ],
+    durationMinutes: 60,
+    basePricePaise: 39900,
+    regularPricePaise: 49900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Filter disassembly and deep degreasing soak",
+      "Oil collector tray hot-chemical wash",
+      "Exterior hood scrubbing and smudge-free polish",
+      "Exhaust suction check and reassembly"
+    ],
+    exclusions: ["Motor rewinding or duct pipe installation"],
+    preparationInstructions: ["Turn off chimney switch at least 30 mins before appointment."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_chimney_clean_standard",
+        serviceId: "srv_chimney_cleaning",
+        name: "Standard Kitchen Chimney Deep Clean",
+        scopeSummary: "Filter degreasing, oil collector wash, outer body polish & reassembly",
+        durationMinutes: 60,
+        basePricePaise: 39900,
+        regularPricePaise: 49900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/t_chimeny.png",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 5. CEILING FAN CLEANING
+  {
+    id: "srv_ceiling_fan_cleaning",
+    slug: "ceiling-fan-cleaning",
+    title: "Celling Fan Cleaning",
+    categoryId: "cat_fan_appliances",
+    shortDescription: "Dry Dusting of fan blades, chemical spray and scrubbing to remove stains on surfaces, wet wipe using microfiber towel.",
+    fullDescription: "Removing stubborn grease and oily dust accumulated on ceiling fans. Dry dusting on both sides of blades, specialized non-abrasive stain remover spray, blade scrubbing, and clean microfiber wet wipe for spotless finish.",
+    illustrationKey: "fan-appliances",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/asian-man-wearing-a-protective-mask-cleaning-ceiling-fan-at-home.jpg",
+    durationMinutes: 20,
+    basePricePaise: 4900,
+    regularPricePaise: 7900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Dry dusting of blades and motor canopy",
+      "Chemical spray to lift sticky yellow grease",
+      "Soft scrubbing on both blade faces",
+      "Microfiber towel wipe and drying"
+    ],
+    exclusions: ["Motor internal winding repair or replacement"],
+    preparationInstructions: ["Ensure fan switch is off and floor beneath is accessible."],
+    cancellationPolicySummary: "Free cancellation up to 2 hours before service.",
+    variants: [
+      {
+        id: "var_ceiling_fan_clean",
+        serviceId: "srv_ceiling_fan_cleaning",
+        name: "Ceiling Fan Deep Cleaning (Per Fan)",
+        scopeSummary: "Blade dry dusting, degreasing scrub & microfiber wet wipe",
+        durationMinutes: 20,
+        basePricePaise: 4900,
+        regularPricePaise: 7900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/asian-man-wearing-a-protective-mask-cleaning-ceiling-fan-at-home.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 6. EXHAUST FAN CLEANING
+  {
+    id: "srv_exhaust_fan_cleaning",
+    slug: "exhaust-fan-cleaning",
+    title: "Exhaust fan cleaning",
+    categoryId: "cat_fan_appliances",
+    shortDescription: "Dry Dusting, chemical spray and scrubbing to remove sticky grease on surfaces, wet wipe using microfiber towel.",
+    fullDescription: "Kitchen and bathroom exhaust fans accumulate hardened grease, oil, and lint. We apply targeted industrial degreasing spray, scrub the mesh guard and blades, wipe away dissolved grime, and restore smooth airflow.",
+    illustrationKey: "fan-appliances",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/IMG_20231119_154808.jpg",
+    durationMinutes: 30,
+    basePricePaise: 9900,
+    regularPricePaise: 14900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Exhaust grill and louvre degreasing",
+      "Blade scrub with heavy-duty oil cutter",
+      "Motor exterior wipe and lint vacuuming",
+      "Microfiber drying and airflow test"
+    ],
+    exclusions: ["Electrical motor rewiring"],
+    preparationInstructions: ["Turn off power to exhaust point."],
+    cancellationPolicySummary: "Free cancellation up to 2 hours before service.",
+    variants: [
+      {
+        id: "var_exhaust_fan_clean",
+        serviceId: "srv_exhaust_fan_cleaning",
+        name: "Exhaust Fan Deep Degreasing (Per Fan)",
+        scopeSummary: "Mesh, blade, and louvre heavy oil & grease removal",
+        durationMinutes: 30,
+        basePricePaise: 9900,
+        regularPricePaise: 14900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/IMG_20231119_154808.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 7. SINGLE DOOR FRIDGE CLEANING
+  {
+    id: "srv_single_door_fridge",
+    slug: "single-door-fridge-cleaning",
+    title: "Single Door Fridge Cleaning",
+    categoryId: "cat_kitchen",
+    shortDescription: "Dry Dusting from exterior and interior, removing dirt/oil/food stains, wiping out moisture with microfiber towel.",
+    fullDescription: "Complete single-door refrigerator sanitation. Includes removing removable trays and baskets for hot-water scrubbing, cleaning door gaskets to prevent mold, interior deodorization, and exterior body wipe.",
+    illustrationKey: "kitchen",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/360_F_511507346_o2oI9h94brU0ziVqJf2TrH54EPN1mNd5.webp",
+    durationMinutes: 45,
+    basePricePaise: 34900,
+    regularPricePaise: 44900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Removal and washing of shelves, crisper box, and door racks",
+      "Antimicrobial sanitization of interior walls and freezer box",
+      "Door rubber gasket mold and dirt removal",
+      "Exterior door surface and handle wipe"
+    ],
+    exclusions: ["Compressor repair or refrigerant gas refill"],
+    preparationInstructions: ["Please remove perishable food items prior to technician arrival."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_fridge_single_door",
+        serviceId: "srv_single_door_fridge",
+        name: "Single Door Refrigerator Deep Clean",
+        scopeSummary: "Shelves, crisper, door gaskets, and interior deodorization",
+        durationMinutes: 45,
+        basePricePaise: 34900,
+        regularPricePaise: 44900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/360_F_511507346_o2oI9h94brU0ziVqJf2TrH54EPN1mNd5.webp",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 8. DOUBLE DOOR FRIDGE CLEANING
+  {
+    id: "srv_double_door_fridge",
+    slug: "double-door-fridge-cleaning",
+    title: "Double Door Fridge Cleaning",
+    categoryId: "cat_kitchen",
+    shortDescription: "Dry Dusting exterior and interior, removing food stains, freezer frost cleanup, shelf descaling, microfiber wipe.",
+    fullDescription: "Comprehensive deep cleaning for double-door / frost-free refrigerators. Thorough washing of glass shelves, vegetable crispers, freezer trays, door seals, odor neutralization, and exterior stainless steel / glass polishing.",
+    illustrationKey: "kitchen",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/360_F_419363786_20QxVTKHTQo7BHuu2vINOtun8p9r1pPu.webp",
+    durationMinutes: 60,
+    basePricePaise: 49900,
+    regularPricePaise: 59900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Full interior cleaning of both freezer and refrigerator compartments",
+      "Washing and drying of all tempered glass shelves and door bins",
+      "Food spill and sticky sauce stain removal",
+      "Antimicrobial deodorization treatment",
+      "Exterior body polishing and handle sanitization"
+    ],
+    exclusions: ["Compressor or cooling coil repairs"],
+    preparationInstructions: ["Empty major food containers before start."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_fridge_double_door",
+        serviceId: "srv_double_door_fridge",
+        name: "Double Door Refrigerator Deep Clean",
+        scopeSummary: "Dual compartment deep clean, shelf washing & deodorization",
+        durationMinutes: 60,
+        basePricePaise: 49900,
+        regularPricePaise: 59900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/360_F_419363786_20QxVTKHTQo7BHuu2vINOtun8p9r1pPu.webp",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 9. GAS STOVE CLEANING
+  {
+    id: "srv_gas_stove_cleaning",
+    slug: "gas-stove-cleaning",
+    title: "Gas Stove Cleaning",
+    categoryId: "cat_kitchen",
+    shortDescription: "Removing stains, spots and dust using cleaner, wiping the surface using a microfiber towel.",
+    fullDescription: "Intensive gas stove and cooktop degreasing. Removal of burnt milk/curry residues, carbon buildup from brass burners, spill trays, control knobs, and glass/stainless steel surface buffing.",
+    illustrationKey: "kitchen",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/cleaning-gas-stove-at-kitchen.jpg",
+    durationMinutes: 30,
+    basePricePaise: 9900,
+    regularPricePaise: 14900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Burner pan support and spill tray degreasing",
+      "Burner head carbon deposit scrubbing",
+      "Glass top / stainless steel surface stain removal",
+      "Knob and surrounding grease wipe down"
+    ],
+    exclusions: ["Gas pipeline or regulator replacement"],
+    preparationInstructions: ["Ensure gas cylinder / pipeline valve is turned off."],
+    cancellationPolicySummary: "Free cancellation up to 2 hours before service.",
+    variants: [
+      {
+        id: "var_gas_stove_clean",
+        serviceId: "srv_gas_stove_cleaning",
+        name: "Gas Stove / Cooktop Deep Degreasing",
+        scopeSummary: "Burnt food stain removal, burner scrub & surface polish",
+        durationMinutes: 30,
+        basePricePaise: 9900,
+        regularPricePaise: 14900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/cleaning-gas-stove-at-kitchen.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 10. KITCHEN SINK CLEANING
+  {
+    id: "srv_kitchen_sink_cleaning",
+    slug: "kitchen-sink-cleaning",
+    title: "Kitchen Sink Cleaning",
+    categoryId: "cat_kitchen",
+    shortDescription: "Removing stains, spots and dust using cleaner, wiping the surface using a microfiber towel.",
+    fullDescription: "Specialized descaling and sanitization of stainless steel, quartz, or granite kitchen sinks. Eliminates hard water scale, food residue grease, tap limescale, and deodorizes drain outlet.",
+    illustrationKey: "kitchen",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/pexels-photo-9462309.jpeg",
+    durationMinutes: 30,
+    basePricePaise: 9900,
+    regularPricePaise: 14900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Sink basin hard-water and scale removal",
+      "Water faucet descaling and buffing",
+      "Drain collar and drain strainer degreasing",
+      "Microfiber dry wipe and shine restore"
+    ],
+    exclusions: ["Under-sink underground sewer unclogging (requires plumber)"],
+    preparationInstructions: ["Keep sink free of unwashed utensils."],
+    cancellationPolicySummary: "Free cancellation up to 2 hours before service.",
+    variants: [
+      {
+        id: "var_kitchen_sink_clean",
+        serviceId: "srv_kitchen_sink_cleaning",
+        name: "Kitchen Sink & Tap Descaling",
+        scopeSummary: "Limescale, oil stains removal, faucet polish & drain sanitization",
+        durationMinutes: 30,
+        basePricePaise: 9900,
+        regularPricePaise: 14900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/11/pexels-photo-9462309.jpeg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 11. EMPTY KITCHEN + CHIMNEY DEEP CLEANING
+  {
+    id: "srv_kitchen_chimney_clean",
+    slug: "empty-kitchen-chimney-deep-cleaning",
+    title: "Empty Kitchen + Chimney Deep Cleaning - Delhi",
+    categoryId: "cat_kitchen",
+    shortDescription: "Professional empty kitchen deep cleaning with chimney degreasing & filter wash. Removes oil, stains & grease for a hygienic, fresh kitchen.",
+    fullDescription: "Bring back the shine to your kitchen with our professional cleaning package.\n\nService Includes:\n\u2022 Floor & wall tile scrubbing\n\u2022 Sink, tap & slab stain removal\n\u2022 External cupboard & rack cleaning\n\u2022 Window & exhaust fan dusting\n\u2022 Switchboards & handles sanitization\n\u2022 Chimney deep cleaning (filter wash, oil & grease removal, outer body shine)\n\nService Time: 2\u20132.5 Hours\nDone By: Trained professionals using eco-friendly products.",
+    illustrationKey: "kitchen",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-04_49_15-PM.png",
+    galleryUrls: [
+      "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-04_49_15-PM.png",
+      "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-04_54_38-PM.png"
+    ],
+    durationMinutes: 150,
+    basePricePaise: 129900,
+    regularPricePaise: 159900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Floor & wall tile scrubbing",
+      "Sink, tap & slab stain removal",
+      "External cupboard & rack cleaning",
+      "Window & exhaust fan dusting",
+      "Switchboards & handles sanitization",
+      "Chimney deep cleaning (filter wash, oil/grease removal, outer shine)"
+    ],
+    exclusions: ["Inside closed cupboards or internal fridge/microwave components"],
+    preparationInstructions: ["Ideal for shifting homes, festival cleaning & empty flats."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_empty_kitchen_chimney",
+        serviceId: "srv_kitchen_chimney_clean",
+        name: "Empty Kitchen + Chimney Deep Cleaning",
+        scopeSummary: "Floor/wall scrub, slab descaling, cabinet outer & chimney deep clean",
+        durationMinutes: 150,
+        basePricePaise: 129900,
+        regularPricePaise: 159900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-04_49_15-PM.png",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 12. EMPTY KITCHEN + CHIMNEY + APPLIANCES CLEANING
+  {
+    id: "srv_empty_kitchen_appliances",
+    slug: "empty-kitchen-chimney-appliances-cleaning",
+    title: "Empty Kitchen + Chimney + Appliances Cleaning - Delhi",
+    categoryId: "cat_kitchen",
+    shortDescription: "Complete empty kitchen deep cleaning with chimney degreasing & external cleaning of appliances like fridge, microwave & gas stove.",
+    fullDescription: "Empty Kitchen + Chimney + Appliances Deep Cleaning \u2013 \u20B91699/-\n\nA premium package for total kitchen hygiene with chimney & appliances care.\n\nService Includes:\n\u2022 Floor & Wall Cleaning (hand scrubbing & mopping)\n\u2022 Sink & Tap Descaling (oil, stains & lime removal)\n\u2022 Slab / Countertop Cleaning (masala & grease stains)\n\u2022 Cupboards & Racks External Cleaning\n\u2022 Windows & Exhaust Fan Dusting\n\u2022 Switchboards & Handles Sanitization\n\u2022 Chimney Deep Cleaning (filter degreasing, outer body scrub, carbon deposit)\n\u2022 Appliances External Cleaning (refrigerator outer, microwave outer, mixer/grinder wipe, gas stove degreasing)\n\nService Time: 2.5\u20133 Hours.",
+    illustrationKey: "kitchen",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-05_10_35-PM.png",
+    galleryUrls: [
+      "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-05_10_35-PM.png",
+      "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-04_45_36-PM.png"
+    ],
+    durationMinutes: 180,
+    basePricePaise: 169900,
+    regularPricePaise: 199900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Floor & wall scrubbing and mopping",
+      "Sink & tap descaling (oil, stains & lime)",
+      "Slab / Countertop grease degreasing",
+      "Cupboards and racks external wiping",
+      "Windows and exhaust fan dusting",
+      "Chimney deep cleaning & filter wash",
+      "External cleaning of fridge, microwave, mixer and gas stove"
+    ],
+    exclusions: ["Internal fridge defrost or oven inside degreasing"],
+    preparationInstructions: ["Keep kitchen counters clear of utensils."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_empty_kitchen_appliances_clean",
+        serviceId: "srv_empty_kitchen_appliances",
+        name: "Empty Kitchen + Chimney + Appliances Cleaning",
+        scopeSummary: "Floor/wall scrub, slab, chimney deep clean + fridge/microwave/stove outer",
+        durationMinutes: 180,
+        basePricePaise: 169900,
+        regularPricePaise: 199900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/ChatGPT-Image-Aug-24-2025-05_10_35-PM.png",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 13. TOILET CLEANING
+  {
+    id: "srv_toilet_cleaning",
+    slug: "toilet-cleaning",
+    title: "Toilet Cleaning",
+    categoryId: "cat_bathroom",
+    shortDescription: "Indian/Western Toilet stain removal from tiles and toilet pot, wiping out all the water with a wiper.",
+    fullDescription: "Targeted deep sanitation for Indian or Western toilet bowls. Includes removing stubborn mineral rings, urine stains, rim descaling, flush tank exterior wipe, and bathroom floor squeegee drying.",
+    illustrationKey: "bathroom",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/12.jpg",
+    durationMinutes: 30,
+    basePricePaise: 9900,
+    regularPricePaise: 14900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Toilet bowl acid-free heavy stain removal",
+      "Rim and jet spray disinfection",
+      "Seat cover and hinge cleaning",
+      "Floor area wiping with rubber squeegee"
+    ],
+    exclusions: ["Full bathroom wall tile scrubbing (see Bathroom Cleaning)"],
+    preparationInstructions: ["Provide running water and toilet brush access."],
+    cancellationPolicySummary: "Free cancellation up to 2 hours before service.",
+    variants: [
+      {
+        id: "var_toilet_clean_standard",
+        serviceId: "srv_toilet_cleaning",
+        name: "Toilet Deep Cleaning (Indian / Western)",
+        scopeSummary: "Pot stain descaling, rim disinfection & squeegee drying",
+        durationMinutes: 30,
+        basePricePaise: 9900,
+        regularPricePaise: 14900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/12.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 14. BATHROOM CLEANING (SQ FT)
+  {
+    id: "srv_bathroom_sqft",
+    slug: "bathroom-cleaning-square-fit",
+    title: "Bathroom cleaning square fit",
+    categoryId: "cat_bathroom",
+    shortDescription: "Wet Wiping geyser, exhaust, window sills, glass partitions and mirrors. Stain removal from tiles, basin, toilet and water closet.",
+    fullDescription: "Custom square-foot bathroom deep cleaning package. Wet wiping dust from outermost part with microfiber towel (geyser, exhaust, window sills, glass partitions, mirrors). Stain removal from wall/floor tiles, basin, toilet, and water closet.",
+    illustrationKey: "bathroom",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/bathroom-.webp",
+    durationMinutes: 60,
+    basePricePaise: 29900,
+    // ₹15/sq.ft, base starts at ₹299
+    regularPricePaise: 39900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Mirror, glass partition & chrome fittings descaling",
+      "Tile wall grout scrubbing and lime mark removal",
+      "Washbasin, counter and toilet seat deep clean",
+      "Geyser, exhaust fan outer surface wet wipe",
+      "Floor water wiper squeegee dry"
+    ],
+    exclusions: ["Tile re-grouting or plumbing pipe replacement"],
+    preparationInstructions: ["Remove personal bath toiletries from shelves prior to cleaning."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_bathroom_sqft_standard",
+        serviceId: "srv_bathroom_sqft",
+        name: "Bathroom Cleaning (\u20B915/sq.ft \xB7 Standard Size)",
+        scopeSummary: "Tile descaling, chrome polish, basin, toilet, mirrors & exhaust wipe",
+        durationMinutes: 60,
+        basePricePaise: 29900,
+        regularPricePaise: 39900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/bathroom-.webp",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 15. FLOOR CLEANING (SQ FT)
+  {
+    id: "srv_floor_cleaning_sqft",
+    slug: "floor-cleaning-sq-ft",
+    title: "Floor cleaning Sq.ft",
+    categoryId: "cat_fan_appliances",
+    shortDescription: "Cleaning using cloth and mop: Cleaning grouts, corners and all over the surface with a wet microfiber towel and mop.",
+    fullDescription: "Floor deep cleaning measured per square foot. Ideal for living rooms, hallways, bedrooms, or full houses. High-grade floor cleaner removes dirt from grouts, hard-to-reach corners, and buffs tiled, marble, or vitrified surfaces.",
+    illustrationKey: "fan-appliances",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/ff.jpg",
+    durationMinutes: 60,
+    basePricePaise: 29900,
+    // ₹15/sq.ft, base starts at ₹299
+    regularPricePaise: 39900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Grout line dirt extraction and hand scrubbing",
+      "Corner dirt and baseboard border cleaning",
+      "Specialized pH-balanced floor cleaning solution",
+      "Double microfiber mop pass for spotless finish"
+    ],
+    exclusions: ["Diamond marble polishing or epoxy re-grouting"],
+    preparationInstructions: ["Clear floor of small rugs and loose items."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_floor_cleaning_sqft",
+        serviceId: "srv_floor_cleaning_sqft",
+        name: "Floor Deep Scrubbing & Mop (\u20B915/sq.ft)",
+        scopeSummary: "Grout cleaning, corner scrub, and motorized microfiber mopping",
+        durationMinutes: 60,
+        basePricePaise: 29900,
+        regularPricePaise: 39900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/ff.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 16. BATHROOM DEEP & MACHINE SCRUB CLEANING (Existing)
+  {
+    id: "srv_bathroom_cleaning",
+    slug: "bathroom-deep-and-machine-scrub-cleaning",
+    title: "Bathroom Deep & Machine Scrub Cleaning",
+    categoryId: "cat_bathroom",
+    shortDescription: "Rotary machine tile scrubbing, acid-free tap & shower descaling, toilet bowl sanitization, and grout line whitening.",
+    fullDescription: "Intensive mechanized bathroom deep cleaning. Includes single-disc rotary machine scrubbing of floor tiles, hand scrubbing of wall tiles, acid-free descaling of taps and showers, and hygienic wipe of mirrors.",
+    illustrationKey: "bathroom",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/bathroom-.webp",
+    galleryUrls: ["https://tankmanpro.com/wp-content/uploads/2023/12/bathroom-.webp"],
+    durationMinutes: 90,
+    basePricePaise: 49900,
+    regularPricePaise: 64900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Floor tiles mechanized single-disc machine scrubbing",
+      "Wall tiles descaling and yellow stain scrub",
+      "Chrome CP tap, shower, and health faucet acid-free descaling",
+      "Toilet bowl, seat, and washbasin sanitization"
+    ],
+    exclusions: ["Civil repairs or broken tile replacement"],
+    preparationInstructions: ["Ensure running water and geyser plug are functional."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before slot.",
+    variants: [
+      {
+        id: "var_bath_machine_scrub",
+        serviceId: "srv_bathroom_cleaning",
+        name: "Standard Bathroom Deep Scrub (Up to 40 sq ft)",
+        scopeSummary: "Single disc machine floor scrub, wall descaling & sanitary sanitization",
+        durationMinutes: 90,
+        basePricePaise: 49900,
+        regularPricePaise: 64900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/bathroom-.webp",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 17. SOFA & CUSHION CLEANING
+  {
+    id: "srv_sofa_mattress_clean",
+    slug: "sofa-cushion-cleaning",
+    title: "Sofa & Cushien cleaning 249/per seat",
+    categoryId: "cat_sofa_mattress",
+    shortDescription: "Dry Dusting, dusting and vacuuming sofa and cushions to remove dirt deposited on surface of sofa, cushion and cushion covers.",
+    fullDescription: "Specialized 3-step upholstery care for fabric and leatherette sofas: high-suction vacuum extraction of deeply trapped dust and food crumbs, organic shampoo foam scrub to lift grease, and moisture extraction for fresh clean seats.",
+    illustrationKey: "sofa-mattress",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/How-Do-we-Clean-Your-Sofa.jpg",
+    galleryUrls: ["https://tankmanpro.com/wp-content/uploads/2023/12/How-Do-we-Clean-Your-Sofa.jpg"],
+    durationMinutes: 60,
+    basePricePaise: 24900,
+    regularPricePaise: 29900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "High-power dry vacuuming for dust mites & hair",
+      "Foam shampoo scrub to eliminate stains and sweat odor",
+      "Wet vacuum extraction of suspended dirt",
+      "Fabric conditioning for soft, fragrant finish"
+    ],
+    exclusions: ["Re-upholstery or fabric tear mending"],
+    preparationInstructions: ["Ensure sofa is dry and ceiling fan is kept on after cleaning."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_sofa_seat_standard",
+        serviceId: "srv_sofa_mattress_clean",
+        name: "Sofa Cleaning (Per Seat \xB7 Minimum 2 Seats)",
+        scopeSummary: "Dry vacuuming, shampoo foam scrubbing, and extraction",
+        durationMinutes: 60,
+        basePricePaise: 24900,
+        regularPricePaise: 29900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/How-Do-we-Clean-Your-Sofa.jpg",
+        active: true
+      },
+      {
+        id: "var_sofa_5seat",
+        serviceId: "srv_sofa_mattress_clean",
+        name: "5-Seater Sofa Deep Shampoo & Extraction",
+        scopeSummary: "3+1+1 or 5-seater fabric/leather sofa deep shampoo and vacuum extraction",
+        durationMinutes: 90,
+        basePricePaise: 119900,
+        regularPricePaise: 149900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/How-Do-we-Clean-Your-Sofa.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 18. CARPET CLEANING
+  {
+    id: "srv_carpet_cleaning",
+    slug: "carpet-cleaning-sq-ft",
+    title: "Carpet cleaning  sq.ft",
+    categoryId: "cat_sofa_mattress",
+    shortDescription: "Carpet cleaning: Deep cleaning and shampooing of carpet with wet vacuum extraction.",
+    fullDescription: "Restores the fresh pile, vibrant color, and hygienic softness of living room rugs and wall-to-wall carpets. Deep rotary brush agitation, antimicrobial shampoo, and moisture extraction.",
+    illustrationKey: "sofa-mattress",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/Helpling-carpet_cleaning.webp",
+    durationMinutes: 60,
+    basePricePaise: 39900,
+    // ₹10/sq.ft, base starts at ₹399
+    regularPricePaise: 49900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "High-power pile vacuuming",
+      "Spot stain pre-treatment for coffee/tea marks",
+      "Rotary shampoo scrub with fabric-safe detergent",
+      "Wet vacuum suction to remove dirty foam and water"
+    ],
+    exclusions: ["Severe acid burn or dye bleeding recovery"],
+    preparationInstructions: ["Keep area free of footwear during and after service."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_carpet_sqft_clean",
+        serviceId: "srv_carpet_cleaning",
+        name: "Carpet Deep Cleaning & Shampooing",
+        scopeSummary: "Deep cleaning and shampooing (\u20B910/sq.ft \xB7 Standard Rug)",
+        durationMinutes: 60,
+        basePricePaise: 39900,
+        regularPricePaise: 49900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2023/12/Helpling-carpet_cleaning.webp",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 19. AC SERVICES
   {
     id: "srv_ac_foam_jet",
-    slug: "split-window-ac-foam-jet-service",
-    title: "AC Service, Repair & Installation",
+    slug: "ac-services",
+    title: "AC Services",
     categoryId: "cat_ac_service",
-    shortDescription: "Swift and professional AC service & installation: expert technicians ready to service coils, clean filters, and install outdoor/indoor units.",
-    fullDescription: "Complete air conditioner care by TankmanPro technicians. Includes deep foam-jet cleaning of indoor cooling coils, blower wheel wash, drain tray flushing, outdoor condenser water wash, and complete split/window AC installation.",
+    shortDescription: "Swift and professional AC repair services: expert technicians ready to diagnose and fix your cooling system issues, ensuring comfort and efficiency.",
+    fullDescription: "Fast and reliable AC repair solutions tailored to your needs, ensuring optimal comfort in any season. Our skilled technicians diagnose and fix issues efficiently, restoring your cooling system\u2019s performance. Count on us for prompt service and lasting results.",
     illustrationKey: "ac-service",
-    imageUrl: "/assets/tankmanpro/ac-service.jpg",
-    galleryUrls: ["/assets/tankmanpro/ac-service.jpg"],
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/repairman-uniform-installing-outside-unit-air-conditioner_93675-91162.jpg",
+    galleryUrls: ["https://tankmanpro.com/wp-content/uploads/2024/03/repairman-uniform-installing-outside-unit-air-conditioner_93675-91162.jpg"],
     durationMinutes: 60,
     basePricePaise: 59900,
-    // ₹599 on tankmanpro.com
     regularPricePaise: 79900,
     defaultPricingMode: "vendor_offer",
     cityModeOverrides: {
@@ -383,675 +1196,905 @@ var DEMO_SERVICES = [
       city_kanpur: "city_fixed"
     },
     inclusions: [
-      "Indoor cooling coil & air filter deep foam wash with spill-guard cover",
+      "Indoor cooling coil & filter deep foam wash with spill-guard jacket",
       "Outdoor condenser unit high-pressure jet wash",
-      "Drain pipe flushing to prevent indoor water leakage",
+      "Drain pipe flushing to prevent indoor water dripping",
       "Coolant pressure, compressor amperage & thermostat check"
     ],
-    exclusions: [
-      "Spare parts, copper pipe extension, or refrigerant gas refill (quoted separately after inspection)",
-      "Masonry core cutting or external iron stand cost"
-    ],
-    preparationInstructions: [
-      "Clear 3 feet of space below the indoor AC unit before technician arrival."
-    ],
-    warrantySummary: "15-day post-service cooling & workmanship assurance",
-    cancellationPolicySummary: "Free cancellation up to 4 hours before scheduled slot.",
+    exclusions: ["Spare parts and refrigerant gas refill (quoted post-inspection)"],
+    preparationInstructions: ["Provide ladder access to indoor unit and open balcony for outdoor unit."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
     variants: [
       {
         id: "var_ac_single",
         serviceId: "srv_ac_foam_jet",
-        name: "AC Services (Split / Window Deep Service)",
-        scopeSummary: "Complete indoor coil + blower + outdoor unit service (1 AC)",
-        durationMinutes: 55,
+        name: "Split / Window AC Foam-Jet Service (1 Unit)",
+        scopeSummary: "Indoor coil foam jet, outdoor condenser jet wash, cooling test",
+        durationMinutes: 60,
         basePricePaise: 59900,
-        // ₹599 on tankmanpro.com
         regularPricePaise: 79900,
-        imageUrl: "/assets/tankmanpro/ac-service.jpg",
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/repairman-uniform-installing-outside-unit-air-conditioner_93675-91162.jpg",
         active: true
       },
       {
         id: "var_ac_twin",
         serviceId: "srv_ac_foam_jet",
-        name: "AC Services Combo (2 AC Units)",
-        scopeSummary: "Complete deep service for 2 Split/Window AC units",
+        name: "Twin AC Service Combo (2 Units)",
+        scopeSummary: "Complete foam-jet servicing for 2 air conditioners",
         durationMinutes: 100,
         basePricePaise: 109900,
-        // ₹1,099
-        regularPricePaise: 149900,
-        imageUrl: "/assets/tankmanpro/ac-service.jpg",
+        regularPricePaise: 139900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/repairman-uniform-installing-outside-unit-air-conditioner_93675-91162.jpg",
         active: true
       },
       {
         id: "var_ac_install",
         serviceId: "srv_ac_foam_jet",
-        name: "AC Installation (Indoor + Outdoor Unit)",
-        scopeSummary: "Professional mounting, flare nut connection, vacuuming & test run",
+        name: "AC Installation (Split / Window)",
+        scopeSummary: "Mounting indoor & outdoor unit, vacuuming & leak testing",
         durationMinutes: 90,
         basePricePaise: 149900,
-        // ₹1,499 on tankmanpro.com
         regularPricePaise: 179900,
-        imageUrl: "/assets/tankmanpro/ac-service.jpg",
-        active: true
-      }
-    ],
-    addons: [
-      {
-        id: "addon_ac_drain_pipe",
-        serviceId: "srv_ac_foam_jet",
-        name: "Insulated Drain Hose Replacement (2m)",
-        description: "Replaces cracked or blocked condensate drain pipe.",
-        pricePaise: 14900,
-        required: false,
-        maxQuantity: 2,
-        active: true
-      }
-    ],
-    questions: [
-      {
-        id: "q_ac_type",
-        label: "AC Type",
-        options: ["Split AC", "Window AC"]
-      }
-    ],
-    faqs: [],
-    supportedCityIds: ["city_delhi", "city_shahjahanpur", "city_kanpur"],
-    status: "published",
-    isDemo: true
-  },
-  // 3. BATHROOM CLEANING (Exact tankmanpro.com items: ₹399 Hand Scrub, ₹499 Machine Scrub, ₹2999 Deep Clean, ₹99 Toilet/Washbasin, ₹49 Door)
-  {
-    id: "srv_bathroom_cleaning",
-    slug: "bathroom-deep-and-machine-cleaning",
-    title: "Bathroom Deep & Machine Scrub Cleaning",
-    categoryId: "cat_bathroom",
-    shortDescription: "Complete bathroom cleaning from tiles to taps, basin to toilet, mirrors to shower \u2014 removes hard-water stains, dirt, and grime.",
-    fullDescription: "Choose between Hand Scrubbing (\u20B9399), Rotary Machine Floor & Tile Scrubbing (\u20B9499), or A-to-Z Complete Bathroom Restoration Deep Cleaning (\u20B92,999). Includes wet wiping of geyser, exhaust, window sills, and descaling of fixtures.",
-    illustrationKey: "plumbing",
-    imageUrl: "/assets/tankmanpro/bathroom-deep.jpg",
-    galleryUrls: [
-      "/assets/tankmanpro/bathroom-deep.jpg",
-      "/assets/tankmanpro/bathroom-scrub.webp",
-      "/assets/tankmanpro/washbasin.jpg",
-      "/assets/tankmanpro/toilet-clean.jpg"
-    ],
-    durationMinutes: 75,
-    basePricePaise: 39900,
-    // ₹399 starting
-    regularPricePaise: 49900,
-    defaultPricingMode: "city_fixed",
-    inclusions: [
-      "Stain & hard-water scale removal from floor tiles, wall tiles, and grouts",
-      "Indian / Western toilet pot descaling and sanitization",
-      "Washbasin, chrome taps, shower head, and mirror polishing",
-      "Microfiber wet wiping of geyser exterior, exhaust fan, and bathroom door"
-    ],
-    exclusions: [
-      "Removal of permanent acid burns or broken tile replacement"
-    ],
-    preparationInstructions: [
-      "Please remove personal toiletries from shelves prior to cleaning."
-    ],
-    cancellationPolicySummary: "Free cancellation up to 4 hours before scheduled slot.",
-    variants: [
-      {
-        id: "var_bath_hand_scrub",
-        serviceId: "srv_bathroom_cleaning",
-        name: "Bathroom Floor & Tile Hand Scrubbing",
-        scopeSummary: "Manual deep scrubbing of bathroom floor, tiles, toilet & basin",
-        durationMinutes: 60,
-        basePricePaise: 39900,
-        // ₹399 on tankmanpro.com
-        regularPricePaise: 49900,
-        imageUrl: "/assets/tankmanpro/bathroom-deep.jpg",
-        active: true
-      },
-      {
-        id: "var_bath_machine_scrub",
-        serviceId: "srv_bathroom_cleaning",
-        name: "Bathroom Floor & Tile Machine Scrubbing",
-        scopeSummary: "Rotary machine scrubbing of floor & wall tiles + full bathroom sanitization",
-        durationMinutes: 75,
-        basePricePaise: 49900,
-        // ₹499 on tankmanpro.com
-        regularPricePaise: 64900,
-        imageUrl: "/assets/tankmanpro/bathroom-scrub.webp",
-        active: true
-      },
-      {
-        id: "var_bath_full_deep",
-        serviceId: "srv_bathroom_cleaning",
-        name: "Complete Bathroom Deep Cleaning (Multi-Bathroom / Restoration)",
-        scopeSummary: "A-to-Z intensive descaling, grout restoration, fittings & full hygiene pack",
-        durationMinutes: 150,
-        basePricePaise: 299900,
-        // ₹2,999 on tankmanpro.com
-        regularPricePaise: 349900,
-        imageUrl: "/assets/tankmanpro/bathroom-deep.jpg",
-        active: true
-      }
-    ],
-    addons: [
-      {
-        id: "addon_toilet_clean",
-        serviceId: "srv_bathroom_cleaning",
-        name: "Extra Toilet Cleaning (Indian / Western)",
-        description: "Stain removal from tiles and toilet pot with wiper finish.",
-        pricePaise: 9900,
-        // ₹99 on tankmanpro.com
-        imageUrl: "/assets/tankmanpro/toilet-clean.jpg",
-        required: false,
-        maxQuantity: 4,
-        active: true
-      },
-      {
-        id: "addon_washbasin_clean",
-        serviceId: "srv_bathroom_cleaning",
-        name: "Washbasin Deep Cleaning",
-        description: "Descaling of ceramic bowl, chrome tap, and mirror.",
-        pricePaise: 9900,
-        // ₹99 on tankmanpro.com
-        imageUrl: "/assets/tankmanpro/washbasin.jpg",
-        required: false,
-        maxQuantity: 4,
-        active: true
-      },
-      {
-        id: "addon_door_clean",
-        serviceId: "srv_bathroom_cleaning",
-        name: "Bathroom / Room Door Cleaning",
-        description: "Wet & dry microfiber cleaning of door panels and frame.",
-        pricePaise: 4900,
-        // ₹49 on tankmanpro.com
-        imageUrl: "/assets/tankmanpro/door-clean.jpg",
-        required: false,
-        maxQuantity: 5,
-        active: true
-      }
-    ],
-    questions: [],
-    faqs: [],
-    supportedCityIds: ["city_delhi", "city_shahjahanpur", "city_kanpur"],
-    status: "published",
-    isDemo: true
-  },
-  // 4. KITCHEN, CHIMNEY & FRIDGE CLEANING (Exact tankmanpro.com prices: ₹399 Chimney, ₹999 Empty Kitchen, ₹1299 Kitchen+Chimney, ₹1499 Kitchen+Appliances, ₹1699 Kitchen+Chimney+Appliances, ₹349/₹499 Fridge)
-  {
-    id: "srv_kitchen_chimney_clean",
-    slug: "kitchen-chimney-and-appliance-deep-cleaning",
-    title: "Kitchen, Chimney & Fridge Deep Cleaning",
-    categoryId: "cat_kitchen",
-    shortDescription: "Professional kitchen degreasing, chimney filter disassembly & wash, fridge interior/exterior sanitization, gas stove & sink cleaning.",
-    fullDescription: "Removes stubborn cooking oil, grease, and stains from kitchen slabs, tiles, cabinets, chimneys, and appliances. Book individual chimney/fridge cleaning or complete Empty Kitchen packages.",
-    illustrationKey: "appliance-repair",
-    imageUrl: "/assets/tankmanpro/kitchen-chimney.png",
-    galleryUrls: [
-      "/assets/tankmanpro/kitchen-chimney.png",
-      "/assets/tankmanpro/chimney-clean.png",
-      "/assets/tankmanpro/fridge-double.webp",
-      "/assets/tankmanpro/gas-stove.jpg"
-    ],
-    durationMinutes: 90,
-    basePricePaise: 39900,
-    // ₹399 starting (Chimney Cleaning on tankmanpro.com)
-    regularPricePaise: 49900,
-    defaultPricingMode: "city_fixed",
-    inclusions: [
-      "Degreasing of kitchen wall tiles, counter slab, and sink area",
-      "Chimney filter unlocking, chemical spray degreasing, and exterior polish",
-      "Appliance external & internal stain removal (as per chosen package)",
-      "Microfiber wet wipe and sanitization"
-    ],
-    exclusions: [
-      "Internal chimney motor replacement or electrical wiring repair"
-    ],
-    preparationInstructions: [
-      "Please clear fragile crockery from the counter slab before the crew arrives."
-    ],
-    cancellationPolicySummary: "Free cancellation up to 4 hours before scheduled slot.",
-    variants: [
-      {
-        id: "var_chimney_only",
-        serviceId: "srv_kitchen_chimney_clean",
-        name: "Chimney Deep Cleaning (Filter Disassembly & Degrease)",
-        scopeSummary: "Unlock & remove baffle/mesh filters, chemical degrease & body wipe",
-        durationMinutes: 60,
-        basePricePaise: 39900,
-        // ₹399 on tankmanpro.com
-        regularPricePaise: 49900,
-        imageUrl: "/assets/tankmanpro/chimney-clean.png",
-        active: true
-      },
-      {
-        id: "var_fridge_single",
-        serviceId: "srv_kitchen_chimney_clean",
-        name: "Single Door Fridge Deep Cleaning",
-        scopeSummary: "Interior & exterior dry dusting, tray wash & food-safe stain removal",
-        durationMinutes: 45,
-        basePricePaise: 34900,
-        // ₹349 on tankmanpro.com
-        regularPricePaise: 44900,
-        imageUrl: "/assets/tankmanpro/fridge-single.webp",
-        active: true
-      },
-      {
-        id: "var_fridge_double",
-        serviceId: "srv_kitchen_chimney_clean",
-        name: "Double Door Fridge Deep Cleaning",
-        scopeSummary: "Complete double-door interior shelves, gasket & exterior sanitization",
-        durationMinutes: 60,
-        basePricePaise: 49900,
-        // ₹499 on tankmanpro.com
-        regularPricePaise: 59900,
-        imageUrl: "/assets/tankmanpro/fridge-double.webp",
-        active: true
-      },
-      {
-        id: "var_empty_kitchen",
-        serviceId: "srv_kitchen_chimney_clean",
-        name: "Empty Kitchen Deep Cleaning",
-        scopeSummary: "Deep cleaning of empty kitchen cabinets, tiles, floor & platform",
-        durationMinutes: 120,
-        basePricePaise: 99900,
-        // ₹999 on tankmanpro.com
-        regularPricePaise: 129900,
-        imageUrl: "/assets/tankmanpro/kitchen-deep.png",
-        active: true
-      },
-      {
-        id: "var_empty_kitchen_chimney",
-        serviceId: "srv_kitchen_chimney_clean",
-        name: "Empty Kitchen + Chimney Deep Cleaning",
-        scopeSummary: "Empty kitchen deep clean + complete chimney degreasing & filter wash",
-        durationMinutes: 150,
-        basePricePaise: 129900,
-        // ₹1,299 on tankmanpro.com
-        regularPricePaise: 159900,
-        imageUrl: "/assets/tankmanpro/kitchen-deep.png",
-        active: true
-      },
-      {
-        id: "var_empty_kitchen_appliances",
-        serviceId: "srv_kitchen_chimney_clean",
-        name: "Empty Kitchen + Appliances Cleaning",
-        scopeSummary: "Empty kitchen deep clean + external cleaning of fridge, microwave & stove",
-        durationMinutes: 150,
-        basePricePaise: 149900,
-        // ₹1,499 on tankmanpro.com
-        regularPricePaise: 179900,
-        imageUrl: "/assets/tankmanpro/kitchen-chimney.png",
-        active: true
-      },
-      {
-        id: "var_empty_kitchen_full",
-        serviceId: "srv_kitchen_chimney_clean",
-        name: "Empty Kitchen + Chimney + Appliances Cleaning",
-        scopeSummary: "Complete hygienic kitchen overhaul including chimney & appliance cleaning",
-        durationMinutes: 180,
-        basePricePaise: 169900,
-        // ₹1,699 on tankmanpro.com
-        regularPricePaise: 199900,
-        imageUrl: "/assets/tankmanpro/kitchen-chimney.png",
-        active: true
-      }
-    ],
-    addons: [
-      {
-        id: "addon_gas_stove",
-        serviceId: "srv_kitchen_chimney_clean",
-        name: "Gas Stove Deep Cleaning",
-        description: "Burner, drip tray, and glass/steel top stain removal.",
-        pricePaise: 9900,
-        // ₹99 on tankmanpro.com
-        imageUrl: "/assets/tankmanpro/gas-stove.jpg",
-        required: false,
-        maxQuantity: 2,
-        active: true
-      },
-      {
-        id: "addon_kitchen_sink",
-        serviceId: "srv_kitchen_chimney_clean",
-        name: "Kitchen Sink & Tap Descaling",
-        description: "Removes grease, water spots, and limescale from sink & faucet.",
-        pricePaise: 9900,
-        // ₹99 on tankmanpro.com
-        imageUrl: "/assets/tankmanpro/kitchen-sink.jpeg",
-        required: false,
-        maxQuantity: 2,
-        active: true
-      }
-    ],
-    questions: [],
-    faqs: [],
-    supportedCityIds: ["city_delhi", "city_shahjahanpur", "city_kanpur"],
-    status: "published",
-    isDemo: true
-  },
-  // 5. SOFA, MATTRESS & CARPET CLEANING (Exact tankmanpro.com prices: ₹149/seat Sofa, ₹249/seat Deep Sofa, ₹349 Single Mattress, ₹649 Double Mattress)
-  {
-    id: "srv_sofa_mattress_clean",
-    slug: "sofa-mattress-and-carpet-deep-cleaning",
-    title: "Sofa, Mattress & Carpet Deep Cleaning",
-    categoryId: "cat_sofa_mattress",
-    shortDescription: "Industrial dry vacuuming, foam shampooing, stain removal, and wet extraction for sofas, cushions, mattresses, and carpets.",
-    fullDescription: "Restores fabric freshness and removes embedded dust mites, allergens, sweat stains, and odours from upholstery and mattresses using commercial wet-and-dry vacuum extraction.",
-    illustrationKey: "appliance-repair",
-    imageUrl: "/assets/tankmanpro/sofa-clean.jpg",
-    galleryUrls: [
-      "/assets/tankmanpro/sofa-clean.jpg",
-      "/assets/tankmanpro/mattress-clean.png",
-      "/assets/tankmanpro/carpet-clean.webp"
-    ],
-    durationMinutes: 60,
-    basePricePaise: 14900,
-    // ₹149 per seat on tankmanpro.com
-    regularPricePaise: 19900,
-    defaultPricingMode: "city_fixed",
-    inclusions: [
-      "Dry dusting and high-suction vacuuming of crevices, cushions, and seams",
-      "Fabric-safe foam shampooing and gentle mechanical brushing",
-      "Wet vacuum moisture and dirt extraction"
-    ],
-    exclusions: [
-      "Ink or permanent dye bleed removal"
-    ],
-    preparationInstructions: [
-      "Keep ceiling fan on for 2\u20133 hours after cleaning for natural air drying."
-    ],
-    cancellationPolicySummary: "Free cancellation up to 4 hours before scheduled slot.",
-    variants: [
-      {
-        id: "var_sofa_149",
-        serviceId: "srv_sofa_mattress_clean",
-        name: "Sofa & Cushion Cleaning (1 Seat \u2014 \u20B9149/seat)",
-        scopeSummary: "Dry dusting + vacuuming & shampoo wash for 1 sofa seat",
-        durationMinutes: 30,
-        basePricePaise: 14900,
-        // ₹149 on tankmanpro.com
-        regularPricePaise: 19900,
-        imageUrl: "/assets/tankmanpro/sofa-clean.jpg",
-        active: true
-      },
-      {
-        id: "var_sofa_5seat",
-        serviceId: "srv_sofa_mattress_clean",
-        name: "5-Seater Sofa Set Deep Cleaning (\u20B9149 \xD7 5)",
-        scopeSummary: "Complete 5-seater sofa & cushion shampoo + vacuum extraction",
-        durationMinutes: 75,
-        basePricePaise: 74500,
-        // ₹745
-        regularPricePaise: 99500,
-        imageUrl: "/assets/tankmanpro/sofa-clean.jpg",
-        active: true
-      },
-      {
-        id: "var_mattress_single",
-        serviceId: "srv_sofa_mattress_clean",
-        name: "Single Bed / Mattress Deep Cleaning",
-        scopeSummary: "Removes dust, stains, allergens & odors from 1 single mattress",
-        durationMinutes: 45,
-        basePricePaise: 34900,
-        // ₹349 on tankmanpro.com
-        regularPricePaise: 39900,
-        imageUrl: "/assets/tankmanpro/mattress-clean.png",
-        active: true
-      },
-      {
-        id: "var_mattress_double",
-        serviceId: "srv_sofa_mattress_clean",
-        name: "Double Bed / Mattress Deep Cleaning",
-        scopeSummary: "Both-side vacuuming, stain treatment & sanitization for double mattress",
-        durationMinutes: 60,
-        basePricePaise: 64900,
-        // ₹649 on tankmanpro.com
-        regularPricePaise: 79900,
-        imageUrl: "/assets/tankmanpro/mattress-clean.png",
-        active: true
-      },
-      {
-        id: "var_carpet_50sqft",
-        serviceId: "srv_sofa_mattress_clean",
-        name: "Carpet Deep Cleaning & Shampooing (Up to 50 sq.ft @ \u20B910/sq.ft)",
-        scopeSummary: "Deep foam shampooing and vacuum extraction for standard room carpet",
-        durationMinutes: 60,
-        basePricePaise: 5e4,
-        // ₹500 (50 sq.ft * ₹10/sq.ft on tankmanpro.com)
-        regularPricePaise: 65e3,
-        imageUrl: "/assets/tankmanpro/carpet-clean.webp",
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/repairman-uniform-installing-outside-unit-air-conditioner_93675-91162.jpg",
         active: true
       }
     ],
     addons: [],
     questions: [],
     faqs: [],
-    supportedCityIds: ["city_delhi", "city_shahjahanpur", "city_kanpur"],
+    supportedCityIds: ALL_CITIES,
     status: "published",
     isDemo: true
   },
-  // 6. CAR & BIKE WASH (Exact tankmanpro.com prices: Bike Wash ₹99, Car Wash ₹299)
+  // 20. REFRIGERATOR SERVICES (REPAIR)
   {
-    id: "srv_vehicle_wash",
-    slug: "doorstep-car-and-bike-foam-wash",
-    title: "Doorstep Car & Bike Foam Wash",
-    categoryId: "cat_vehicle_wash",
-    shortDescription: "Interior & exterior car cleaning via vacuum + polish (\u20B9299) and two-wheeler high-foam pressure wash (\u20B999).",
-    fullDescription: "Doorstep vehicle care by TankmanPro. Includes snow-foam exterior wash, tyre & alloy dressing, dashboard polish, and interior dry vacuuming.",
-    illustrationKey: "water-tank",
-    imageUrl: "/assets/tankmanpro/car-wash.jpg",
-    galleryUrls: ["/assets/tankmanpro/car-wash.jpg", "/assets/tankmanpro/bike-wash.jpg"],
+    id: "srv_refrigerator_repair",
+    slug: "refrigerator-services",
+    title: "Refrigerator Services",
+    categoryId: "cat_repairs",
+    shortDescription: "Expert refrigerator repair services: fast, reliable fixes to keep your food fresh and your kitchen running smoothly.",
+    fullDescription: "Need your refrigerator fixed? Our experienced technicians offer prompt and dependable repair services to get your fridge up and running in no time. We diagnose and resolve cooling issues, compressor problems, defrost failures, gas leaks, and thermostat faults efficiently.",
+    illustrationKey: "appliance-repair",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/Refrigerator-Repair-Appliance-Company.jpg",
     durationMinutes: 45,
-    basePricePaise: 9900,
-    // ₹99 starting (Bike Wash on tankmanpro.com)
-    regularPricePaise: 14900,
+    basePricePaise: 29900,
+    regularPricePaise: 39900,
     defaultPricingMode: "city_fixed",
     inclusions: [
-      "High-pressure pre-rinse and snow-foam shampoo wash",
-      "Microfiber hand wipe and water-spot removal",
-      "Interior dry vacuuming and dashboard/tyre polish (for Car Wash)"
+      "Comprehensive cooling diagnostics & error code read",
+      "Compressor relay, capacitor, and thermostat inspection",
+      "Gas pressure check and defrost timer test",
+      "Minor wiring and connection repair"
     ],
-    exclusions: [
-      "Rubbing compound paint correction or ceramic coating"
-    ],
-    preparationInstructions: [
-      "Ensure parking space and water tap access within 15 metres."
-    ],
-    cancellationPolicySummary: "Free cancellation up to 4 hours before scheduled slot.",
+    exclusions: ["Cost of compressor, PCB or gas recharge (quoted post-diagnosis)"],
+    preparationInstructions: ["Ensure refrigerator is plugged into electric socket."],
+    cancellationPolicySummary: "Free cancellation up to 2 hours before service.",
     variants: [
       {
-        id: "var_bike_wash",
-        serviceId: "srv_vehicle_wash",
-        name: "Bike / Scooter Foam Wash",
-        scopeSummary: "Complete exterior foam wash, chain/rim degreaser & polish",
-        durationMinutes: 30,
-        basePricePaise: 9900,
-        // ₹99 on tankmanpro.com
-        regularPricePaise: 14900,
-        imageUrl: "/assets/tankmanpro/bike-wash.jpg",
-        active: true
-      },
-      {
-        id: "var_car_wash",
-        serviceId: "srv_vehicle_wash",
-        name: "Car Wash (Interior Vacuum + Exterior Foam & Polish)",
-        scopeSummary: "Complete interior vacuuming, dashboard polish & exterior pressure wash",
-        durationMinutes: 50,
+        id: "var_fridge_repair_diag",
+        serviceId: "srv_refrigerator_repair",
+        name: "Refrigerator Diagnostic & Inspection Visit",
+        scopeSummary: "Inspection, fault finding, and minor repair adjustment",
+        durationMinutes: 45,
         basePricePaise: 29900,
-        // ₹299 on tankmanpro.com
         regularPricePaise: 39900,
-        imageUrl: "/assets/tankmanpro/car-wash.jpg",
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/Refrigerator-Repair-Appliance-Company.jpg",
         active: true
       }
     ],
     addons: [],
     questions: [],
     faqs: [],
-    supportedCityIds: ["city_delhi", "city_shahjahanpur", "city_kanpur"],
+    supportedCityIds: ALL_CITIES,
     status: "published",
     isDemo: true
   },
-  // 7. FAN, EXHAUST, DOOR & FLOOR CLEANING (Exact tankmanpro.com prices: Ceiling Fan ₹49, Exhaust Fan ₹99, Door ₹49, Floor ₹15/sq.ft)
+  // 21. WASHING MACHINE SERVICES (REPAIR)
   {
     id: "srv_washing_machine_repair",
-    slug: "fan-exhaust-and-floor-deep-cleaning",
-    title: "Ceiling Fan, Exhaust Fan & Floor Scrubbing",
-    categoryId: "cat_fan_appliances",
-    shortDescription: "Dry dusting, chemical degreasing, and microfiber wiping for ceiling fans (\u20B949), exhaust fans (\u20B999), doors (\u20B949), and floors.",
-    fullDescription: "Essential fixture and surface cleaning for Indian homes. Removes thick grease from kitchen/bathroom exhaust fans, dust buildup on ceiling fan blades, and grime from floor grouts.",
+    slug: "washing-machine-services",
+    title: "Washing Machine Services",
+    categoryId: "cat_repairs",
+    shortDescription: "Efficient washing machine repair services: skilled technicians swiftly diagnose and resolve issues to restore functionality.",
+    fullDescription: "Need your washing machine fixed? Our expert technicians offer fast and dependable repair services for front-load, top-load, and semi-automatic machines. We resolve drum rotation issues, vibration noise, drainage blockage, water inlet valve faults, and PCB errors.",
     illustrationKey: "appliance-repair",
-    imageUrl: "/assets/tankmanpro/ceiling-fan.jpg",
-    galleryUrls: [
-      "/assets/tankmanpro/ceiling-fan.jpg",
-      "/assets/tankmanpro/exhaust-fan.jpg",
-      "/assets/tankmanpro/floor-clean.jpg"
-    ],
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/360_F_423351639_qcIVh5khAZrpTdIHakM5n8G6wtgFIA7y.jpg",
     durationMinutes: 45,
-    basePricePaise: 4900,
-    // ₹49 on tankmanpro.com
-    regularPricePaise: 9900,
+    basePricePaise: 29900,
+    regularPricePaise: 39900,
     defaultPricingMode: "city_fixed",
     inclusions: [
-      "Dry dusting of all fan blades and motor canopy",
-      "Chemical spray and scrubbing to remove oil/grease stains",
-      "Final clean microfiber wipe with zero floor mess"
+      "Complete mechanical and electrical system diagnostics",
+      "Drain pump, inlet valve, and belt tension check",
+      "Motor carbon brush and drum balance inspection",
+      "Basic filter cleaning and lint trap clean"
     ],
-    exclusions: [
-      "Electrical rewiring or capacitor replacement"
-    ],
-    preparationInstructions: [
-      "Switch off the fan regulator prior to cleaning."
-    ],
-    cancellationPolicySummary: "Free cancellation up to 4 hours before scheduled slot.",
+    exclusions: ["Replacement parts like drum bearings, motor or motherboard"],
+    preparationInstructions: ["Ensure machine is connected to water tap and power socket."],
+    cancellationPolicySummary: "Free cancellation up to 2 hours before service.",
     variants: [
       {
-        id: "var_wm_top_load",
+        id: "var_wm_repair_diag",
         serviceId: "srv_washing_machine_repair",
-        name: "Ceiling Fan Cleaning (Per Fan)",
-        scopeSummary: "Blade dry dusting, stain scrubbing & canopy wipe",
-        durationMinutes: 20,
-        basePricePaise: 4900,
-        // ₹49 on tankmanpro.com
-        regularPricePaise: 7900,
-        imageUrl: "/assets/tankmanpro/ceiling-fan.jpg",
-        active: true
-      },
-      {
-        id: "var_exhaust_fan",
-        serviceId: "srv_washing_machine_repair",
-        name: "Exhaust Fan Degreasing & Cleaning",
-        scopeSummary: "Chemical oil/grease removal for kitchen or bathroom exhaust fan",
-        durationMinutes: 30,
-        basePricePaise: 9900,
-        // ₹99 on tankmanpro.com
-        regularPricePaise: 14900,
-        imageUrl: "/assets/tankmanpro/exhaust-fan.jpg",
-        active: true
-      },
-      {
-        id: "var_floor_scrub_pack",
-        serviceId: "srv_washing_machine_repair",
-        name: "Room Floor & Grout Scrubbing (Up to 100 sq.ft @ \u20B915/sq.ft)",
-        scopeSummary: "Cleaning grouts, corners, and floor surface with microfiber & mop",
-        durationMinutes: 60,
-        basePricePaise: 15e4,
-        // ₹1,500
-        regularPricePaise: 18e4,
-        imageUrl: "/assets/tankmanpro/floor-clean.jpg",
+        name: "Washing Machine Inspection & Diagnostic Visit",
+        scopeSummary: "Full diagnosis of front-load, top-load or semi-auto machines",
+        durationMinutes: 45,
+        basePricePaise: 29900,
+        regularPricePaise: 39900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/360_F_423351639_qcIVh5khAZrpTdIHakM5n8G6wtgFIA7y.jpg",
         active: true
       }
     ],
     addons: [],
     questions: [],
     faqs: [],
-    supportedCityIds: ["city_delhi", "city_shahjahanpur", "city_kanpur"],
+    supportedCityIds: ALL_CITIES,
     status: "published",
     isDemo: true
   },
-  // 8. BEEDARE BY TANKMANPRO — AESTHETIC & PEEL TREATMENTS AT HOME (Exact tankmanpro.com prices: ₹1,999 Peels, ₹3,999 PRP/Laser, ₹4,999 Dermapen)
+  // 22. PLUMBER SERVICES
   {
-    id: "srv_plumbing_pipeline_care",
-    slug: "beedare-at-home-skin-peels-and-aesthetics",
-    title: "Beedare Aesthetic & Skin Peel Treatments at Home",
-    categoryId: "cat_aesthetics",
-    shortDescription: "Advanced skin resurfacing, brightening peels (\u20B91,999), Dermapen collagen boost (\u20B94,999), and laser hair reduction at home.",
-    fullDescription: "Welcome to Beedare by TankmanPro. Experience advanced skin resurfacing, brightening peels, and aesthetic care from the comfort of your home \u2014 no clinic queues or waiting.",
+    id: "srv_plumber_services",
+    slug: "plumber-services",
+    title: "Plumber Services",
+    categoryId: "cat_repairs",
+    shortDescription: "Maintain and repair all plumbing installations: fixtures, leakages, piping, toilets, water heaters, and drain clearance.",
+    fullDescription: "Plumbers install and repair water, gas, and other piping systems in homes and businesses. They install plumbing fixtures such as faucets, sinks, bathtubs, and toilets. They clear blocked drains, fix pipe bursts, replace angle valves, and overhaul bathroom fittings.",
     illustrationKey: "plumbing",
-    imageUrl: "/assets/tankmanpro/aesthetic-facial.jpg",
-    galleryUrls: [
-      "/assets/tankmanpro/aesthetic-facial.jpg",
-      "/assets/tankmanpro/chemical-peel.jpg",
-      "/assets/tankmanpro/laser-skin.jpg"
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/colorful-plumbing-round-composition_1284-40766.jpg",
+    durationMinutes: 45,
+    basePricePaise: 14900,
+    regularPricePaise: 24900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Expert diagnostic check of piping lines & fixtures",
+      "Minor leak repair, washer replacement or tap tightening",
+      "Water pressure and overhead tank connection assessment"
     ],
+    exclusions: ["Cost of replacement taps, pipes or specialized sanitaryware"],
+    preparationInstructions: ["Locate main water supply valve before technician arrival."],
+    cancellationPolicySummary: "Free cancellation up to 2 hours before service.",
+    variants: [
+      {
+        id: "var_plumber_inspection",
+        serviceId: "srv_plumber_services",
+        name: "Plumber Diagnostic & Repair Visit",
+        scopeSummary: "Tap repair, leak check, toilet flush or pipe fixing",
+        durationMinutes: 45,
+        basePricePaise: 14900,
+        regularPricePaise: 24900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/colorful-plumbing-round-composition_1284-40766.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 23. ELECTRICIAN SERVICES
+  {
+    id: "srv_electrician_services",
+    slug: "electrician-services",
+    title: "Electrician Services",
+    categoryId: "cat_repairs",
+    shortDescription: "Installing, maintaining, and repairing electrical control, wiring, circuit breakers, switchboards, and lighting systems.",
+    fullDescription: "Certified electrical diagnostics: reading blueprints, inspecting circuit breakers, replacing faulty switchboards, repairing short circuits, inverter battery line setup, light fixtures, and fan installations.",
+    illustrationKey: "appliance-repair",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/colorful-electricity-elements-concept_1284-37811.jpg",
+    durationMinutes: 45,
+    basePricePaise: 14900,
+    regularPricePaise: 24900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Electrical load and voltage fault testing",
+      "Minor switch, socket, or wire terminal replacement",
+      "Earthing and MCB trip diagnosis"
+    ],
+    exclusions: ["Cost of cables, MCB switches, chandelier or heavy materials"],
+    preparationInstructions: ["Provide access to main MCB distribution board."],
+    cancellationPolicySummary: "Free cancellation up to 2 hours before service.",
+    variants: [
+      {
+        id: "var_electrician_inspection",
+        serviceId: "srv_electrician_services",
+        name: "Electrician Inspection & Repair Visit",
+        scopeSummary: "Switchboard, wiring, MCB, or light fixture diagnosis & repair",
+        durationMinutes: 45,
+        basePricePaise: 14900,
+        regularPricePaise: 24900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/colorful-electricity-elements-concept_1284-37811.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 24. PAINTER SERVICES
+  {
+    id: "srv_painter_services",
+    slug: "painter-services",
+    title: "Painter Services",
+    categoryId: "cat_repairs",
+    shortDescription: "Professional painting services for interior and exterior walls: surface prep, scraping, crack filling, primer & finish.",
+    fullDescription: "Mixing and matching paint, stain and finishes to specifications. Applying paint using rollers/sprayers, repairing wall cracks with putty, scraping flaking paint, water seepage primer treatment, and flawless coats.",
+    illustrationKey: "appliance-repair",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/istockphoto-1198989663-612x612-1.jpg",
     durationMinutes: 60,
+    basePricePaise: 49900,
+    regularPricePaise: 69900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Site laser measurement & wall moisture inspection",
+      "Paint shade catalog and texture finish consultation",
+      "Surface area square footage estimation and quote"
+    ],
+    exclusions: ["Cost of paint cans, primer buckets, and masking tape"],
+    preparationInstructions: ["Clear wall areas for accurate tape measurements."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_painter_consultation",
+        serviceId: "srv_painter_services",
+        name: "Painter Wall Measurement & Site Inspection",
+        scopeSummary: "Detailed measurement, seepage check, color consult & quote",
+        durationMinutes: 60,
+        basePricePaise: 49900,
+        regularPricePaise: 69900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2024/03/istockphoto-1198989663-612x612-1.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 25. YELLOW PEEL
+  {
+    id: "srv_beedare_yellow_peel",
+    slug: "yellow-peel-anti-aging-skin-renewal",
+    title: "Yellow Peel \u2013 Anti-aging & skin renewal",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Welcome to Beedare by Tankmanpro. Experience Advanced Skin Resurfacing and Brightening \u2013 all from the comfort of your home.",
+    fullDescription: "Certified & Skilled Skincare Experts at your doorstep. Safe, Dermatologist-Approved Formulas to improve skin texture, stimulate collagen, reduce fine lines, and reveal brighter, healthier-looking skin with minimal downtime.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/54a488b2-c84c-4ea4-ad5b-62f4610ece16.jpg",
+    durationMinutes: 60,
+    basePricePaise: 399900,
+    regularPricePaise: 499900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Skin assessment and pre-peel cleansing",
+      "Application of dermatological Yellow Peel formula",
+      "Post-peel soothing mask and SPF application",
+      "Customized home-care recovery guidelines"
+    ],
+    exclusions: ["Internal oral medications"],
+    preparationInstructions: ["Just a comfortable space, towel, and clean running water."],
+    cancellationPolicySummary: "Free cancellation up to 6 hours before appointment.",
+    variants: [
+      {
+        id: "var_yellow_peel",
+        serviceId: "srv_beedare_yellow_peel",
+        name: "Yellow Peel Anti-Aging & Renewal Session",
+        scopeSummary: "Advanced skin resurfacing, collagen renewal & glow",
+        durationMinutes: 60,
+        basePricePaise: 399900,
+        regularPricePaise: 499900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/54a488b2-c84c-4ea4-ad5b-62f4610ece16.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 26. TCA PEEL
+  {
+    id: "srv_beedare_tca_peel",
+    slug: "tca-peel-pigmentation-scar-reduction",
+    title: "TCA Peel \u2013 Pigmentation & scar reduction",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Advanced Skin Resurfacing: Target stubborn pigmentation, acne scars, and uneven skin tone with clinical TCA peel at home.",
+    fullDescription: "Trichloroacetic Acid (TCA) peel treatment administered by certified skincare practitioners. Targets deep pigmentation, old acne blemishes, and sun damage for refreshed, smooth skin.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/enjoying-beauty-treatment.jpg",
+    durationMinutes: 60,
+    basePricePaise: 299900,
+    regularPricePaise: 399900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Medical skin prep and degreasing",
+      "Precision TCA acid peel application",
+      "Neutralization & calming post-peel serum",
+      "Post-procedure sun protection protocol"
+    ],
+    exclusions: ["Prescription steroid creams"],
+    preparationInstructions: ["Avoid waxing, bleaching, or retinoids for 48 hours prior."],
+    cancellationPolicySummary: "Free cancellation up to 6 hours before appointment.",
+    variants: [
+      {
+        id: "var_tca_peel",
+        serviceId: "srv_beedare_tca_peel",
+        name: "TCA Pigmentation & Scar Reduction Session",
+        scopeSummary: "Targeted deep pigmentation, scar softening & resurfacing",
+        durationMinutes: 60,
+        basePricePaise: 299900,
+        regularPricePaise: 399900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/enjoying-beauty-treatment.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 27. VITAMIN C PEEL
+  {
+    id: "srv_beedare_vitc_peel",
+    slug: "vitamin-c-peel-brightening-antioxidant-boost",
+    title: "Vitamin C Peel \u2013 Brightening & antioxidant boost",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Instantly revive dull skin: high-potency antioxidant Vitamin C peel provides radiant glow, minimizes tan and boosts hydration.",
+    fullDescription: "Gentle yet powerful brightening treatment. Concentrated Vitamin C combined with botanical fruit acids infuses antioxidants, removes surface dead cells, and brightens sun-damaged skin.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/anti-aging.jpg",
+    durationMinutes: 45,
     basePricePaise: 199900,
-    // ₹1,999 on tankmanpro.com
     regularPricePaise: 249900,
     defaultPricingMode: "city_fixed",
     inclusions: [
-      "Pre-treatment skin cleansing and sensitivity patch assessment",
-      "Application of clinical-grade peel or aesthetic protocol with sterile single-use consumables",
-      "Post-care soothing mask and SPF protection guidance"
+      "Antioxidant deep facial cleanse",
+      "Vitamin C active booster peel application",
+      "Hydrating cooling mask and barrier cream"
     ],
-    exclusions: [
-      "Prescription oral medications"
-    ],
-    preparationInstructions: [
-      "Avoid active retinoids or harsh exfoliants 48 hours prior to your session."
-    ],
-    cancellationPolicySummary: "Free cancellation up to 4 hours before scheduled slot.",
+    exclusions: ["Laser skin treatments"],
+    preparationInstructions: ["Gentle face wash before arrival."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
     variants: [
       {
-        id: "var_plumb_standard",
-        serviceId: "srv_plumbing_pipeline_care",
-        name: "Glycolic / Vitamin C / Salicylic Acid Peel",
-        scopeSummary: "Skin resurfacing, brightening, even tone & acne/oil control peel",
+        id: "var_vitc_peel",
+        serviceId: "srv_beedare_vitc_peel",
+        name: "Vitamin C Brightening & Glow Session",
+        scopeSummary: "Instant glow, tan removal, and antioxidant hydration",
         durationMinutes: 45,
         basePricePaise: 199900,
-        // ₹1,999 on tankmanpro.com
         regularPricePaise: 249900,
-        imageUrl: "/assets/tankmanpro/chemical-peel.jpg",
-        active: true
-      },
-      {
-        id: "var_tca_peel",
-        serviceId: "srv_plumbing_pipeline_care",
-        name: "TCA Peel \u2014 Pigmentation & Scar Reduction",
-        scopeSummary: "Targeted medium-depth peel for stubborn pigmentation and scars",
-        durationMinutes: 50,
-        basePricePaise: 299900,
-        // ₹2,999 on tankmanpro.com
-        regularPricePaise: 349900,
-        imageUrl: "/assets/tankmanpro/chemical-peel.jpg",
-        active: true
-      },
-      {
-        id: "var_prp_laser",
-        serviceId: "srv_plumbing_pipeline_care",
-        name: "Full Face Laser / PRP Rejuvenation Session",
-        scopeSummary: "At-home full face diode laser or platelet-rich plasma skin/hair session",
-        durationMinutes: 60,
-        basePricePaise: 399900,
-        // ₹3,999 on tankmanpro.com
-        regularPricePaise: 499900,
-        imageUrl: "/assets/tankmanpro/laser-skin.jpg",
-        active: true
-      },
-      {
-        id: "var_dermapen",
-        serviceId: "srv_plumbing_pipeline_care",
-        name: "Dermapen / Micro-Needle Therapy",
-        scopeSummary: "Collagen induction, scar reduction & texture renewal session",
-        durationMinutes: 60,
-        basePricePaise: 499900,
-        // ₹4,999 on tankmanpro.com
-        regularPricePaise: 599900,
-        imageUrl: "/assets/tankmanpro/aesthetic-facial.jpg",
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/anti-aging.jpg",
         active: true
       }
     ],
     addons: [],
     questions: [],
     faqs: [],
-    supportedCityIds: ["city_delhi", "city_shahjahanpur", "city_kanpur"],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 28. GLYCOLIC PEEL
+  {
+    id: "srv_beedare_glycolic_peel",
+    slug: "glycolic-peel-skin-resurfacing-even-tone",
+    title: "\u2022 Glycolic Peel \u2013 Skin resurfacing & even tone",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Clinical alpha-hydroxy acid (AHA) peel dissolves cellular glue to reveal fresher, smoother, and more even-toned skin.",
+    fullDescription: "Experience medical-grade AHA skin resurfacing at home. Gently unclogs congested pores, softens fine lines, and promotes cellular turnover for smooth porcelain skin texture.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/Chemical-Peel.jpg",
+    durationMinutes: 45,
+    basePricePaise: 199900,
+    regularPricePaise: 249900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Gentle pre-peel cleanser and toner",
+      "Controlled Glycolic AHA peel layer",
+      "Skin neutralizer and cold compress",
+      "Hydra-nourishing soothing balm"
+    ],
+    exclusions: ["Microdermabrasion combination"],
+    preparationInstructions: ["Do not scrub or exfoliate skin on day of treatment."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_glycolic_peel",
+        serviceId: "srv_beedare_glycolic_peel",
+        name: "Glycolic Peel Skin Resurfacing Session",
+        scopeSummary: "AHA cell renewal, smooth texture & even skin tone",
+        durationMinutes: 45,
+        basePricePaise: 199900,
+        regularPricePaise: 249900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/Chemical-Peel.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 29. PRP (PLATELET-RICH PLASMA)
+  {
+    id: "srv_beedare_prp",
+    slug: "prp-platelet-rich-plasma-therapy",
+    title: "\u2022 PRP (Platelet-Rich Plasma Therapy) \u2013 Hair & skin rejuvenation",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Autologous growth factor therapy to stimulate hair follicle regrowth, thicken hair roots, and rejuvenate facial collagen.",
+    fullDescription: "Administered by certified medical professionals adhering to hospital-grade sterile standards. Uses your body\u2019s concentrated growth factors to revitalize dormant scalp hair follicles and reverse facial aging.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/prp-hair-treatment.jpg",
+    durationMinutes: 60,
+    basePricePaise: 399900,
+    regularPricePaise: 499900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Sterile blood draw and high-speed centrifugal separation",
+      "Topical numbing cream for painless application",
+      "Targeted micro-injection or meso-gun delivery",
+      "Post-procedure antiseptic spray and care kit"
+    ],
+    exclusions: ["Hair transplant surgery"],
+    preparationInstructions: ["Wash hair thoroughly in morning; stay well-hydrated."],
+    cancellationPolicySummary: "Free cancellation up to 8 hours before appointment.",
+    variants: [
+      {
+        id: "var_prp_therapy",
+        serviceId: "srv_beedare_prp",
+        name: "PRP Hair & Scalp Rejuvenation Session",
+        scopeSummary: "Autologous platelet plasma micro-therapy for hair density",
+        durationMinutes: 60,
+        basePricePaise: 399900,
+        regularPricePaise: 499900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/prp-hair-treatment.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 30. BOTOX
+  {
+    id: "srv_beedare_botox",
+    slug: "botox-smoothens-wrinkles-fine-lines",
+    title: "\u2022 Botox \u2013 Smoothens wrinkles & fine lines (per unit)",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Experience Advanced Aesthetic Solutions: smooth forehead lines, crow\u2019s feet, and frown lines with certified botulinum toxin at home.",
+    fullDescription: "Precise micro-dosing to relax hyperactive facial muscles and eliminate dynamic wrinkles. Safe, FDA-approved authentic botulinum protein delivered by certified injectors.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/botox-2020-01-13-5e1c430703002.jpg",
+    durationMinutes: 30,
+    basePricePaise: 15e4,
+    // Starts at 5 units = ₹1,500 (₹300/unit)
+    regularPricePaise: 18e4,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Facial muscle movement mapping and consultation",
+      "Topical anesthetic numbing cream",
+      "Precise micro-droplet injection delivery",
+      "2-week follow-up touch-up check"
+    ],
+    exclusions: ["Surgical facelift"],
+    preparationInstructions: ["Avoid alcohol and blood thinners 24 hours prior."],
+    cancellationPolicySummary: "Free cancellation up to 6 hours before appointment.",
+    variants: [
+      {
+        id: "var_botox_unit",
+        serviceId: "srv_beedare_botox",
+        name: "Botox Anti-Wrinkle Treatment (Starting 5 Units)",
+        scopeSummary: "Forehead lines, crow\u2019s feet or frown line smoothing (\u20B9300/unit)",
+        durationMinutes: 30,
+        basePricePaise: 15e4,
+        regularPricePaise: 18e4,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/botox-2020-01-13-5e1c430703002.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 31. FILLER (1 ML)
+  {
+    id: "srv_beedare_filler",
+    slug: "filler-1-ml-volume-restoration-contouring",
+    title: "Filler (1 ml) \u2013 Volume restoration & contouring \u2013",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Hyaluronic acid dermal filler (1 ml): Restore hollow cheeks, enhance lips, soften nasolabial folds, and sculpt jawline contour.",
+    fullDescription: "Premium cross-linked hyaluronic acid filler to replenish youthful volume. Instant, natural results delivered by experienced aesthetic doctors in a comfortable home setting.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/what-are-skin-boosters.jpg",
+    durationMinutes: 45,
+    basePricePaise: 1599900,
+    regularPricePaise: 1899900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Sterile sealed 1 ml hyaluronic acid syringe (Allergan / Juvederm / Restylane)",
+      "Detailed facial contour symmetry analysis",
+      "Painless cannula or fine-needle injection with lidocaine",
+      "Sculpting massage and post-filler cool pack"
+    ],
+    exclusions: ["Permanent silicone fillers"],
+    preparationInstructions: ["Avoid aspirin and green tea for 24 hours prior."],
+    cancellationPolicySummary: "Free cancellation up to 8 hours before service.",
+    variants: [
+      {
+        id: "var_filler_1ml",
+        serviceId: "srv_beedare_filler",
+        name: "Dermal Filler (1 ml Hyaluronic Acid)",
+        scopeSummary: "Lip enhancement, cheek lift, or smile lines volume restoration",
+        durationMinutes: 45,
+        basePricePaise: 1599900,
+        regularPricePaise: 1899900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/what-are-skin-boosters.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 32. SKIN BOOSTER
+  {
+    id: "srv_beedare_skin_booster",
+    slug: "skin-booster-hydration-radiance-boost",
+    title: "Skin Booster \u2013 Hydration & radiance boost",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Deep dermal hydration micro-injections with pure hyaluronic acid. Boosts elasticity, glow, and plumps dehydrated skin.",
+    fullDescription: "Profhilo / Restylane SkinBoosters deliver ultra-pure hyaluronic acid across bio-aesthetic points. Stimulates 4 types of collagen and elastin, restoring natural firm radiance without altering facial structure.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/what-are-skin-boosters.jpg",
+    durationMinutes: 45,
+    basePricePaise: 1499900,
+    regularPricePaise: 1799900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Topical numbing and skin disinfection",
+      "Multi-point hyaluronic micro-bolus placement",
+      "Hydrating sheet mask and soothing cream"
+    ],
+    exclusions: ["Surgical threading"],
+    preparationInstructions: ["Arrive with clean makeup-free skin."],
+    cancellationPolicySummary: "Free cancellation up to 6 hours before service.",
+    variants: [
+      {
+        id: "var_skin_booster",
+        serviceId: "srv_beedare_skin_booster",
+        name: "Skin Booster Deep Hydration & Collagen Session",
+        scopeSummary: "Pure hyaluronic acid bio-remodeling for intense glow and elasticity",
+        durationMinutes: 45,
+        basePricePaise: 1499900,
+        regularPricePaise: 1799900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/what-are-skin-boosters.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 33. MICRO-NEEDLE THERAPY
+  {
+    id: "srv_beedare_microneedle",
+    slug: "micro-needle-therapy-scar-reduction-skin-renewal",
+    title: "Micro-Needle Therapy \u2013 Scar reduction & skin renewal",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Medical micro-needling stimulates natural elastin and collagen synthesis to diminish acne scars, reduce pore size, and firm skin.",
+    fullDescription: "Precision motorized micro-needling creates controlled micro-channels in the dermis, triggering natural wound-healing cascade, serum absorption boost, and skin tightening.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/360_F_471092808_sUCrkTM1CwSfXuFvMWTUKrGsTzfbfTCw.jpg",
+    durationMinutes: 60,
+    basePricePaise: 499900,
+    regularPricePaise: 599900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Medical numbing cream for comfortable session",
+      "Sterile single-use multi-needle cartridge",
+      "Hyaluronic & peptide infusion during needling",
+      "Cryo-cooling calming mask and SPF 50+"
+    ],
+    exclusions: ["Active cystic acne infected lesions"],
+    preparationInstructions: ["Avoid direct sun exposure 24 hours prior."],
+    cancellationPolicySummary: "Free cancellation up to 6 hours before service.",
+    variants: [
+      {
+        id: "var_microneedle",
+        serviceId: "srv_beedare_microneedle",
+        name: "Micro-Needle Collagen Induction Therapy",
+        scopeSummary: "Acne scar reduction, pore shrinking & skin texture renewal",
+        durationMinutes: 60,
+        basePricePaise: 499900,
+        regularPricePaise: 599900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/360_F_471092808_sUCrkTM1CwSfXuFvMWTUKrGsTzfbfTCw.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 34. DERMAPEN TREATMENT
+  {
+    id: "srv_beedare_dermapen",
+    slug: "dermapen-treatment-collagen-boost-smooth-texture",
+    title: "Dermapen Treatment \u2013 Collagen boost & smooth texture",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Dermapen 4 digital fractional micro-needling for superior scar repair, fine line softening, and epidermal glow.",
+    fullDescription: "The gold standard in mechanical collagen induction therapy. Dermapen 4 creates up to 1,920 micro-punctures per second, stimulating rapid fibroblasts, smoothing surgical/acne scars and firming lax skin.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/beautiful-young-woman-at-beauty-clinic.jpg",
+    durationMinutes: 60,
+    basePricePaise: 499900,
+    regularPricePaise: 599900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Full face antiseptic prep & high-strength numbing",
+      "Dermapen 4 automated micro-therapy with targeted depth",
+      "Growth factor complex infusion",
+      "Post-procedure biocellulose cooling mask"
+    ],
+    exclusions: ["Keloid scar prone skin"],
+    preparationInstructions: ["Avoid exfoliating acid serums 48 hours prior."],
+    cancellationPolicySummary: "Free cancellation up to 6 hours before service.",
+    variants: [
+      {
+        id: "var_dermapen_clean",
+        serviceId: "srv_beedare_dermapen",
+        name: "Dermapen 4 Fractional Collagen Induction",
+        scopeSummary: "High-speed automated micro-needling for scars & smoothness",
+        durationMinutes: 60,
+        basePricePaise: 499900,
+        regularPricePaise: 599900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/beautiful-young-woman-at-beauty-clinic.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 35. FULL BODY LASER
+  {
+    id: "srv_beedare_full_body_laser",
+    slug: "full-body-laser-complete-hair-removal",
+    title: "Full Body Laser \u2013 Complete hair removal",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Enjoy smooth, hair-free skin with our advanced diode laser hair removal \u2013 painless, safe, and permanent at your doorstep.",
+    fullDescription: "State-of-the-art triple-wavelength diode laser with ice-chill contact cooling. Targets hair roots without pain or burns across arms, legs, back, chest, stomach, and bikini zone.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/full-body-laser-hair-removal-india.jpg",
+    durationMinutes: 120,
+    basePricePaise: 799900,
+    regularPricePaise: 999900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Skin phototype laser energy calibration",
+      "Full body shave touch-up and cooling gel application",
+      "Triple wavelength pain-free diode laser pass",
+      "Soothing aloe vera skin hydration"
+    ],
+    exclusions: ["Hair bleaching before treatment"],
+    preparationInstructions: ["Shave treatment areas 24 hours before appointment. Do not wax or thread."],
+    cancellationPolicySummary: "Free cancellation up to 8 hours before appointment.",
+    variants: [
+      {
+        id: "var_full_body_laser",
+        serviceId: "srv_beedare_full_body_laser",
+        name: "Full Body Painless Laser Hair Removal Session",
+        scopeSummary: "Complete full body permanent hair reduction with cooling tip",
+        durationMinutes: 120,
+        basePricePaise: 799900,
+        regularPricePaise: 999900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/full-body-laser-hair-removal-india.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 36. FULL FACE LASER
+  {
+    id: "srv_beedare_full_face_laser",
+    slug: "full-face-laser-smooth-clear-facial-skin",
+    title: "Full Face Laser \u2013 Smooth & clear facial skin",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Permanent reduction of upper lip, chin, sideburns, and forehead peach fuzz with gentle pain-reduced diode laser.",
+    fullDescription: "Achieve flawless makeup-ready facial skin without monthly threading or waxing pain. Safe for all skin tones with customized laser fluences.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/skin-care-face-beauty-treatment-ipl-photo-facial-therapy-ant.jpg",
+    durationMinutes: 30,
+    basePricePaise: 399900,
+    regularPricePaise: 499900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Protective eye goggles and cooling gel application",
+      "Upper lip, chin, jawline and cheek laser passes",
+      "Post-laser soothing gel and sun block"
+    ],
+    exclusions: ["Eyebrow shaping"],
+    preparationInstructions: ["Shave or trim facial hair 12 hours prior."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_full_face_laser",
+        serviceId: "srv_beedare_full_face_laser",
+        name: "Full Face Laser Hair Reduction Session",
+        scopeSummary: "Upper lip, chin, sideburns & forehead painless laser",
+        durationMinutes: 30,
+        basePricePaise: 399900,
+        regularPricePaise: 499900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/skin-care-face-beauty-treatment-ipl-photo-facial-therapy-ant.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 37. BIKINI LASER
+  {
+    id: "srv_beedare_bikini_laser",
+    slug: "bikini-laser-hygiene-smoothness",
+    title: "Bikini Laser \u2013 Hygiene & smoothness",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Hygienic, smooth, and ingrown-free bikini area laser hair removal with maximum privacy and certified female laser technicians.",
+    fullDescription: "Enjoy long-lasting smoothness and eliminate painful waxing rashes and ingrown hairs. Certified female practitioners maintain complete privacy in your home.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/woman-receiving-laser-epilation-on-bikini-zone-at-beauty-clinic-bikini-zone-laser-hair.jpg",
+    durationMinutes: 45,
+    basePricePaise: 399900,
+    regularPricePaise: 499900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Strict single-use sanitized disposables",
+      "Cooling gel and painless diode laser coverage",
+      "Anti-inflammatory post-care application"
+    ],
+    exclusions: ["Waxing services"],
+    preparationInstructions: ["Shave area 24 hours prior with clean razor."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_bikini_laser",
+        serviceId: "srv_beedare_bikini_laser",
+        name: "Bikini Line Precision Laser Session",
+        scopeSummary: "Hygiene & smoothness with certified female technicians",
+        durationMinutes: 45,
+        basePricePaise: 399900,
+        regularPricePaise: 499900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/woman-receiving-laser-epilation-on-bikini-zone-at-beauty-clinic-bikini-zone-laser-hair.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 38. FULL ARM LASER
+  {
+    id: "srv_beedare_full_arm_laser",
+    slug: "full-arm-laser-hair-free-arms",
+    title: "Full Arm Laser \u2013 Hair-free arms",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Complete hair-free arms including hands, fingers, and underarms with fast scanning diode laser technology.",
+    fullDescription: "Say goodbye to razor burns and tanning on arms. Uniform diode laser beams target deep dark hair follicles, giving soft, silky-smooth arms.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/body-care-laser-hair-removal-epilation-treatment-smooth-skin.jpg",
+    durationMinutes: 45,
+    basePricePaise: 499900,
+    regularPricePaise: 599900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Both full arms and underarms laser coverage",
+      "Ice cooling protection for zero discomfort",
+      "Post-treatment soothing lotion"
+    ],
+    exclusions: ["Chemical bleaching"],
+    preparationInstructions: ["Shave arms 24 hours before appointment."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_full_arm_laser",
+        serviceId: "srv_beedare_full_arm_laser",
+        name: "Full Both Arms + Underarms Laser Session",
+        scopeSummary: "Complete hair removal for both arms and underarms",
+        durationMinutes: 45,
+        basePricePaise: 499900,
+        regularPricePaise: 599900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/body-care-laser-hair-removal-epilation-treatment-smooth-skin.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
+    status: "published",
+    isDemo: true
+  },
+  // 39. FULL LEGS LASER
+  {
+    id: "srv_beedare_full_legs_laser",
+    slug: "full-legs-laser-hair-free-legs",
+    title: "Full Legs Laser \u2013 Hair-free legs-Delhi",
+    categoryId: "cat_aesthetics",
+    shortDescription: "Both full legs hair removal: thighs, knees, calves, and feet with painless cooling diode laser.",
+    fullDescription: "Flaunt silky, hair-free legs all year round. High-repetition diode laser rapidly treats large surface areas, permanently reducing leg hair and strawberry legs.",
+    illustrationKey: "aesthetics",
+    imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/360_F_325763670_7HDQhp4ZLh530EzsAM0iUfPJpIW2by1Z.jpg",
+    durationMinutes: 60,
+    basePricePaise: 499900,
+    regularPricePaise: 599900,
+    defaultPricingMode: "city_fixed",
+    inclusions: [
+      "Full thighs, calves, knees and feet coverage",
+      "Pre-laser cooling glide gel",
+      "Calming post-laser mist and moisturizing cream"
+    ],
+    exclusions: ["Chemical body tanning"],
+    preparationInstructions: ["Shave legs thoroughly 24 hours in advance."],
+    cancellationPolicySummary: "Free cancellation up to 4 hours before service.",
+    variants: [
+      {
+        id: "var_full_legs_laser",
+        serviceId: "srv_beedare_full_legs_laser",
+        name: "Full Both Legs Pain-Free Laser Session",
+        scopeSummary: "Thighs to feet permanent hair reduction with ice-chill tip",
+        durationMinutes: 60,
+        basePricePaise: 499900,
+        regularPricePaise: 599900,
+        imageUrl: "https://tankmanpro.com/wp-content/uploads/2025/08/360_F_325763670_7HDQhp4ZLh530EzsAM0iUfPJpIW2by1Z.jpg",
+        active: true
+      }
+    ],
+    addons: [],
+    questions: [],
+    faqs: [],
+    supportedCityIds: ALL_CITIES,
     status: "published",
     isDemo: true
   },
@@ -2207,6 +3250,7 @@ var DEMO_SERVICES = [
     isDemo: true
   }
 ];
+var ALL_SERVICE_IDS = DEMO_SERVICES.map((s) => s.id);
 var DEMO_VENDORS = [
   {
     uid: "vendor_demo_del_1",
@@ -2217,16 +3261,7 @@ var DEMO_VENDORS = [
     status: "active",
     supportedCityIds: ["city_delhi"],
     supportedAreaPins: ["110001", "110016", "110075"],
-    supportedServiceIds: [
-      "srv_mechanized_tank_clean",
-      "srv_ac_foam_jet",
-      "srv_bathroom_cleaning",
-      "srv_kitchen_chimney_clean",
-      "srv_sofa_mattress_clean",
-      "srv_vehicle_wash",
-      "srv_washing_machine_repair",
-      "srv_plumbing_pipeline_care"
-    ],
+    supportedServiceIds: ALL_SERVICE_IDS,
     workingDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     workingHoursLabel: "08:00 AM \u2013 08:00 PM",
     maxActiveJobs: 6,
@@ -2244,12 +3279,7 @@ var DEMO_VENDORS = [
     status: "active",
     supportedCityIds: ["city_delhi"],
     supportedAreaPins: ["110001", "110016", "110075"],
-    supportedServiceIds: [
-      "srv_ac_foam_jet",
-      "srv_washing_machine_repair",
-      "srv_mechanized_tank_clean",
-      "srv_bathroom_cleaning"
-    ],
+    supportedServiceIds: ALL_SERVICE_IDS,
     workingDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     workingHoursLabel: "09:00 AM \u2013 07:00 PM",
     maxActiveJobs: 5,
@@ -2267,16 +3297,7 @@ var DEMO_VENDORS = [
     status: "active",
     supportedCityIds: ["city_shahjahanpur", "city_kanpur"],
     supportedAreaPins: ["242001", "242226", "208001", "208002"],
-    supportedServiceIds: [
-      "srv_mechanized_tank_clean",
-      "srv_ac_foam_jet",
-      "srv_bathroom_cleaning",
-      "srv_kitchen_chimney_clean",
-      "srv_sofa_mattress_clean",
-      "srv_vehicle_wash",
-      "srv_washing_machine_repair",
-      "srv_plumbing_pipeline_care"
-    ],
+    supportedServiceIds: ALL_SERVICE_IDS,
     workingDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     workingHoursLabel: "08:30 AM \u2013 07:00 PM",
     maxActiveJobs: 5,
@@ -2294,12 +3315,7 @@ var DEMO_VENDORS = [
     status: "active",
     supportedCityIds: ["city_shahjahanpur", "city_kanpur"],
     supportedAreaPins: ["242001", "242226", "208001", "208002"],
-    supportedServiceIds: [
-      "srv_mechanized_tank_clean",
-      "srv_bathroom_cleaning",
-      "srv_kitchen_chimney_clean",
-      "srv_plumbing_pipeline_care"
-    ],
+    supportedServiceIds: ALL_SERVICE_IDS,
     workingDays: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     workingHoursLabel: "09:00 AM \u2013 06:30 PM",
     maxActiveJobs: 4,
@@ -2316,7 +3332,6 @@ var DEMO_PRICE_OVERRIDES = [
     variantId: "var_tank_500_1000",
     cityId: "city_delhi",
     amountPaise: 49900,
-    // ₹499 (authentic tankmanpro.com 500L-750L price!)
     currency: "INR",
     active: true,
     updatedByUid: "admin_seed",
@@ -2329,7 +3344,6 @@ var DEMO_PRICE_OVERRIDES = [
     variantId: "var_tank_500_1000",
     cityId: "city_kanpur",
     amountPaise: 49900,
-    // ₹499
     currency: "INR",
     active: true,
     updatedByUid: "admin_seed",
@@ -2355,7 +3369,6 @@ var DEMO_PRICE_OVERRIDES = [
     cityId: "city_shahjahanpur",
     vendorUid: "vendor_demo_spn_1",
     amountPaise: 85e3,
-    // ₹850 (PRD Appendix B test requirement)
     currency: "INR",
     active: true,
     updatedByUid: "admin_seed",
@@ -2369,7 +3382,6 @@ var DEMO_PRICE_OVERRIDES = [
     cityId: "city_shahjahanpur",
     vendorUid: "vendor_demo_spn_2",
     amountPaise: 89e3,
-    // ₹890
     currency: "INR",
     active: true,
     updatedByUid: "admin_seed",
@@ -2383,7 +3395,6 @@ var DEMO_PRICE_OVERRIDES = [
     cityId: "city_shahjahanpur",
     vendorUid: "vendor_demo_spn_1",
     amountPaise: 89900,
-    // ₹899
     currency: "INR",
     active: true,
     updatedByUid: "admin_seed",
@@ -2409,7 +3420,6 @@ var DEMO_PRICE_OVERRIDES = [
     variantId: "var_tank_1500_2000",
     cityId: "city_delhi",
     amountPaise: 149900,
-    // ₹1,499
     currency: "INR",
     active: true,
     updatedByUid: "admin_seed",
@@ -2468,7 +3478,6 @@ var DEMO_PRICE_OVERRIDES = [
     updatedAtIso: "2026-10-20T00:00:00Z",
     isDemo: true
   },
-  // AC Services (₹599 & ₹629 in Delhi Vendor-Offer mode; ₹599 in Shahjahanpur/Kanpur)
   {
     id: "po_ac_single_del_vendor1",
     serviceId: "srv_ac_foam_jet",
@@ -2476,7 +3485,6 @@ var DEMO_PRICE_OVERRIDES = [
     cityId: "city_delhi",
     vendorUid: "vendor_demo_del_1",
     amountPaise: 59900,
-    // ₹599 (authentic tankmanpro.com AC service price)
     currency: "INR",
     active: true,
     updatedByUid: "admin_seed",
@@ -2529,7 +3537,6 @@ var DEMO_PRICE_OVERRIDES = [
     cityId: "city_delhi",
     vendorUid: "vendor_demo_del_1",
     amountPaise: 149900,
-    // ₹1,499 (authentic tankmanpro.com AC Installation price)
     currency: "INR",
     active: true,
     updatedByUid: "admin_seed",
@@ -2559,9 +3566,7 @@ var DEMO_COUPONS = [
     discountType: "percentage",
     discountValue: 10,
     maxDiscountCapPaise: 2e4,
-    // ₹200 cap
     minOrderSubtotalPaise: 3e4,
-    // ₹300 min
     validFromIso: "2025-01-01T00:00:00Z",
     validUntilIso: "2027-12-31T23:59:59Z",
     totalRedemptionLimit: 500,
@@ -2578,9 +3583,7 @@ var DEMO_COUPONS = [
     description: "Flat \u20B9150 off on orders above \u20B9800 in New Delhi service areas.",
     discountType: "fixed",
     discountValue: 15e3,
-    // ₹150
     minOrderSubtotalPaise: 8e4,
-    // ₹800 min
     validFromIso: "2025-01-01T00:00:00Z",
     validUntilIso: "2027-12-31T23:59:59Z",
     applicableCityIds: ["city_delhi"],
@@ -2592,6 +3595,192 @@ var DEMO_COUPONS = [
     isDemo: true
   }
 ];
+
+// src/data/initialOperationsData.ts
+var SEEDED_VENDORS = DEMO_VENDORS.map((v, idx) => ({
+  ...v,
+  vendorCode: `TMP-VND-${1001 + idx}`,
+  isAvailable: true,
+  activeAssignedJobs: 0,
+  commissionPercent: 18,
+  password: "TankmanPartner@2026",
+  kycNotes: "Verified Aadhaar, PAN, Police Clearance & Mechanised Tool Kit Inspection.",
+  createdAtIso: "2026-09-15T09:00:00.000Z",
+  updatedAtIso: "2026-10-19T14:30:00.000Z"
+}));
+var INITIAL_BOOKINGS = [];
+var INITIAL_BOOKING_EVENTS = [];
+var INITIAL_NOTIFICATIONS = [];
+var todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
+var INITIAL_CMS_SETTINGS = {
+  id: "global",
+  heroTitle: "Home services at your doorstep",
+  heroSubtitle: "Mechanised 6-stage water tank cleaning, intense bathroom & kitchen hygiene, foam-jet AC servicing, and clinical skin care by verified professionals.",
+  announcementText: "Live in Kanpur (208001, 208002), Shahjahanpur (242001) & New Delhi (110001) \xB7 Use code CLEAN10 for 10% off!",
+  supportPhone: "+91 96481 75639",
+  supportEmail: "support@tankmanpro.com",
+  whatsappNumber: "+91 96481 75639",
+  instagramUrl: "https://www.instagram.com/tankmanpro.in/",
+  dispatchMode: "manual",
+  trustBadges: [
+    "6-Stage UV & High-Pressure Jet Protocol",
+    "Background-Verified & Trained Crew",
+    "100% Transparent Paise-Exact Tariff Card"
+  ],
+  faqs: [
+    {
+      question: "How does TankmanPro verify serviceability for my location?",
+      answer: "Enter your 6-digit Indian PIN code on the homepage. We verify active technician coverage and show exact city-resolved rates before you book."
+    },
+    {
+      question: "What is included in the 6-Stage Mechanised Water Tank Cleaning?",
+      answer: "Dewatering, sludge vacuum extraction, high-pressure rotary jet washing of walls/ceiling, anti-bacterial spray, UV radiator treatment, and inlet/float valve check."
+    },
+    {
+      question: "Can I reschedule or cancel my booking?",
+      answer: "Yes, bookings can be rescheduled or cancelled free of charge before technician dispatch."
+    }
+  ],
+  updatedAtIso: `${todayStr}T04:00:00.000Z`
+};
+
+// src/firebase.ts
+import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  signOut,
+  sendPasswordResetEmail,
+  onAuthStateChanged
+} from "firebase/auth";
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  deleteDoc,
+  collection,
+  getDocs,
+  getDocFromServer
+} from "firebase/firestore";
+
+// firebase-applet-config.json
+var firebase_applet_config_default = {
+  projectId: "gen-lang-client-0264637166",
+  appId: "1:626509803830:web:ad533c612bb2a53b0b0397",
+  apiKey: "AIzaSyCAU1g9dmx7miv8DJ1b7GRgEi3TrMwz1Qk",
+  authDomain: "gen-lang-client-0264637166.firebaseapp.com",
+  firestoreDatabaseId: "ai-studio-tankmanpro-ae50bc10-1dec-4a8d-bead-11f20ddaf0b8",
+  storageBucket: "gen-lang-client-0264637166.firebasestorage.app",
+  messagingSenderId: "626509803830",
+  measurementId: "",
+  oAuthClientId: "626509803830-oel4ok31irshhrp3p4olf0c1kdvadcoo.apps.googleusercontent.com",
+  recaptchaSiteKey: ""
+};
+
+// src/firebase.ts
+var app = initializeApp(firebase_applet_config_default);
+var db = getFirestore(app, firebase_applet_config_default.firestoreDatabaseId);
+var auth = getAuth(app);
+var googleProvider = new GoogleAuthProvider();
+
+// src/lib/databaseEngine.ts
+var __filename = fileURLToPath(import.meta.url);
+var __dirname = path.dirname(__filename);
+var DATA_DIR = path.resolve(__dirname, "../data");
+var DB_FILE_PATH = path.resolve(DATA_DIR, "tankman_production_db.json");
+function createInitialDatabase() {
+  return {
+    cities: structuredClone(DEMO_CITIES),
+    serviceAreas: structuredClone(DEMO_SERVICE_AREAS),
+    categories: structuredClone(DEMO_CATEGORIES),
+    services: structuredClone(DEMO_SERVICES),
+    vendors: structuredClone(SEEDED_VENDORS),
+    priceOverrides: structuredClone(DEMO_PRICE_OVERRIDES),
+    coupons: structuredClone(DEMO_COUPONS),
+    bookings: structuredClone(INITIAL_BOOKINGS),
+    bookingEvents: structuredClone(INITIAL_BOOKING_EVENTS),
+    notifications: structuredClone(INITIAL_NOTIFICATIONS),
+    cmsSettings: structuredClone(INITIAL_CMS_SETTINGS),
+    waitlistEntries: [],
+    contactSubmissions: [],
+    version: "1.0.0",
+    updatedAtIso: (/* @__PURE__ */ new Date()).toISOString()
+  };
+}
+function loadPlatformDatabase() {
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    if (fs.existsSync(DB_FILE_PATH)) {
+      const raw = fs.readFileSync(DB_FILE_PATH, "utf-8");
+      const parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.services) && Array.isArray(parsed.vendors)) {
+        console.log(
+          `[DatabaseEngine] Loaded database: ${parsed.services.length} services, ${parsed.vendors.length} vendors, ${parsed.bookings?.length || 0} bookings.`
+        );
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.warn("[DatabaseEngine] Error reading existing DB file, re-initializing fresh database:", err);
+  }
+  const freshDb = createInitialDatabase();
+  savePlatformDatabase(freshDb);
+  console.log("[DatabaseEngine] Initialized and saved fresh platform database.");
+  return freshDb;
+}
+function savePlatformDatabase(database) {
+  try {
+    database.updatedAtIso = (/* @__PURE__ */ new Date()).toISOString();
+    const tempPath = `${DB_FILE_PATH}.tmp_${Date.now()}`;
+    const serialized = JSON.stringify(database, null, 2);
+    fs.writeFileSync(tempPath, serialized, "utf-8");
+    fs.renameSync(tempPath, DB_FILE_PATH);
+    return true;
+  } catch (err) {
+    console.error("[DatabaseEngine] Fatal error writing platform database to disk:", err);
+    return false;
+  }
+}
+async function mirrorToFirestore(collectionName, docId, payload) {
+  try {
+    const docRef = doc(db, collectionName, docId);
+    await setDoc(docRef, JSON.parse(JSON.stringify(payload)), { merge: true });
+  } catch {
+  }
+}
+async function deleteFromFirestore(collectionName, docId) {
+  try {
+    const docRef = doc(db, collectionName, docId);
+    await deleteDoc(docRef);
+  } catch {
+  }
+}
+function getDatabaseMetrics(currentDb) {
+  let fileSizeBytes = 0;
+  try {
+    if (fs.existsSync(DB_FILE_PATH)) {
+      const stats = fs.statSync(DB_FILE_PATH);
+      fileSizeBytes = stats.size;
+    }
+  } catch {
+  }
+  return {
+    storageType: "persistent_json_and_firestore_mirror",
+    dbFilePath: DB_FILE_PATH,
+    fileSizeBytes,
+    fileSizeKb: (fileSizeBytes / 1024).toFixed(2),
+    totalBookings: currentDb.bookings?.length || 0,
+    totalVendors: currentDb.vendors?.length || 0,
+    totalServices: currentDb.services?.length || 0,
+    totalCities: currentDb.cities?.length || 0,
+    totalPinCodes: currentDb.serviceAreas?.length || 0,
+    lastSavedIso: currentDb.updatedAtIso
+  };
+}
 
 // src/lib/portalRouting.ts
 function isValidIndianPin(pin) {
@@ -3081,476 +4270,6 @@ function calculateAuthoritativeQuote(params) {
     isDemoData: service.isDemo
   };
 }
-
-// src/data/initialOperationsData.ts
-var SEEDED_VENDORS = DEMO_VENDORS.map((v, idx) => ({
-  ...v,
-  vendorCode: `TMP-VND-${1001 + idx}`,
-  isAvailable: true,
-  commissionPercent: 18,
-  kycNotes: "Verified Aadhaar, PAN, Police Clearance & Mechanised Tool Kit Inspection.",
-  createdAtIso: "2026-09-15T09:00:00.000Z",
-  updatedAtIso: "2026-10-19T14:30:00.000Z"
-}));
-function buildSeedQuote(params) {
-  return calculateAuthoritativeQuote({
-    request: {
-      pinCode: params.pinCode,
-      serviceId: params.serviceId,
-      variantId: params.variantId,
-      addonQuantities: params.addonQuantities || {},
-      selectedVendorUid: params.selectedVendorUid,
-      couponCode: params.couponCode
-    },
-    cities: DEMO_CITIES,
-    serviceAreas: DEMO_SERVICE_AREAS,
-    services: DEMO_SERVICES,
-    vendors: SEEDED_VENDORS,
-    priceOverrides: DEMO_PRICE_OVERRIDES,
-    coupons: DEMO_COUPONS,
-    taxRatePercent: 0
-  });
-}
-var todayStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
-var tomorrowStr = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
-var quoteKanpur1 = buildSeedQuote({
-  pinCode: "208001",
-  serviceId: "srv_mechanized_tank_clean",
-  variantId: "var_tank_1000_1500",
-  addonQuantities: { addon_float_valve: 1 }
-});
-var quoteKanpur2 = buildSeedQuote({
-  pinCode: "208002",
-  serviceId: "srv_bathroom_cleaning",
-  variantId: "var_bath_machine_scrub"
-});
-var quoteDelhi1 = buildSeedQuote({
-  pinCode: "110001",
-  serviceId: "srv_ac_foam_jet",
-  variantId: "var_ac_single",
-  selectedVendorUid: "vendor_demo_del_1"
-});
-var quoteSpn1 = buildSeedQuote({
-  pinCode: "242001",
-  serviceId: "srv_mechanized_tank_clean",
-  variantId: "var_tank_500_1000",
-  selectedVendorUid: "vendor_demo_spn_1"
-});
-var quoteKanpur3 = buildSeedQuote({
-  pinCode: "208001",
-  serviceId: "srv_kitchen_chimney_clean",
-  variantId: "var_empty_kitchen_chimney"
-});
-var quoteDelhi2 = buildSeedQuote({
-  pinCode: "110001",
-  serviceId: "srv_sofa_mattress_clean",
-  variantId: "var_sofa_5seat"
-});
-var INITIAL_BOOKINGS = [
-  {
-    id: "bk_1001",
-    bookingNumber: "TMP-2026-1001",
-    customerUid: "cust_kanpur_01",
-    customerName: "Vikramaditya Tandon",
-    customerPhone: "+91 98390 44112",
-    customerEmail: "vikram.tandon@example.com",
-    cityId: "city_kanpur",
-    cityName: "Kanpur",
-    pinCode: "208001",
-    zoneLabel: "Mall Road & Birhana Road, Kanpur",
-    addressLine: "Flat 402, Emerald Garden Residency, Civil Lines",
-    landmark: "Near Green Park Stadium",
-    propertyType: "apartment",
-    serviceId: "srv_mechanized_tank_clean",
-    serviceTitle: "Mechanized Water Tank Cleaning",
-    variantId: "var_tank_1000_1500",
-    variantName: "Water Tank Cleaning (1000L to 1500L)",
-    addons: quoteKanpur1.addons,
-    preferredDate: todayStr,
-    preferredSlot: "10:00 AM \u2013 12:00 PM",
-    customerNotes: "Overhead Sintex tank on 4th floor terrace. Ladder access available.",
-    pricingMode: quoteKanpur1.pricingMode,
-    quoteSnapshot: quoteKanpur1,
-    status: "completed",
-    subStatus: null,
-    paymentMethod: "pay_after_service",
-    paymentStatus: "paid",
-    assignedVendorUid: "vendor_demo_spn_1",
-    assignedVendorName: "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
-    vendorExecutionNotes: [
-      "Sludge vacuuming completed. TDS & UV sanitization verified.",
-      "Before & after tank interior inspection signed off by customer."
-    ],
-    completionPhotos: ["/assets/tankmanpro/water-tank.jpg"],
-    createdAtIso: `${todayStr}T04:15:00.000Z`,
-    updatedAtIso: `${todayStr}T07:20:00.000Z`
-  },
-  {
-    id: "bk_1002",
-    bookingNumber: "TMP-2026-1002",
-    customerUid: "cust_kanpur_02",
-    customerName: "Neha Agarwal",
-    customerPhone: "+91 94151 88230",
-    customerEmail: "neha.agarwal@example.com",
-    cityId: "city_kanpur",
-    cityName: "Kanpur",
-    pinCode: "208002",
-    zoneLabel: "Tilak Nagar & Swaroop Nagar, Kanpur",
-    addressLine: "112/318 Swaroop Nagar, Block C",
-    landmark: "Opposite Haldiram Outlet",
-    propertyType: "residential",
-    serviceId: "srv_bathroom_cleaning",
-    serviceTitle: "Bathroom Deep & Machine Scrub Cleaning",
-    variantId: "var_bath_machine_scrub",
-    variantName: "Bathroom Floor & Tile Machine Scrubbing",
-    addons: quoteKanpur2.addons,
-    preferredDate: todayStr,
-    preferredSlot: "01:00 PM \u2013 03:00 PM",
-    customerNotes: "Hard water scaling on glass partition and taps.",
-    pricingMode: quoteKanpur2.pricingMode,
-    quoteSnapshot: quoteKanpur2,
-    status: "in_progress",
-    subStatus: "working",
-    paymentMethod: "pay_after_service",
-    paymentStatus: "pending",
-    assignedVendorUid: "vendor_demo_spn_1",
-    assignedVendorName: "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
-    vendorExecutionNotes: ["Technician arrived on site and started machine descaling."],
-    completionPhotos: [],
-    createdAtIso: `${todayStr}T05:30:00.000Z`,
-    updatedAtIso: `${todayStr}T08:05:00.000Z`
-  },
-  {
-    id: "bk_1003",
-    bookingNumber: "TMP-2026-1003",
-    customerUid: "cust_delhi_01",
-    customerName: "Rohan Malhotra",
-    customerPhone: "+91 98110 73490",
-    customerEmail: "rohan.malhotra@example.com",
-    cityId: "city_delhi",
-    cityName: "New Delhi",
-    pinCode: "110001",
-    zoneLabel: "Connaught Place, central New Delhi",
-    addressLine: "B-24 Hailey Road, Connaught Place",
-    landmark: "Near Agrasen ki Baoli",
-    propertyType: "apartment",
-    serviceId: "srv_ac_foam_jet",
-    serviceTitle: "AC Service, Repair & Installation",
-    variantId: "var_ac_single",
-    variantName: "AC Services (Split / Window Deep Service)",
-    addons: quoteDelhi1.addons,
-    preferredDate: todayStr,
-    preferredSlot: "03:30 PM \u2013 05:30 PM",
-    customerNotes: "Daikin 1.5 Ton inverter split AC in master bedroom.",
-    pricingMode: quoteDelhi1.pricingMode,
-    quoteSnapshot: quoteDelhi1,
-    status: "vendor_accepted",
-    subStatus: "en_route",
-    paymentMethod: "pay_after_service",
-    paymentStatus: "pending",
-    assignedVendorUid: "vendor_demo_del_1",
-    assignedVendorName: "AquaPure Mechanized Crew (Delhi)",
-    vendorExecutionNotes: ["Slot confirmed. Carrying digital manifold pressure gauge and jet pump."],
-    completionPhotos: [],
-    createdAtIso: `${todayStr}T06:10:00.000Z`,
-    updatedAtIso: `${todayStr}T06:45:00.000Z`
-  },
-  {
-    id: "bk_1004",
-    bookingNumber: "TMP-2026-1004",
-    customerUid: "cust_spn_01",
-    customerName: "Mohd. Salman Khan",
-    customerPhone: "+91 97942 11098",
-    customerEmail: "salman.spn@example.com",
-    cityId: "city_shahjahanpur",
-    cityName: "Shahjahanpur",
-    pinCode: "242001",
-    zoneLabel: "Sadar Bazar & Civil Lines, Shahjahanpur",
-    addressLine: "House No. 48, Civil Lines, Near Collectorate",
-    landmark: "Collectorate Road",
-    propertyType: "residential",
-    serviceId: "srv_mechanized_tank_clean",
-    serviceTitle: "Mechanized Water Tank Cleaning",
-    variantId: "var_tank_500_1000",
-    variantName: "Water Tank Cleaning (500L to 750L)",
-    addons: quoteSpn1.addons,
-    preferredDate: todayStr,
-    preferredSlot: "04:00 PM \u2013 06:00 PM",
-    customerNotes: "Please call 15 mins before reaching.",
-    pricingMode: quoteSpn1.pricingMode,
-    quoteSnapshot: quoteSpn1,
-    status: "assigned_to_vendor",
-    subStatus: null,
-    paymentMethod: "pay_after_service",
-    paymentStatus: "pending",
-    assignedVendorUid: "vendor_demo_spn_1",
-    assignedVendorName: "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
-    vendorExecutionNotes: [],
-    completionPhotos: [],
-    createdAtIso: `${todayStr}T07:00:00.000Z`,
-    updatedAtIso: `${todayStr}T07:05:00.000Z`
-  },
-  {
-    id: "bk_1005",
-    bookingNumber: "TMP-2026-1005",
-    customerUid: "cust_kanpur_03",
-    customerName: "Dr. Ananya Verma",
-    customerPhone: "+91 99350 61204",
-    customerEmail: "ananya.verma@example.com",
-    cityId: "city_kanpur",
-    cityName: "Kanpur",
-    pinCode: "208001",
-    zoneLabel: "Mall Road & Birhana Road, Kanpur",
-    addressLine: "7/114 Tilak Nagar, Main Road",
-    landmark: "Near Regency Hospital",
-    propertyType: "residential",
-    serviceId: "srv_kitchen_chimney_clean",
-    serviceTitle: "Kitchen, Chimney & Fridge Deep Cleaning",
-    variantId: "var_empty_kitchen_chimney",
-    variantName: "Empty Kitchen + Chimney Deep Cleaning",
-    addons: quoteKanpur3.addons,
-    preferredDate: todayStr,
-    preferredSlot: "05:00 PM \u2013 07:00 PM",
-    customerNotes: "Faber 90cm baffle filter chimney + modular cabinets.",
-    pricingMode: quoteKanpur3.pricingMode,
-    quoteSnapshot: quoteKanpur3,
-    status: "requested",
-    subStatus: null,
-    paymentMethod: "pay_after_service",
-    paymentStatus: "pending",
-    assignedVendorUid: null,
-    assignedVendorName: null,
-    vendorExecutionNotes: [],
-    completionPhotos: [],
-    createdAtIso: `${todayStr}T08:15:00.000Z`,
-    updatedAtIso: `${todayStr}T08:15:00.000Z`
-  },
-  {
-    id: "bk_1006",
-    bookingNumber: "TMP-2026-1006",
-    customerUid: "cust_delhi_02",
-    customerName: "Siddharth Kapoor",
-    customerPhone: "+91 98182 30911",
-    customerEmail: "siddharth.k@example.com",
-    cityId: "city_delhi",
-    cityName: "New Delhi",
-    pinCode: "110001",
-    zoneLabel: "Connaught Place, central New Delhi",
-    addressLine: "Flat 12B, Barakhamba Road Apartments",
-    landmark: "Near Metro Gate 3",
-    propertyType: "apartment",
-    serviceId: "srv_sofa_mattress_clean",
-    serviceTitle: "Sofa, Mattress & Carpet Deep Cleaning",
-    variantId: "var_sofa_5seat",
-    variantName: "5-Seater Sofa Set Deep Cleaning (\u20B9149 \xD7 5)",
-    addons: quoteDelhi2.addons,
-    preferredDate: "2026-10-18",
-    preferredSlot: "11:00 AM \u2013 01:00 PM",
-    customerNotes: "Customer requested cancellation due to out-of-station travel.",
-    pricingMode: quoteDelhi2.pricingMode,
-    quoteSnapshot: quoteDelhi2,
-    status: "cancelled",
-    subStatus: null,
-    paymentMethod: "pay_after_service",
-    paymentStatus: "unpaid",
-    assignedVendorUid: null,
-    assignedVendorName: null,
-    vendorExecutionNotes: [],
-    completionPhotos: [],
-    createdAtIso: "2026-10-18T05:00:00.000Z",
-    updatedAtIso: "2026-10-18T06:30:00.000Z"
-  },
-  {
-    id: "bk_1007",
-    bookingNumber: "TMP-2026-1007",
-    customerUid: "cust_kanpur_04",
-    customerName: "Rajeshwar Dayal Gupta",
-    customerPhone: "+91 98391 55209",
-    customerEmail: "rd.gupta@example.com",
-    cityId: "city_kanpur",
-    cityName: "Kanpur",
-    pinCode: "208001",
-    zoneLabel: "Mall Road & Birhana Road, Kanpur",
-    addressLine: "24/56 Birhana Road, Near Post Office",
-    landmark: "Opposite Central Bank",
-    propertyType: "residential",
-    serviceId: "srv_mechanized_tank_clean",
-    serviceTitle: "Mechanized Water Tank Cleaning",
-    variantId: "var_tank_1000_1500",
-    variantName: "Water Tank Cleaning (1000L to 1500L)",
-    addons: quoteKanpur1.addons,
-    preferredDate: tomorrowStr,
-    preferredSlot: "09:30 AM \u2013 11:30 AM",
-    customerNotes: "Underground sump + rooftop sintex tank inspection.",
-    pricingMode: quoteKanpur1.pricingMode,
-    quoteSnapshot: quoteKanpur1,
-    status: "vendor_accepted",
-    subStatus: null,
-    paymentMethod: "pay_after_service",
-    paymentStatus: "pending",
-    assignedVendorUid: "vendor_demo_spn_1",
-    assignedVendorName: "Rohilkhand Tank & Hydro Care (Shahjahanpur)",
-    vendorExecutionNotes: ["Accepted for tomorrow morning shift. Crew & UV unit reserved."],
-    completionPhotos: [],
-    createdAtIso: `${todayStr}T07:40:00.000Z`,
-    updatedAtIso: `${todayStr}T07:50:00.000Z`
-  }
-];
-var INITIAL_BOOKING_EVENTS = [
-  {
-    id: "evt_1001_1",
-    bookingId: "bk_1001",
-    actorUid: "cust_kanpur_01",
-    actorRole: "customer",
-    actorName: "Vikramaditya Tandon",
-    fromStatus: null,
-    toStatus: "requested",
-    note: "Booking submitted via TankmanPro Kanpur storefront (PIN 208001).",
-    createdAtIso: `${todayStr}T04:15:00.000Z`
-  },
-  {
-    id: "evt_1001_2",
-    bookingId: "bk_1001",
-    actorUid: "admin_main",
-    actorRole: "admin",
-    actorName: "Main Admin Dispatch",
-    fromStatus: "requested",
-    toStatus: "assigned_to_vendor",
-    note: "Assigned to Rohilkhand Tank & Hydro Care (TMP-VND-1003).",
-    createdAtIso: `${todayStr}T04:22:00.000Z`
-  },
-  {
-    id: "evt_1001_3",
-    bookingId: "bk_1001",
-    actorUid: "vendor_demo_spn_1",
-    actorRole: "vendor",
-    actorName: "Rohilkhand Tank & Hydro Care",
-    fromStatus: "assigned_to_vendor",
-    toStatus: "vendor_accepted",
-    note: "Vendor accepted job for 10:00 AM \u2013 12:00 PM slot.",
-    createdAtIso: `${todayStr}T04:30:00.000Z`
-  },
-  {
-    id: "evt_1001_4",
-    bookingId: "bk_1001",
-    actorUid: "vendor_demo_spn_1",
-    actorRole: "vendor",
-    actorName: "Rohilkhand Tank & Hydro Care",
-    fromStatus: "vendor_accepted",
-    toStatus: "in_progress",
-    note: "6-stage mechanised dewatering & sludge extraction started.",
-    createdAtIso: `${todayStr}T05:55:00.000Z`
-  },
-  {
-    id: "evt_1001_5",
-    bookingId: "bk_1001",
-    actorUid: "vendor_demo_spn_1",
-    actorRole: "vendor",
-    actorName: "Rohilkhand Tank & Hydro Care",
-    fromStatus: "in_progress",
-    toStatus: "completed",
-    note: "Job completed & UV sanitization signed off. Payment collected.",
-    createdAtIso: `${todayStr}T07:20:00.000Z`
-  },
-  {
-    id: "evt_1002_1",
-    bookingId: "bk_1002",
-    actorUid: "cust_kanpur_02",
-    actorRole: "customer",
-    actorName: "Neha Agarwal",
-    fromStatus: null,
-    toStatus: "assigned_to_vendor",
-    note: "Auto-dispatched to Rohilkhand Tank & Hydro Care in PIN 208002.",
-    createdAtIso: `${todayStr}T05:30:00.000Z`
-  },
-  {
-    id: "evt_1002_2",
-    bookingId: "bk_1002",
-    actorUid: "vendor_demo_spn_1",
-    actorRole: "vendor",
-    actorName: "Rohilkhand Tank & Hydro Care",
-    fromStatus: "assigned_to_vendor",
-    toStatus: "in_progress",
-    note: "Technician arrived and started bathroom descaling.",
-    createdAtIso: `${todayStr}T08:05:00.000Z`
-  },
-  {
-    id: "evt_1005_1",
-    bookingId: "bk_1005",
-    actorUid: "cust_kanpur_03",
-    actorRole: "customer",
-    actorName: "Dr. Ananya Verma",
-    fromStatus: null,
-    toStatus: "requested",
-    note: "New booking awaiting vendor assignment in Kanpur (PIN 208001).",
-    createdAtIso: `${todayStr}T08:15:00.000Z`
-  }
-];
-var INITIAL_NOTIFICATIONS = [
-  {
-    id: "notif_1",
-    recipientRole: "admin",
-    recipientUid: "ALL_ADMINS",
-    bookingId: "bk_1005",
-    title: "New Unassigned Booking \xB7 TMP-2026-1005",
-    message: "Dr. Ananya Verma booked Kitchen, Chimney & Fridge Deep Cleaning in Kanpur (208001). Assign an eligible vendor.",
-    type: "booking_created",
-    read: false,
-    createdAtIso: `${todayStr}T08:15:00.000Z`
-  },
-  {
-    id: "notif_2",
-    recipientRole: "admin",
-    recipientUid: "ALL_ADMINS",
-    bookingId: "bk_1001",
-    title: "Job Completed & Paid \xB7 TMP-2026-1001",
-    message: "Rohilkhand Tank & Hydro Care completed Mechanized Water Tank Cleaning in Civil Lines, Kanpur (\u20B91,048 collected).",
-    type: "job_completed",
-    read: false,
-    createdAtIso: `${todayStr}T07:20:00.000Z`
-  },
-  {
-    id: "notif_3",
-    recipientRole: "vendor",
-    recipientUid: "vendor_demo_spn_1",
-    bookingId: "bk_1004",
-    title: "New Job Assigned \xB7 TMP-2026-1004",
-    message: "500L\u2013750L Water Tank Cleaning assigned in PIN 242001 (Sadar Bazar & Civil Lines). Please accept or reject.",
-    type: "vendor_assigned",
-    read: false,
-    createdAtIso: `${todayStr}T07:05:00.000Z`
-  }
-];
-var INITIAL_CMS_SETTINGS = {
-  id: "global",
-  heroTitle: "Home services at your doorstep",
-  heroSubtitle: "Mechanised 6-stage water tank cleaning, intense bathroom & kitchen hygiene, foam-jet AC servicing, and clinical skin care by verified professionals.",
-  announcementText: "Live in Kanpur (208001, 208002), Shahjahanpur (242001) & New Delhi (110001) \xB7 Use code CLEAN10 for 10% off!",
-  supportPhone: "+91 97942 00100",
-  supportEmail: "support@tankmanpro.com",
-  whatsappNumber: "+91 97942 00100",
-  dispatchMode: "manual",
-  trustBadges: [
-    "6-Stage UV & High-Pressure Jet Protocol",
-    "Background-Verified & Trained Crew",
-    "100% Transparent Paise-Exact Tariff Card"
-  ],
-  faqs: [
-    {
-      question: "How does TankmanPro verify serviceability for my location?",
-      answer: "Enter your 6-digit Indian PIN code on the homepage. We verify active technician coverage and show exact city-resolved rates before you book."
-    },
-    {
-      question: "What is included in the 6-Stage Mechanised Water Tank Cleaning?",
-      answer: "Dewatering, sludge vacuum extraction, high-pressure rotary jet washing of walls/ceiling, anti-bacterial spray, UV radiator treatment, and inlet/float valve check."
-    },
-    {
-      question: "Can I reschedule or cancel my booking?",
-      answer: "Yes, bookings can be rescheduled or cancelled free of charge before technician dispatch."
-    }
-  ],
-  updatedAtIso: `${todayStr}T04:00:00.000Z`
-};
 
 // src/lib/adminEngine.ts
 function evaluateServiceDeletion(serviceId, bookings) {
@@ -4594,21 +5313,44 @@ function generateSimulatedRazorpayOrder(input) {
 
 // server.ts
 dotenv.config();
-var __filename = fileURLToPath(import.meta.url);
-var __dirname = path.dirname(__filename);
-var liveCities = structuredClone(DEMO_CITIES);
-var liveServiceAreas = structuredClone(DEMO_SERVICE_AREAS);
-var liveCategories = structuredClone(DEMO_CATEGORIES);
-var liveServices = structuredClone(DEMO_SERVICES);
-var liveVendors = structuredClone(SEEDED_VENDORS);
-var livePriceOverrides = structuredClone(DEMO_PRICE_OVERRIDES);
-var liveCoupons = structuredClone(DEMO_COUPONS);
-var liveBookings = structuredClone(INITIAL_BOOKINGS);
-var liveBookingEvents = structuredClone(INITIAL_BOOKING_EVENTS);
-var liveNotifications = structuredClone(INITIAL_NOTIFICATIONS);
-var liveCmsSettings = structuredClone(INITIAL_CMS_SETTINGS);
-var waitlistEntries = [];
-var contactSubmissions = [];
+var __filename2 = fileURLToPath2(import.meta.url);
+var __dirname2 = path2.dirname(__filename2);
+var platformDb = loadPlatformDatabase();
+var liveCities = platformDb.cities;
+var liveServiceAreas = platformDb.serviceAreas;
+var liveCategories = platformDb.categories;
+var liveServices = platformDb.services;
+var liveVendors = platformDb.vendors;
+var livePriceOverrides = platformDb.priceOverrides;
+var liveCoupons = platformDb.coupons;
+var liveBookings = platformDb.bookings;
+var liveBookingEvents = platformDb.bookingEvents;
+var liveNotifications = platformDb.notifications;
+var liveCmsSettings = platformDb.cmsSettings;
+var waitlistEntries = platformDb.waitlistEntries || [];
+var contactSubmissions = platformDb.contactSubmissions || [];
+function getCurrentDatabaseSnapshot() {
+  return {
+    cities: liveCities,
+    serviceAreas: liveServiceAreas,
+    categories: liveCategories,
+    services: liveServices,
+    vendors: liveVendors,
+    priceOverrides: livePriceOverrides,
+    coupons: liveCoupons,
+    bookings: liveBookings,
+    bookingEvents: liveBookingEvents,
+    notifications: liveNotifications,
+    cmsSettings: liveCmsSettings,
+    waitlistEntries,
+    contactSubmissions,
+    version: "1.0.0",
+    updatedAtIso: (/* @__PURE__ */ new Date()).toISOString()
+  };
+}
+function syncLiveDatabase() {
+  savePlatformDatabase(getCurrentDatabaseSnapshot());
+}
 var processedRazorpayWebhookEventIds = /* @__PURE__ */ new Set();
 var activeAdminSessions = /* @__PURE__ */ new Map();
 var activeVendorSessions = /* @__PURE__ */ new Map();
@@ -4663,17 +5405,17 @@ function securePasswordMatch(provided, expected) {
   return crypto2.timingSafeEqual(hashProvided, hashExpected);
 }
 async function startServer() {
-  const app = express();
+  const app2 = express();
   const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3e3;
-  app.disable("x-powered-by");
-  app.use((_req, res, next) => {
+  app2.disable("x-powered-by");
+  app2.use((_req, res, next) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "SAMEORIGIN");
     res.setHeader("X-XSS-Protection", "1; mode=block");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
     next();
   });
-  app.use((req, res, next) => {
+  app2.use((req, res, next) => {
     const origin = req.headers.origin;
     const allowedOrigins = [
       "https://tankmanpro.com",
@@ -4699,7 +5441,7 @@ async function startServer() {
     }
     next();
   });
-  app.use(
+  app2.use(
     express.json({
       limit: "1mb",
       verify: (req, _res, buf) => {
@@ -4707,7 +5449,7 @@ async function startServer() {
       }
     })
   );
-  app.get("/api/health", (_req, res) => {
+  app2.get("/api/health", (_req, res) => {
     const status = getServerIntegrationStatus();
     res.json({
       status: "ok",
@@ -4716,7 +5458,7 @@ async function startServer() {
       ...status
     });
   });
-  app.get("/api/config/status", (_req, res) => {
+  app2.get("/api/config/status", (_req, res) => {
     const status = getServerIntegrationStatus();
     res.json({
       ...status,
@@ -4729,7 +5471,7 @@ async function startServer() {
     maxRequests: 20,
     message: "Too many authentication attempts. Please wait 1 minute before retrying."
   });
-  app.post("/api/admin/session", authRateLimiter, (req, res) => {
+  app2.post("/api/admin/session", authRateLimiter, (req, res) => {
     const { email, password, firebaseEmail, firebaseUid } = req.body || {};
     if (firebaseUid && firebaseEmail) {
       const normalizedFbEmail = String(firebaseEmail).trim().toLowerCase();
@@ -4795,13 +5537,16 @@ async function startServer() {
       admin: session
     });
   });
-  app.use("/api/admin", (req, res, next) => {
+  app2.use("/api/admin", (req, res, next) => {
     if (req.path === "/session" && req.method === "POST") {
       next();
       return;
     }
     const authHeader = req.headers.authorization || "";
-    const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+    let token = authHeader.startsWith("Bearer ") ? authHeader.slice(7).trim() : "";
+    if (!token && typeof req.query.token === "string") {
+      token = req.query.token.trim();
+    }
     if (!token || !activeAdminSessions.has(token)) {
       res.status(401).json({
         authorized: false,
@@ -4812,7 +5557,7 @@ async function startServer() {
     }
     next();
   });
-  app.get("/api/admin/state", (_req, res) => {
+  app2.get("/api/admin/state", (_req, res) => {
     res.json({
       cities: liveCities,
       serviceAreas: liveServiceAreas,
@@ -4829,7 +5574,39 @@ async function startServer() {
       contactSubmissions
     });
   });
-  app.post("/api/admin/services", (req, res) => {
+  app2.get("/api/admin/database/status", (_req, res) => {
+    const currentDb = getCurrentDatabaseSnapshot();
+    const metrics = getDatabaseMetrics(currentDb);
+    res.json({
+      ok: true,
+      metrics
+    });
+  });
+  app2.get("/api/admin/database/backup", (_req, res) => {
+    syncLiveDatabase();
+    res.download(
+      DB_FILE_PATH,
+      `tankman_backup_${(/* @__PURE__ */ new Date()).toISOString().replace(/[:.]/g, "-")}.json`
+    );
+  });
+  app2.post("/api/admin/database/sync", async (_req, res) => {
+    syncLiveDatabase();
+    void Promise.allSettled([
+      ...liveServices.map((s) => mirrorToFirestore("services", s.id, s)),
+      ...liveVendors.map((v) => mirrorToFirestore("vendors", v.uid, v)),
+      ...liveBookings.map((b) => mirrorToFirestore("bookings", b.id, b)),
+      ...liveCities.map((c) => mirrorToFirestore("cities", c.id, c)),
+      ...liveCoupons.map((cp) => mirrorToFirestore("coupons", cp.id, cp)),
+      mirrorToFirestore("cms_settings", "global", liveCmsSettings)
+    ]);
+    const currentDb = getCurrentDatabaseSnapshot();
+    res.json({
+      ok: true,
+      message: "Database state successfully synced to persistent disk and mirrored to Firestore.",
+      metrics: getDatabaseMetrics(currentDb)
+    });
+  });
+  app2.post("/api/admin/services", (req, res) => {
     const payload = req.body;
     if (!payload || !payload.title || !payload.categoryId) {
       res.status(400).json({ error: "Service title and categoryId are required." });
@@ -4851,6 +5628,8 @@ async function startServer() {
         isDemo: false
       };
       liveServices[existingIdx] = updated;
+      syncLiveDatabase();
+      void mirrorToFirestore("services", updated.id, updated);
       res.json({ service: updated, message: `Service "${updated.title}" updated.` });
       return;
     }
@@ -4908,12 +5687,14 @@ async function startServer() {
       updatedAtIso: nowIso
     };
     liveServices.unshift(newService);
+    syncLiveDatabase();
+    void mirrorToFirestore("services", newService.id, newService);
     res.status(201).json({
       service: newService,
       message: `Service "${newService.title}" created and ${newService.status}.`
     });
   });
-  app.post("/api/admin/services/:id/status", (req, res) => {
+  app2.post("/api/admin/services/:id/status", (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
     const svc = liveServices.find((s) => s.id === id);
@@ -4927,12 +5708,14 @@ async function startServer() {
     }
     svc.status = status;
     svc.updatedAtIso = (/* @__PURE__ */ new Date()).toISOString();
+    syncLiveDatabase();
+    void mirrorToFirestore("services", svc.id, svc);
     res.json({
       service: svc,
       message: `Service "${svc.title}" status updated to ${status}.`
     });
   });
-  app.delete("/api/admin/services/:id", (req, res) => {
+  app2.delete("/api/admin/services/:id", (req, res) => {
     const { id } = req.params;
     const svcIdx = liveServices.findIndex((s) => s.id === id);
     if (svcIdx < 0) {
@@ -4941,9 +5724,11 @@ async function startServer() {
     }
     const svc = liveServices[svcIdx];
     const evaluation = evaluateServiceDeletion(id, liveBookings);
-    if (!evaluation.canHardDelete) {
+    if (!evaluation.canHardDelete && req.query.force !== "true") {
       svc.status = "archived";
       svc.updatedAtIso = (/* @__PURE__ */ new Date()).toISOString();
+      syncLiveDatabase();
+      void mirrorToFirestore("services", svc.id, svc);
       res.json({
         deleted: false,
         archivedInstead: true,
@@ -4954,6 +5739,8 @@ async function startServer() {
       return;
     }
     liveServices.splice(svcIdx, 1);
+    syncLiveDatabase();
+    void deleteFromFirestore("services", id);
     res.json({
       deleted: true,
       archivedInstead: false,
@@ -4961,7 +5748,7 @@ async function startServer() {
       message: `Service "${svc.title}" permanently deleted.`
     });
   });
-  app.post("/api/admin/categories", (req, res) => {
+  app2.post("/api/admin/categories", (req, res) => {
     const payload = req.body;
     if (!payload || !payload.name) {
       res.status(400).json({ error: "Category name is required." });
@@ -4975,6 +5762,8 @@ async function startServer() {
         id: liveCategories[existingIdx].id,
         isDemo: false
       };
+      syncLiveDatabase();
+      void mirrorToFirestore("categories", liveCategories[existingIdx].id, liveCategories[existingIdx]);
       res.json({
         category: liveCategories[existingIdx],
         message: `Category "${liveCategories[existingIdx].name}" updated.`
@@ -4993,12 +5782,14 @@ async function startServer() {
       isDemo: false
     };
     liveCategories.push(newCat);
+    syncLiveDatabase();
+    void mirrorToFirestore("categories", newCat.id, newCat);
     res.status(201).json({
       category: newCat,
       message: `Category "${newCat.name}" created.`
     });
   });
-  app.post("/api/admin/price-overrides", (req, res) => {
+  app2.post("/api/admin/price-overrides", (req, res) => {
     const payload = req.body;
     if (!payload || !payload.serviceId || !payload.variantId || !payload.cityId || typeof payload.amountPaise !== "number") {
       res.status(400).json({
@@ -5019,6 +5810,8 @@ async function startServer() {
         updatedAtIso: nowIso,
         isDemo: false
       };
+      syncLiveDatabase();
+      void mirrorToFirestore("price_overrides", livePriceOverrides[existingIdx].id, livePriceOverrides[existingIdx]);
       res.json({
         priceOverride: livePriceOverrides[existingIdx],
         message: "Price override updated."
@@ -5040,12 +5833,14 @@ async function startServer() {
       isDemo: false
     };
     livePriceOverrides.push(created);
+    syncLiveDatabase();
+    void mirrorToFirestore("price_overrides", created.id, created);
     res.status(201).json({
       priceOverride: created,
       message: "Price override created."
     });
   });
-  app.post("/api/admin/cities", (req, res) => {
+  app2.post("/api/admin/cities", (req, res) => {
     const payload = req.body;
     if (!payload || !payload.name || !payload.state) {
       res.status(400).json({ error: "City name and state are required." });
@@ -5064,6 +5859,8 @@ async function startServer() {
         updatedAtIso: nowIso,
         isDemo: false
       };
+      syncLiveDatabase();
+      void mirrorToFirestore("cities", liveCities[existingIdx].id, liveCities[existingIdx]);
       res.json({
         city: liveCities[existingIdx],
         message: `City "${liveCities[existingIdx].name}" updated.`
@@ -5076,18 +5873,48 @@ async function startServer() {
       name: payload.name.trim(),
       state: payload.state.trim(),
       slug,
-      supportPhone: payload.supportPhone || "+91 97942 00100",
+      supportPhone: payload.supportPhone || "+91 96481 75639",
       active: payload.active ?? true,
       isDemo: false,
       updatedAtIso: nowIso
     };
     liveCities.push(newCity);
+    syncLiveDatabase();
+    void mirrorToFirestore("cities", newCity.id, newCity);
     res.status(201).json({
       city: newCity,
       message: `City "${newCity.name}" added.`
     });
   });
-  app.post("/api/admin/service-areas", (req, res) => {
+  app2.delete("/api/admin/cities/:id", (req, res) => {
+    const { id } = req.params;
+    const cityIdx = liveCities.findIndex((c) => c.id === id);
+    if (cityIdx < 0) {
+      res.status(404).json({ error: "City not found." });
+      return;
+    }
+    const removedCity = liveCities[cityIdx];
+    liveCities.splice(cityIdx, 1);
+    liveServiceAreas = liveServiceAreas.filter((a) => a.cityId !== id);
+    for (const s of liveServices) {
+      if (s.supportedCityIds && s.supportedCityIds.includes(id)) {
+        s.supportedCityIds = s.supportedCityIds.filter((cid) => cid !== id);
+      }
+    }
+    for (const v of liveVendors) {
+      if (v.supportedCityIds && v.supportedCityIds.includes(id)) {
+        v.supportedCityIds = v.supportedCityIds.filter((cid) => cid !== id);
+      }
+    }
+    syncLiveDatabase();
+    void deleteFromFirestore("cities", id);
+    res.json({
+      success: true,
+      message: `City "${removedCity.name}" and associated PIN coverage areas deleted successfully.`,
+      deletedId: id
+    });
+  });
+  app2.post("/api/admin/service-areas", (req, res) => {
     const payload = req.body;
     const pinCode = String(payload?.pinCode || "").trim();
     if (!isValidIndianPin(pinCode)) {
@@ -5132,6 +5959,8 @@ async function startServer() {
         updatedAtIso: nowIso,
         isDemo: false
       };
+      syncLiveDatabase();
+      void mirrorToFirestore("service_areas", liveServiceAreas[existingIdx].id, liveServiceAreas[existingIdx]);
       res.json({
         serviceArea: liveServiceAreas[existingIdx],
         message: `PIN ${pinCode} (${liveServiceAreas[existingIdx].zoneLabel}) updated.`
@@ -5154,12 +5983,14 @@ async function startServer() {
       updatedAtIso: nowIso
     };
     liveServiceAreas.push(newArea);
+    syncLiveDatabase();
+    void mirrorToFirestore("service_areas", newArea.id, newArea);
     res.status(201).json({
       serviceArea: newArea,
       message: `PIN ${pinCode} added to ${targetCity.name}.`
     });
   });
-  app.post("/api/admin/service-areas/import-csv", (req, res) => {
+  app2.post("/api/admin/service-areas/import-csv", (req, res) => {
     const { csvText, mode = "preview", allowConflictOverride = false } = req.body || {};
     if (!csvText || typeof csvText !== "string") {
       res.status(400).json({ error: "CSV content is required." });
@@ -5191,7 +6022,7 @@ async function startServer() {
           name: row.cityName,
           state: row.state || "Uttar Pradesh",
           slug,
-          supportPhone: "+91 97942 00100",
+          supportPhone: "+91 96481 75639",
           active: true,
           isDemo: false,
           updatedAtIso: nowIso
@@ -5230,6 +6061,7 @@ async function startServer() {
         createdCount += 1;
       }
     }
+    syncLiveDatabase();
     res.json({
       mode: "commit",
       createdCount,
@@ -5240,7 +6072,7 @@ async function startServer() {
       message: `CSV import completed: ${createdCount} new PIN(s) created, ${updatedCount} updated.`
     });
   });
-  app.post("/api/admin/vendors", (req, res) => {
+  app2.post("/api/admin/vendors", (req, res) => {
     const payload = req.body;
     if (!payload || !payload.displayName || !payload.phone || !payload.email) {
       res.status(400).json({
@@ -5255,11 +6087,14 @@ async function startServer() {
       liveVendors[existingIdx] = {
         ...current,
         ...payload,
+        password: payload.password?.trim() ? payload.password.trim() : current.password,
         uid: current.uid,
         vendorCode: current.vendorCode || generateUniqueVendorCode(liveVendors),
         updatedAtIso: nowIso,
         isDemo: false
       };
+      syncLiveDatabase();
+      void mirrorToFirestore("vendors", liveVendors[existingIdx].uid, liveVendors[existingIdx]);
       res.json({
         vendor: liveVendors[existingIdx],
         message: `Vendor "${liveVendors[existingIdx].displayName}" (${liveVendors[existingIdx].vendorCode}) updated.`
@@ -5274,6 +6109,7 @@ async function startServer() {
       businessName: payload.businessName?.trim() || `${payload.displayName.trim()} Services`,
       phone: payload.phone.trim(),
       email: payload.email.trim().toLowerCase(),
+      password: payload.password?.trim() || "TankmanPartner@2026",
       status: payload.status || "active",
       isAvailable: payload.isAvailable ?? true,
       supportedCityIds: payload.supportedCityIds || ["city_kanpur"],
@@ -5292,12 +6128,14 @@ async function startServer() {
       isDemo: false
     };
     liveVendors.unshift(newVendor);
+    syncLiveDatabase();
+    void mirrorToFirestore("vendors", newVendor.uid, newVendor);
     res.status(201).json({
       vendor: newVendor,
       message: `Vendor registered with ID ${newVendor.vendorCode}.`
     });
   });
-  app.post("/api/admin/vendors/:uid/status", (req, res) => {
+  app2.post("/api/admin/vendors/:uid/status", (req, res) => {
     const { uid } = req.params;
     const { status, reason } = req.body;
     const vendor = liveVendors.find((v) => v.uid === uid);
@@ -5321,12 +6159,14 @@ async function startServer() {
         }
       }
     }
+    syncLiveDatabase();
+    void mirrorToFirestore("vendors", vendor.uid, vendor);
     res.json({
       vendor,
       message: `Vendor ${vendor.displayName} (${vendor.vendorCode}) status updated to ${status}.`
     });
   });
-  app.post("/api/admin/vendors/:uid/reset-password", (req, res) => {
+  app2.post("/api/admin/vendors/:uid/reset-password", (req, res) => {
     const { uid } = req.params;
     const vendor = liveVendors.find((v) => v.uid === uid);
     if (!vendor) {
@@ -5346,12 +6186,51 @@ async function startServer() {
       read: false,
       createdAtIso: nowIso
     });
+    syncLiveDatabase();
+    void mirrorToFirestore("vendors", vendor.uid, vendor);
     res.json({
       vendor,
       message: `Secure password setup/reset link triggered for ${vendor.email} (${vendor.vendorCode}).`
     });
   });
-  app.post("/api/admin/bookings/:id/assign", (req, res) => {
+  app2.delete("/api/admin/vendors/:uid", (req, res) => {
+    const { uid } = req.params;
+    const vendorIdx = liveVendors.findIndex((v) => v.uid === uid);
+    if (vendorIdx < 0) {
+      res.status(404).json({ error: "Vendor not found." });
+      return;
+    }
+    const removedVendor = liveVendors[vendorIdx];
+    liveVendors.splice(vendorIdx, 1);
+    for (const b of liveBookings) {
+      if (b.assignedVendorUid === uid) {
+        b.assignedVendorUid = void 0;
+        b.assignedVendorName = void 0;
+        if (b.status === "assigned_to_vendor") {
+          b.status = "requested";
+        }
+        b.updatedAtIso = (/* @__PURE__ */ new Date()).toISOString();
+      }
+    }
+    for (const area of liveServiceAreas) {
+      if (area.assignedVendorUids && area.assignedVendorUids.includes(uid)) {
+        area.assignedVendorUids = area.assignedVendorUids.filter((u) => u !== uid);
+      }
+    }
+    for (const [tokenKey, sessionVal] of activeVendorSessions.entries()) {
+      if (sessionVal.uid === uid) {
+        activeVendorSessions.delete(tokenKey);
+      }
+    }
+    syncLiveDatabase();
+    void deleteFromFirestore("vendors", uid);
+    res.json({
+      success: true,
+      message: `Vendor "${removedVendor.displayName}" (${removedVendor.vendorCode}) deleted permanently.`,
+      deletedUid: uid
+    });
+  });
+  app2.post("/api/admin/bookings/:id/assign", (req, res) => {
     const { id } = req.params;
     const { vendorUid, autoAssign, note } = req.body;
     const booking = liveBookings.find((b) => b.id === id);
@@ -5406,13 +6285,15 @@ async function startServer() {
       read: false,
       createdAtIso: nowIso
     });
+    syncLiveDatabase();
+    void mirrorToFirestore("bookings", booking.id, booking);
     res.json({
       booking,
       event,
       message: `Booking ${booking.bookingNumber} assigned to ${chosenVendor.displayName}.`
     });
   });
-  app.post("/api/admin/bookings/:id/status", (req, res) => {
+  app2.post("/api/admin/bookings/:id/status", (req, res) => {
     const { id } = req.params;
     const {
       status,
@@ -5458,13 +6339,55 @@ async function startServer() {
       createdAtIso: nowIso
     };
     liveBookingEvents.unshift(event);
+    syncLiveDatabase();
+    void mirrorToFirestore("bookings", booking.id, booking);
     res.json({
       booking,
       event,
       message: `Booking ${booking.bookingNumber} updated to ${booking.status}.`
     });
   });
-  app.post("/api/admin/cms", (req, res) => {
+  app2.delete("/api/admin/bookings/clear-all", (_req, res) => {
+    const count = liveBookings.length;
+    liveBookings = [];
+    liveBookingEvents = [];
+    liveNotifications = liveNotifications.filter((n) => !n.bookingId);
+    for (const v of liveVendors) {
+      v.activeAssignedJobs = 0;
+    }
+    syncLiveDatabase();
+    res.json({
+      success: true,
+      clearedCount: count,
+      message: `All booking history (${count} bookings) and associated event logs have been cleared.`
+    });
+  });
+  app2.delete("/api/admin/bookings/:id", (req, res) => {
+    const { id } = req.params;
+    const bkIdx = liveBookings.findIndex((b) => b.id === id);
+    if (bkIdx < 0) {
+      res.status(404).json({ error: "Booking not found." });
+      return;
+    }
+    const target = liveBookings[bkIdx];
+    if (target.assignedVendorUid) {
+      const vnd = liveVendors.find((v) => v.uid === target.assignedVendorUid);
+      if (vnd && vnd.activeAssignedJobs > 0) {
+        vnd.activeAssignedJobs = Math.max(0, vnd.activeAssignedJobs - 1);
+      }
+    }
+    liveBookings.splice(bkIdx, 1);
+    liveBookingEvents = liveBookingEvents.filter((e) => e.bookingId !== id);
+    liveNotifications = liveNotifications.filter((n) => n.bookingId !== id);
+    syncLiveDatabase();
+    void deleteFromFirestore("bookings", id);
+    res.json({
+      success: true,
+      message: `Booking ${target.bookingNumber} deleted permanently.`,
+      deletedId: id
+    });
+  });
+  app2.post("/api/admin/cms", (req, res) => {
     const payload = req.body;
     liveCmsSettings = {
       ...liveCmsSettings,
@@ -5472,12 +6395,14 @@ async function startServer() {
       id: "global",
       updatedAtIso: (/* @__PURE__ */ new Date()).toISOString()
     };
+    syncLiveDatabase();
+    void mirrorToFirestore("cms_settings", "global", liveCmsSettings);
     res.json({
       cmsSettings: liveCmsSettings,
       message: "Website CMS content updated and published to storefront."
     });
   });
-  app.post("/api/admin/coupons", (req, res) => {
+  app2.post("/api/admin/coupons", (req, res) => {
     const payload = req.body;
     if (!payload || !payload.code) {
       res.status(400).json({ error: "Coupon code is required." });
@@ -5494,6 +6419,8 @@ async function startServer() {
         code,
         isDemo: false
       };
+      syncLiveDatabase();
+      void mirrorToFirestore("coupons", liveCoupons[existingIdx].id, liveCoupons[existingIdx]);
       res.json({
         coupon: liveCoupons[existingIdx],
         message: `Coupon ${code} updated.`
@@ -5520,12 +6447,14 @@ async function startServer() {
       isDemo: false
     };
     liveCoupons.push(newCoupon);
+    syncLiveDatabase();
+    void mirrorToFirestore("coupons", newCoupon.id, newCoupon);
     res.status(201).json({
       coupon: newCoupon,
       message: `Coupon ${code} created.`
     });
   });
-  app.delete("/api/admin/coupons/:id", (req, res) => {
+  app2.delete("/api/admin/coupons/:id", (req, res) => {
     const couponId = req.params.id;
     const index = liveCoupons.findIndex(
       (c) => c.id === couponId || c.code.toUpperCase() === String(couponId).toUpperCase()
@@ -5535,22 +6464,25 @@ async function startServer() {
       return;
     }
     const removed = liveCoupons.splice(index, 1)[0];
+    syncLiveDatabase();
+    void deleteFromFirestore("coupons", removed.id);
     res.json({
       ok: true,
       message: `Coupon "${removed.code}" deleted permanently.`,
       deletedId: removed.id
     });
   });
-  app.post("/api/admin/notifications/read", (req, res) => {
+  app2.post("/api/admin/notifications/read", (req, res) => {
     const { id } = req.body;
     for (const n of liveNotifications) {
       if (!id || n.id === id) {
         n.read = true;
       }
     }
+    syncLiveDatabase();
     res.json({ notifications: liveNotifications });
   });
-  app.get("/api/vendor/accounts-preview", (_req, res) => {
+  app2.get("/api/vendor/accounts-preview", (_req, res) => {
     const accounts = liveVendors.map((v) => ({
       uid: v.uid,
       vendorCode: v.vendorCode || v.uid,
@@ -5563,7 +6495,7 @@ async function startServer() {
     }));
     res.json({ accounts });
   });
-  app.post("/api/vendor/session", authRateLimiter, (req, res) => {
+  app2.post("/api/vendor/session", authRateLimiter, (req, res) => {
     const { emailOrCode, email, password, firebaseEmail, firebaseUid } = req.body || {};
     if (firebaseUid && firebaseEmail) {
       const cleanFbEmail = String(firebaseEmail).trim().toLowerCase();
@@ -5617,14 +6549,16 @@ async function startServer() {
     const matchedVendor = liveVendors.find(
       (v) => (v.email || "").toLowerCase() === identifier || (v.vendorCode || "").toLowerCase() === identifier || v.uid.toLowerCase() === identifier
     );
+    const vendorAssignedPass = matchedVendor?.password?.trim();
     const allowedVendorPasswords = [
       expectedPass,
+      vendorAssignedPass,
       "Partner@12345",
       "partner123",
       "Partner@123",
       "partner"
-    ];
-    const isVendorPassValid = allowedVendorPasswords.some((p) => securePasswordMatch(rawPass, p));
+    ].filter(Boolean);
+    const isVendorPassValid = Boolean(matchedVendor) && allowedVendorPasswords.some((p) => securePasswordMatch(rawPass, p));
     if (!matchedVendor || !isVendorPassValid) {
       res.status(401).json({
         authorized: false,
@@ -5666,7 +6600,7 @@ async function startServer() {
       session
     });
   });
-  app.post("/api/vendor/request-password-reset", (req, res) => {
+  app2.post("/api/vendor/request-password-reset", (req, res) => {
     const identifier = String(req.body?.emailOrCode || "").trim().toLowerCase();
     if (!identifier) {
       res.status(400).json({ error: "Please enter your registered Partner Email or Vendor ID." });
@@ -5694,7 +6628,7 @@ async function startServer() {
       message: "Password reset request logged and routed to TankmanPro Main Admin Dispatch for identity verification."
     });
   });
-  app.use("/api/vendor", (req, res, next) => {
+  app2.use("/api/vendor", (req, res, next) => {
     if (req.path === "/session" && req.method === "POST" || req.path === "/accounts-preview" && req.method === "GET" || req.path === "/request-password-reset" && req.method === "POST") {
       next();
       return;
@@ -5723,7 +6657,7 @@ async function startServer() {
     res.locals.vendor = vendor;
     next();
   });
-  app.get("/api/vendor/state", (_req, res) => {
+  app2.get("/api/vendor/state", (_req, res) => {
     const vendor = res.locals.vendor;
     const todayDateStr = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
     const rawAssignedBookings = filterVendorScopedBookings(liveBookings, vendor.uid, vendor.supportedAreaPins);
@@ -5760,7 +6694,7 @@ async function startServer() {
       vendorPriceOverrides
     });
   });
-  app.post("/api/vendor/bookings/:id/transition", (req, res) => {
+  app2.post("/api/vendor/bookings/:id/transition", (req, res) => {
     const vendor = res.locals.vendor;
     const { id } = req.params;
     const { targetStatus, reason, executionNote, subStatus } = req.body;
@@ -5831,13 +6765,15 @@ async function startServer() {
       read: false,
       createdAtIso: nowIso
     });
+    syncLiveDatabase();
+    void mirrorToFirestore("bookings", booking.id, booking);
     res.json({
       booking: sanitizeBookingForVendorView(booking, vendor.uid),
       event,
       message: targetStatus === "vendor_accepted" ? `Booking ${booking.bookingNumber} accepted! Customer contact and full address are now unlocked.` : targetStatus === "vendor_rejected" ? `Booking ${booking.bookingNumber} flagged for Admin reassignment.` : targetStatus === "in_progress" ? `Job ${booking.bookingNumber} marked In Progress.` : `Job ${booking.bookingNumber} marked Completed!`
     });
   });
-  app.post("/api/vendor/bookings/:id/substatus", (req, res) => {
+  app2.post("/api/vendor/bookings/:id/substatus", (req, res) => {
     const vendor = res.locals.vendor;
     const { id } = req.params;
     const { subStatus, executionNote } = req.body;
@@ -5878,13 +6814,15 @@ async function startServer() {
       createdAtIso: nowIso
     };
     liveBookingEvents.unshift(event);
+    syncLiveDatabase();
+    void mirrorToFirestore("bookings", booking.id, booking);
     res.json({
       booking: sanitizeBookingForVendorView(booking, vendor.uid),
       event,
       message: `Field log updated for ${booking.bookingNumber}.`
     });
   });
-  app.post("/api/vendor/availability", (req, res) => {
+  app2.post("/api/vendor/availability", (req, res) => {
     const vendor = res.locals.vendor;
     const { isAvailable, workingHoursLabel, workingDays, maxActiveJobs } = req.body;
     if (typeof isAvailable === "boolean") {
@@ -5900,12 +6838,14 @@ async function startServer() {
       vendor.maxActiveJobs = Math.round(maxActiveJobs);
     }
     vendor.updatedAtIso = (/* @__PURE__ */ new Date()).toISOString();
+    syncLiveDatabase();
+    void mirrorToFirestore("vendors", vendor.uid, vendor);
     res.json({
       vendor,
       message: `Partner availability updated (${vendor.isAvailable ? "Online & Accepting Dispatch" : "Offline / Shift Paused"}).`
     });
   });
-  app.post("/api/vendor/price-overrides", (req, res) => {
+  app2.post("/api/vendor/price-overrides", (req, res) => {
     const vendor = res.locals.vendor;
     const { serviceId, variantId, cityId, amountPaise } = req.body;
     if (!serviceId || !variantId || !cityId || typeof amountPaise !== "number" || amountPaise < 4900) {
@@ -5940,6 +6880,8 @@ async function startServer() {
         updatedAtIso: nowIso,
         isDemo: false
       };
+      syncLiveDatabase();
+      void mirrorToFirestore("price_overrides", livePriceOverrides[existingIdx].id, livePriceOverrides[existingIdx]);
       res.json({
         priceOverride: livePriceOverrides[existingIdx],
         message: "Your Partner service rate has been updated."
@@ -5961,12 +6903,14 @@ async function startServer() {
       isDemo: false
     };
     livePriceOverrides.push(created);
+    syncLiveDatabase();
+    void mirrorToFirestore("price_overrides", created.id, created);
     res.status(201).json({
       priceOverride: created,
       message: "New Partner service rate saved."
     });
   });
-  app.post("/api/vendor/notifications/read", (req, res) => {
+  app2.post("/api/vendor/notifications/read", (req, res) => {
     const vendor = res.locals.vendor;
     const { id } = req.body;
     for (const n of liveNotifications) {
@@ -5976,13 +6920,14 @@ async function startServer() {
         }
       }
     }
+    syncLiveDatabase();
     res.json({
       notifications: liveNotifications.filter(
         (n) => n.recipientRole === "vendor" && n.recipientUid === vendor.uid
       )
     });
   });
-  app.get("/api/payments/config", (_req, res) => {
+  app2.get("/api/payments/config", (_req, res) => {
     const keyId = (process.env.RAZORPAY_KEY_ID || "").trim();
     const keySecret = (process.env.RAZORPAY_KEY_SECRET || "").trim();
     const isLiveKey = keyId.startsWith("rzp_live_");
@@ -5997,7 +6942,7 @@ async function startServer() {
       message: isConfigured ? `Razorpay active in ${isLiveKey ? "LIVE" : "TEST"} mode.` : "Razorpay simulated test mode active. Real payments require RAZORPAY_KEY_ID in .env."
     });
   });
-  app.post("/api/payments/razorpay/create-order", async (req, res) => {
+  app2.post("/api/payments/razorpay/create-order", async (req, res) => {
     try {
       const {
         bookingId,
@@ -6091,7 +7036,7 @@ async function startServer() {
       });
     }
   });
-  app.post("/api/payments/razorpay/verify", (req, res) => {
+  app2.post("/api/payments/razorpay/verify", (req, res) => {
     const {
       razorpay_order_id,
       razorpay_payment_id,
@@ -6157,6 +7102,8 @@ async function startServer() {
         createdAtIso: (/* @__PURE__ */ new Date()).toISOString()
       };
       liveNotifications.unshift(notif);
+      syncLiveDatabase();
+      void mirrorToFirestore("bookings", booking.id, booking);
     }
     res.json({
       ok: true,
@@ -6166,7 +7113,7 @@ async function startServer() {
       booking
     });
   });
-  app.post("/api/payments/razorpay/webhook", (req, res) => {
+  app2.post("/api/payments/razorpay/webhook", (req, res) => {
     const signature = req.headers["x-razorpay-signature"];
     const webhookSecret = (process.env.RAZORPAY_WEBHOOK_SECRET || "").trim();
     if (webhookSecret) {
@@ -6255,10 +7202,12 @@ async function startServer() {
           createdAtIso: (/* @__PURE__ */ new Date()).toISOString()
         });
       }
+      syncLiveDatabase();
+      void mirrorToFirestore("bookings", matchedBooking.id, matchedBooking);
     }
     res.status(200).json({ ok: true, received: true, event });
   });
-  app.post("/api/payments/razorpay/refund", async (req, res) => {
+  app2.post("/api/payments/razorpay/refund", async (req, res) => {
     const { bookingId, amountPaise, reason } = req.body || {};
     const booking = liveBookings.find((b) => b.id === bookingId);
     if (!booking) {
@@ -6322,7 +7271,7 @@ async function startServer() {
     });
     res.json({ ok: true, refundIssued: true, booking });
   });
-  app.get("/api/public/service-areas", (req, res) => {
+  app2.get("/api/public/service-areas", (req, res) => {
     const pin = typeof req.query.pin === "string" ? req.query.pin.trim() : "";
     if (pin) {
       const result = lookupPinCoverage(pin, liveCities, liveServiceAreas);
@@ -6339,7 +7288,7 @@ async function startServer() {
       isDemoData: false
     });
   });
-  app.get("/api/public/catalog", (req, res) => {
+  app2.get("/api/public/catalog", (req, res) => {
     const pin = typeof req.query.pin === "string" ? req.query.pin.trim() : "";
     const pinLookup = pin ? lookupPinCoverage(pin, liveCities, liveServiceAreas) : null;
     const activeCityId = pinLookup?.serviceable ? pinLookup.city?.id : void 0;
@@ -6426,7 +7375,7 @@ async function startServer() {
       isDemoData: false
     });
   });
-  app.get("/api/public/services/:slug", (req, res) => {
+  app2.get("/api/public/services/:slug", (req, res) => {
     const slug = req.params.slug;
     const pin = typeof req.query.pin === "string" ? req.query.pin.trim() : "";
     const variantIdParam = typeof req.query.variantId === "string" ? req.query.variantId.trim() : "";
@@ -6472,7 +7421,7 @@ async function startServer() {
       isDemoData: false
     });
   });
-  app.post("/api/pricing/quote", (req, res) => {
+  app2.post("/api/pricing/quote", (req, res) => {
     const body = req.body;
     if (!body || !body.pinCode || !body.serviceId || !body.variantId) {
       res.status(400).json({
@@ -6500,7 +7449,7 @@ async function startServer() {
     });
     res.json(quote);
   });
-  app.post("/api/coupons/validate", (req, res) => {
+  app2.post("/api/coupons/validate", (req, res) => {
     const { couponCode, subtotalPaise, cityId, serviceId } = req.body || {};
     const result = evaluateCouponDiscount({
       couponCode: String(couponCode || ""),
@@ -6511,7 +7460,7 @@ async function startServer() {
     });
     res.json(result);
   });
-  app.get("/api/bookings/slots", (req, res) => {
+  app2.get("/api/bookings/slots", (req, res) => {
     const pinCode = typeof req.query.pinCode === "string" ? req.query.pinCode.trim() : "";
     const serviceId = typeof req.query.serviceId === "string" ? req.query.serviceId.trim() : "";
     const variantId = typeof req.query.variantId === "string" ? req.query.variantId.trim() : "";
@@ -6558,7 +7507,7 @@ async function startServer() {
       slots
     });
   });
-  app.post("/api/bookings", (req, res) => {
+  app2.post("/api/bookings", (req, res) => {
     const input = req.body || {};
     const result = createCustomerBookingTransaction({
       input,
@@ -6606,6 +7555,8 @@ async function startServer() {
       if (result.notifications && result.notifications.length > 0) {
         liveNotifications.unshift(...result.notifications);
       }
+      syncLiveDatabase();
+      void mirrorToFirestore("bookings", result.booking.id, result.booking);
     }
     const bookingEvents = liveBookingEvents.filter(
       (ev) => ev.bookingId === result.booking.id
@@ -6620,7 +7571,7 @@ async function startServer() {
       message: result.dispatchDecision?.customerMessage || "Booking confirmed."
     });
   });
-  app.get("/api/customer/bookings", (req, res) => {
+  app2.get("/api/customer/bookings", (req, res) => {
     const phoneParam = typeof req.query.phone === "string" ? req.query.phone.replace(/\D/g, "").slice(-10) : "";
     const codeParam = typeof req.query.bookingCode === "string" ? req.query.bookingCode.trim().toUpperCase() : "";
     const idsParam = typeof req.query.ids === "string" ? req.query.ids.split(",").map((s) => s.trim()).filter(Boolean) : [];
@@ -6656,7 +7607,7 @@ async function startServer() {
       bookings: enriched
     });
   });
-  app.post("/api/customer/bookings/:id/cancel", (req, res) => {
+  app2.post("/api/customer/bookings/:id/cancel", (req, res) => {
     const { id } = req.params;
     const { reason } = req.body || {};
     const booking = liveBookings.find(
@@ -6729,7 +7680,7 @@ async function startServer() {
       message: `Booking ${booking.bookingCode} has been cancelled.`
     });
   });
-  app.post("/api/public/waitlist", (req, res) => {
+  app2.post("/api/public/waitlist", (req, res) => {
     const { pinCode, customerName, phoneOrEmail, requestedServiceSlug, consentGiven } = req.body || {};
     if (!isValidIndianPin(String(pinCode || ""))) {
       res.status(400).json({ error: "Please provide a valid 6-digit Indian PIN code." });
@@ -6759,13 +7710,15 @@ async function startServer() {
       createdAtIso: (/* @__PURE__ */ new Date()).toISOString()
     };
     waitlistEntries.push(entry);
+    syncLiveDatabase();
+    void mirrorToFirestore("waitlist_entries", entry.id, entry);
     res.status(201).json({
       success: true,
       entry,
       message: `Waitlist request recorded for PIN ${entry.pinCode}.`
     });
   });
-  app.post("/api/public/contact", (req, res) => {
+  app2.post("/api/public/contact", (req, res) => {
     const { name, emailOrPhone, pinCode, message } = req.body || {};
     if (!name || String(name).trim().length < 2) {
       res.status(400).json({ error: "Please enter your full name." });
@@ -6788,6 +7741,8 @@ async function startServer() {
       createdAtIso: (/* @__PURE__ */ new Date()).toISOString()
     };
     contactSubmissions.push(record);
+    syncLiveDatabase();
+    void mirrorToFirestore("contact_submissions", record.id, record);
     res.status(201).json({
       success: true,
       inquiryId: record.id,
@@ -6799,15 +7754,15 @@ async function startServer() {
       server: { middlewareMode: true },
       appType: "spa"
     });
-    app.use(vite.middlewares);
+    app2.use(vite.middlewares);
   } else {
-    const distPath = path.join(__dirname, "dist");
-    app.use(express.static(distPath));
-    app.get("*", (_req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+    const distPath = path2.join(__dirname2, "dist");
+    app2.use(express.static(distPath));
+    app2.get("*", (_req, res) => {
+      res.sendFile(path2.join(distPath, "index.html"));
     });
   }
-  app.listen(PORT, "0.0.0.0", () => {
+  app2.listen(PORT, "0.0.0.0", () => {
     console.log(`TankmanPro server listening on http://localhost:${PORT}`);
   });
 }

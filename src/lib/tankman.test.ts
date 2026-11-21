@@ -38,6 +38,15 @@ import {
   generateSimulatedRazorpayOrder,
 } from './paymentEngine.ts';
 import {
+  cleanIndianPhone,
+  buildWhatsAppLink,
+  buildCustomerBookingConfirmedWhatsApp,
+  buildCustomerTechnicianAssignedWhatsApp,
+  buildVendorDispatchWhatsApp,
+  buildVendorToCustomerEnRouteWhatsApp,
+  buildCustomerJobCompletedWhatsApp,
+} from './whatsappEngine.ts';
+import {
   DEMO_CITIES,
   DEMO_SERVICE_AREAS,
   DEMO_SERVICES,
@@ -647,6 +656,122 @@ test('Razorpay Payment & Webhook Engine: verifies HMAC SHA-256 signatures and ti
   assert.equal(simOrder.receipt, 'TMP-DEL-8901');
   assert.ok(simOrder.id.startsWith('order_sim_'));
 });
+
+test('WhatsApp 1-Click Engine: sanitizes Indian phone numbers and builds pre-filled wa.me links', () => {
+  // 1. Phone sanitization
+  assert.equal(cleanIndianPhone('9794200100'), '919794200100');
+  assert.equal(cleanIndianPhone('+91 97942 00100'), '919794200100');
+  assert.equal(cleanIndianPhone('09794200100'), '919794200100');
+  assert.equal(cleanIndianPhone('919794200100'), '919794200100');
+
+  // 2. Click-to-chat URL generation
+  const link = buildWhatsAppLink('9794200100', 'Namaste Salman ji! Aapka booking confirm hai.');
+  assert.ok(link.startsWith('https://wa.me/919794200100?text='));
+  assert.ok(link.includes(encodeURIComponent('Namaste Salman ji!')));
+
+  // 3. Customer Booking Confirmation Template
+  const sampleBooking: Booking = {
+    id: 'bk_wa_test',
+    bookingNumber: 'TMP-2026-1001',
+    bookingCode: 'TMP-2026-1001',
+    customerUid: 'cust_wa',
+    customerName: 'Salman Khan',
+    customerPhone: '9794200100',
+    customerEmail: 'skhan786spn@gmail.com',
+    cityId: 'city_kanpur',
+    cityName: 'Kanpur',
+    pinCode: '208001',
+    zoneLabel: 'Civil Lines',
+    addressLine: 'Flat 402, Civil Lines',
+    pricingMode: 'city_fixed',
+    propertyType: 'residential',
+    serviceId: 'srv_mechanized_tank_clean',
+    serviceTitle: 'Mechanized Water Tank Cleaning',
+    variantId: 'var_tank_500_1000',
+    variantName: '500L – 1000L Underground / Overhead',
+    addons: [],
+    priceSnapshot: {
+      pricingMode: 'city_fixed',
+      pricingSource: 'city_override',
+      baseServicePaise: 149900,
+      addonsTotalPaise: 0,
+      subtotalPaise: 149900,
+      discountPaise: 0,
+      taxRatePercent: 0,
+      taxPaise: 0,
+      finalTotalPaise: 149900,
+      currency: 'INR',
+    },
+    quoteSnapshot: {
+      bookable: true,
+      cityId: 'city_kanpur',
+      cityName: 'Kanpur',
+      pinCode: '208001',
+      zoneLabel: 'Civil Lines Zone',
+      pricingMode: 'city_fixed',
+      pricingSource: 'city_override',
+      serviceId: 'srv_mechanized_tank_clean',
+      serviceTitle: 'Mechanized Water Tank Cleaning',
+      variantId: 'var_tank_500_1000',
+      variantName: '500L – 1000L Underground / Overhead',
+      baseServicePaise: 149900,
+      addons: [],
+      addonsTotalPaise: 0,
+      subtotalPaise: 149900,
+      discountPaise: 0,
+      taxRatePercent: 0,
+      taxPaise: 0,
+      finalTotalPaise: 149900,
+      currency: 'INR',
+      quoteExpiresAtIso: '2026-10-25T10:00:00.000Z',
+      isDemoData: false,
+    },
+    preferredDate: '2026-10-25',
+    preferredSlot: '09:00 AM – 11:00 AM',
+    paymentMethod: 'pay_after_service',
+    paymentStatus: 'pending',
+    status: 'requested',
+    vendorExecutionNotes: [],
+    assignedVendorUid: 'vnd_1',
+    assignedVendorName: 'AquaPure Crew',
+    vendorRejectionReason: null,
+    subStatus: null,
+    createdAtIso: '2026-10-23T10:00:00.000Z',
+    updatedAtIso: '2026-10-23T10:00:00.000Z',
+    completionPhotos: [],
+  };
+
+  const customerMsg = buildCustomerBookingConfirmedWhatsApp(sampleBooking, 'https://tankmanpro.com');
+  assert.ok(customerMsg.includes('TMP-2026-1001'));
+  assert.ok(customerMsg.includes('Mechanized Water Tank Cleaning'));
+  assert.ok(customerMsg.includes('Salman Khan'));
+  assert.ok(customerMsg.includes('https://tankmanpro.com/track?bookingCode=TMP-2026-1001'));
+
+  // 4. Vendor Dispatch Template
+  const vendorDispatchMsg = buildVendorDispatchWhatsApp(
+    sampleBooking,
+    { displayName: 'AquaPure Techs', vendorCode: 'TMP-VND-1001' },
+    'https://tankmanpro.com'
+  );
+  assert.ok(vendorDispatchMsg.includes('NEW JOB DISPATCH'));
+  assert.ok(vendorDispatchMsg.includes('TMP-2026-1001'));
+  assert.ok(vendorDispatchMsg.includes('208001'));
+
+  // 5. Technician En-Route Template
+  const enRouteMsg = buildVendorToCustomerEnRouteWhatsApp(sampleBooking, {
+    displayName: 'Ramesh Kumar',
+    phone: '9876543210',
+  });
+  assert.ok(enRouteMsg.includes('TECHNICIAN EN ROUTE'));
+  assert.ok(enRouteMsg.includes('Ramesh Kumar'));
+  assert.ok(enRouteMsg.includes('9876543210'));
+
+  // 6. Job Completed Template
+  const completedMsg = buildCustomerJobCompletedWhatsApp(sampleBooking, 'https://tankmanpro.com');
+  assert.ok(completedMsg.includes('SERVICE COMPLETED'));
+  assert.ok(completedMsg.includes('7-Day TankmanPro Service Guarantee'));
+});
+
 
 
 
